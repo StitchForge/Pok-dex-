@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#121212"/>
+<title>DexBinder v0.4</title>
+<style>
+:root{--bg:#f3efe7;--paper:#fffdf8;--ink:#171717;--muted:#756f66;--line:#ded7cc;--yellow:#ffd24d;--red:#e94d3c;--green:#287a4b;--blue:#3e6fd8;--shadow:0 14px 40px rgba(0,0,0,.10)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}
+.app{max-width:1160px;margin:auto;padding:16px 14px 112px}.top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.brand{display:flex;align-items:center;gap:9px;font-weight:950;letter-spacing:-.04em;font-size:1.2rem}.ball{width:27px;height:27px;border-radius:50%;border:2px solid #171717;background:linear-gradient(#e94d3c 0 44%,#171717 44% 56%,#fff 56%);position:relative}.ball:after{content:"";position:absolute;width:7px;height:7px;border:2px solid #171717;background:#fff;border-radius:50%;left:7px;top:7px}.version{font-size:.72rem;color:var(--muted);font-weight:800}
+.hero{background:#171717;color:white;border-radius:25px;padding:20px;box-shadow:var(--shadow);margin-bottom:14px}.heroRow{display:flex;justify-content:space-between;gap:14px;align-items:end}.eyebrow{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:#bbb6ae;font-weight:850}.hero h1{font-size:clamp(2rem,8vw,3.5rem);letter-spacing:-.065em;line-height:.95;margin:7px 0}.hero p{margin:0;color:#cbc7c0;font-size:.86rem}.stats{text-align:right}.stats b{display:block;font-size:1.65rem;letter-spacing:-.05em}.stats span{font-size:.78rem;color:var(--yellow);font-weight:850}.progress{height:8px;background:#363636;border-radius:999px;overflow:hidden;margin-top:12px}.progress i{display:block;height:100%;width:0;background:var(--yellow);transition:.25s}
+.dexHead{display:flex;justify-content:space-between;align-items:end;margin:24px 2px 12px}.dexHead h2{margin:0;font-size:1.4rem;letter-spacing:-.04em}.dexHead p{margin:3px 0 0;color:var(--muted);font-size:.8rem}
+.sets{display:grid;gap:12px}.setCard{border:1px solid var(--line);background:var(--paper);border-radius:21px;padding:16px;box-shadow:0 5px 18px rgba(0,0,0,.05);display:grid;grid-template-columns:1fr auto;gap:10px}.setCard h3{margin:3px 0 5px;font-size:1.3rem;letter-spacing:-.04em}.setCard p{margin:0;color:var(--muted);font-size:.8rem}.setPct{font-size:1.45rem;font-weight:950;text-align:right}.setPct small{display:block;font-size:.68rem;color:var(--muted);font-weight:750}.setActions{grid-column:1/-1;display:flex;gap:8px}.btn{border:1px solid var(--line);background:var(--paper);padding:10px 12px;border-radius:13px;font-weight:850;color:var(--ink)}.btn.dark{background:#171717;color:#fff;border-color:#171717}.btn.small{padding:8px 10px;font-size:.78rem}.btn:disabled{opacity:.45}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:8px;margin:12px 0}.search{width:100%;border:1px solid var(--line);background:var(--paper);padding:12px 13px;border-radius:14px;outline:none}.select{border:1px solid var(--line);background:var(--paper);padding:10px;border-radius:14px}
+.chips{display:flex;gap:7px;overflow:auto;padding:0 0 9px;scrollbar-width:none}.chip{white-space:nowrap;border:1px solid var(--line);background:var(--paper);padding:8px 10px;border-radius:999px;font-size:.76rem;font-weight:850}.chip.active{background:#171717;color:#fff;border-color:#171717}
+.sub{display:flex;justify-content:space-between;align-items:center;margin:2px 2px 10px;gap:8px}.sub strong{font-size:.9rem}.sub span{font-size:.74rem;color:var(--muted);text-align:right}
+.grid{display:grid;gap:7px;grid-template-columns:repeat(3,1fr)}.card{position:relative;aspect-ratio:245/337;border-radius:8px;overflow:hidden;background:#d8d2c8;border:1px solid rgba(0,0,0,.12);box-shadow:0 3px 11px rgba(0,0,0,.08)}.card img{width:100%;height:100%;object-fit:cover;display:block}.card.missing img{filter:grayscale(1) brightness(.55);opacity:.3}.card.partial img{filter:saturate(.65) brightness(.82);opacity:.72}.card.partial:after{content:'PARTIAL';position:absolute;inset:auto 4px 26px auto;background:rgba(255,210,77,.95);color:#171717;font-size:.5rem;font-weight:950;padding:3px 5px;border-radius:6px}.hunt .card.missing img,.missingView .card.missing img{filter:none;opacity:1}.card .fallback{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:8px;background:linear-gradient(135deg,#e6e0d7,#cfc7bb);font-weight:850;font-size:.75rem}.card img.loaded+.fallback{display:none}.tag{position:absolute;left:4px;bottom:4px;background:rgba(20,20,20,.86);color:#fff;border-radius:6px;padding:3px 5px;font-size:.53rem;font-weight:900;max-width:88%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tick{position:absolute;right:4px;top:4px;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;background:var(--green);color:#fff;font-size:.7rem;font-weight:950}.missing .tick,.partial .tick{display:none}.variantCount{position:absolute;left:4px;top:4px;background:rgba(255,255,255,.92);border-radius:7px;padding:3px 5px;font-size:.55rem;font-weight:950}.price{position:absolute;right:4px;bottom:4px;background:rgba(255,210,77,.95);color:#171717;border-radius:6px;padding:3px 5px;font-size:.53rem;font-weight:950}
+.pager{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:15px}.pager .label{min-width:82px;text-align:center;font-size:.78rem;font-weight:900}
+.list{display:grid;gap:8px}.row{display:grid;grid-template-columns:48px 1fr auto;gap:10px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:8px}.thumb{width:48px;aspect-ratio:245/337;object-fit:cover;border-radius:5px;background:#ddd}.row h4{margin:0;font-size:.86rem}.row p{margin:3px 0 0;color:var(--muted);font-size:.7rem}.rowPrice{text-align:right;font-size:.72rem}.rowPrice b{display:block;font-size:.83rem}.rowPrice small{color:var(--muted)}
+.bottom{position:fixed;z-index:20;left:0;right:0;bottom:0;padding:8px 12px calc(8px + env(safe-area-inset-bottom));background:rgba(243,239,231,.94);backdrop-filter:blur(18px);border-top:1px solid rgba(0,0,0,.08)}.nav{max-width:650px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.nav button{border:0;background:transparent;border-radius:13px;padding:9px 5px;color:#6d675f;font-weight:850}.nav button.active{background:#171717;color:#fff}.nav small{display:block;font-size:.57rem;margin-top:2px}
+.modal{position:fixed;z-index:50;inset:0;background:rgba(0,0,0,.62);display:none;align-items:flex-end;justify-content:center;padding:10px}.modal.open{display:flex}.sheet{background:var(--paper);width:min(560px,100%);max-height:92vh;overflow:auto;border-radius:23px 23px 17px 17px;padding:16px}.grab{width:42px;height:4px;background:#d2ccc2;border-radius:4px;margin:0 auto 13px}.detailImg{display:block;width:min(260px,66vw);margin:auto;border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.18)}.detailTop{display:flex;justify-content:space-between;gap:10px;margin:14px 0}.detailTop h2{margin:0;font-size:1.25rem}.detailTop p{margin:3px 0;color:var(--muted);font-size:.78rem}.variants{display:grid;gap:8px}.variantRow{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);border-radius:13px;padding:10px}.variantRow b{font-size:.84rem}.variantRow small{display:block;color:var(--muted);font-size:.68rem;margin-top:2px}.toggle{border:0;border-radius:10px;padding:8px 10px;font-weight:900;background:#ece7dd}.toggle.on{background:var(--green);color:#fff}.notice{background:#fff6cf;border:1px solid #ead77c;border-radius:14px;padding:10px 12px;font-size:.75rem;margin:10px 0}.notice.error{background:#ffe2de;border-color:#eaa59d}.statusLine{font-size:.7rem;color:var(--muted);margin:6px 2px 10px}.bulk{display:grid;gap:7px}.bulkRow{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:7px;border-bottom:1px solid var(--line);padding:8px 2px}.bulkRow b{font-size:.8rem}.bulkRow span{font-size:.68rem;color:var(--muted)}.miniToggle{border:1px solid var(--line);background:#eee8df;border-radius:9px;padding:6px 8px;font-size:.68rem;font-weight:900}.miniToggle.on{background:var(--green);color:#fff;border-color:var(--green)}
+.toast{position:fixed;z-index:70;left:50%;bottom:94px;transform:translateX(-50%) translateY(15px);background:#171717;color:#fff;padding:9px 13px;border-radius:11px;font-size:.78rem;font-weight:850;opacity:0;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+@media(min-width:760px){.app{padding-top:26px}.sets{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:repeat(6,1fr);gap:10px}.bottom{left:50%;right:auto;transform:translateX(-50%);width:640px;border:1px solid rgba(0,0,0,.1);border-bottom:0;border-radius:22px 22px 0 0}.toolbar{grid-template-columns:1fr 150px}.hero{padding:28px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.4.5</div></div>
+
+  <section id="homeScreen">
+    <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 590</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button></div>
+    <div class="sets" id="setCards">
+      <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
+      <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
+    </div>
+  </section>
+
+  <section id="setScreen" class="hidden">
+    <button class="btn small" id="backBtn">← My Dex</button>
+    <div class="hero" style="margin-top:10px"><div class="heroRow"><div><div class="eyebrow" id="setSeries"></div><h1 id="setTitle"></h1><p id="setDesc"></p></div><div class="stats"><b id="setOwned">0 / 0</b><span id="setPct">0% complete</span></div></div><div class="progress"><i id="setProgress"></i></div></div>
+    <div class="toolbar"><input class="search" id="search" placeholder="Search name or card #…"/><select class="select" id="pageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="16">16 / page</option></select></div>
+    <div class="chips" id="chips">
+      <button class="chip active" data-mode="compact">Compact</button><button class="chip" data-mode="full">Full binder</button><button class="chip" id="bulkBtn">Bulk edit</button>
+    </div>
+    <div class="sub"><strong id="viewTitle">Binder</strong><span id="meta"></span></div>
+    <main id="content"></main>
+    <div class="pager" id="pager"><button class="btn small" id="prev">← Prev</button><div class="label" id="pageLabel"></div><button class="btn small" id="next">Next →</button></div>
+  </section>
+
+  <section id="globalHuntScreen" class="hidden">
+    <button class="btn small" id="huntBack">← My Dex</button>
+    <div class="hero" style="margin-top:10px"><div class="eyebrow">Card show mode</div><h1>Global Hunt</h1><p>Everything missing across your active collections, with TCGplayer pricing when available.</p></div>
+    <div class="toolbar"><input class="search" id="huntSearch" placeholder="Search all missing cards…"/><select class="select" id="huntSet"><option value="all">All sets</option><option value="sv03.5">151</option><option value="swsh12.5">Crown Zenith</option></select></div>
+    <div class="chips"><button class="chip active" data-price="all">All prices</button><button class="chip" data-price="5">Under $5</button><button class="chip" data-price="10">Under $10</button><button class="chip" data-price="25">Under $25</button></div>
+    <div class="notice">Prices are TCGplayer reference data supplied by TCGdex. Marketplace-to-variant matching is still being improved upstream, and prices may be cached or delayed. Verify expensive purchases before buying.</div>
+    <div class="list" id="globalHuntList"></div>
+  </section>
+</div>
+
+<nav class="bottom hidden" id="bottomNav"><div class="nav">
+<button data-view="binder" class="active">▦<small>Binder</small></button>
+<button data-view="missing">◌<small>Missing</small></button>
+<button data-view="hunt">◎<small>Hunt</small></button>
+<button data-view="home">⌂<small>My Dex</small></button>
+</div></nav>
+
+<div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small close">Close</button></div><div class="variants" id="detailVariants"></div></div></div>
+<div class="modal" id="bulkModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Bulk edit</h2><p>Fast initial entry without fighting the binder pages.</p></div><button class="btn small close">Close</button></div><div class="chips"><button class="chip" id="allBase">Own all base</button><button class="chip" id="allReverse">Own all reverse</button><button class="chip" id="clearSet">Clear set</button></div><div class="bulk" id="bulkList"></div></div></div>
+<div class="modal" id="backupModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Collection backup</h2><p>Copy this JSON somewhere safe, or paste it back to restore.</p></div><button class="btn small close">Close</button></div><textarea id="backupBox" style="width:100%;height:190px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace"></textarea><button class="btn dark" style="width:100%;margin-top:8px" id="copyBackup">Copy backup</button><button class="btn" style="width:100%;margin-top:7px" id="restoreBackup">Restore pasted backup</button></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://api.tcgdex.net/v2/en';
+const SETS={
+ 'sv03.5':{
+   id:'sv03.5',name:'151',series:'Scarlet & Violet',
+   desc:'English master set · 207 numbered cards + 153 reverse holos',
+   baseTotal:207,masterTotal:360,
+   variantStrategy:'151-known'
+ },
+ 'swsh12.5':{
+   id:'swsh12.5',name:'Crown Zenith',series:'Sword & Shield',
+   desc:'160-card main set + 70-card Galarian Gallery + booster-pack variants',
+   baseTotal:230,masterTotal:272,
+   variantStrategy:'tcgdex-detail'
+ }
+};
+let currentSet=null,cardsBySet={},owned=new Set(),view='binder',binderMode='compact',page=1,selected=null,detailCache={},priceFilter='all';
+let variantReadyBySet={'sv03.5':true,'swsh12.5':false};
+let variantCache={};
+let variantLoadPromiseBySet={};
+let huntGeneration=0;
+let binderPriceGeneration=0;
+try{
+  const raw=localStorage.getItem('dexbinder_v04_owned');
+  const parsed=raw?JSON.parse(raw):[];
+  owned=new Set(Array.isArray(parsed)?parsed:[]);
+}catch(e){
+  console.warn('DexBinder storage could not be read; starting with an empty collection.',e);
+  owned=new Set();
+}
+try{
+  const cached=JSON.parse(localStorage.getItem('dexbinder_v044_variant_cache')||'{}');
+  if(cached && typeof cached==='object'){
+    variantCache=cached;
+    // Crown Zenith has 159 numbered main-set cards whose variants must be known.
+    if(Object.keys(cached).length>=159) variantReadyBySet['swsh12.5']=true;
+  }
+}catch(e){console.warn('Variant cache skipped',e)}
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const key=(sid,cid,variant='base')=>`${sid}|${cid}|${variant}`;
+const save=()=>{try{localStorage.setItem('dexbinder_v04_owned',JSON.stringify([...owned]));}catch(e){console.warn('DexBinder storage save failed',e)}renderStats()};
+function toast(t){let x=$('#toast');x.textContent=t;x.classList.add('show');setTimeout(()=>x.classList.remove('show'),1300)}
+function image(c,q='low'){
+ if(c.id?.startsWith('swsh12.5gg-') || String(c.localId).startsWith('GG')) return `https://assets.tcgdex.net/en/swsh/swsh12.5/${c.localId}/${q}.webp`;
+ if(c.image)return `${c.image}/${q}.webp`;
+ return ''
+}
+function numSort(a,b){let aa=String(a.localId),bb=String(b.localId); if(aa.startsWith('GG')||bb.startsWith('GG')) return aa.localeCompare(bb,undefined,{numeric:true}); return (+aa||9999)-(+bb||9999)}
+function variantsFor(sid,c){
+  // Prefer authoritative TCGdex per-card variants whenever we have them.
+  const d=detailCache[c.id];
+  const knownVariants=d?.variants||variantCache[c.id];
+  if(knownVariants){
+    const out=[];
+    if(knownVariants.normal) out.push({id:'base',label:'Normal'});
+    else if(knownVariants.holo) out.push({id:'base',label:'Holo'});
+    else out.push({id:'base',label:String(c.localId).startsWith('GG')?'Gallery':'Base'});
+    if(knownVariants.reverse) out.push({id:'reverse',label:'Reverse Holo'});
+    return out;
+  }
+
+  // 151 has a stable known structure, so it does not need hundreds of detail requests.
+  if(sid==='sv03.5'){
+    const n=+String(c.localId).replace(/\D/g,'');
+    const reverseExcluded=new Set([3,6,9,24,38,40,65,76,115,124,145,151]);
+    const out=[{id:'base',label:'Base'}];
+    if(n && n<=165 && !reverseExcluded.has(n)) out.push({id:'reverse',label:'Reverse Holo'});
+    return out;
+  }
+
+  // Crown Zenith GG cards are single physical positions in the booster master set.
+  if(sid==='swsh12.5' && String(c.localId).startsWith('GG')){
+    return [{id:'base',label:'Gallery'}];
+  }
+
+  // Until Crown Zenith detail metadata finishes loading, render a safe single base position.
+  return [{id:'base',label:'Base'}];
+}
+function masterItems(sid){let cs=cardsBySet[sid]||[]; return cs.flatMap(c=>variantsFor(sid,c).map(v=>({card:c,variant:v})))}
+function compactOwned(sid,c){let vs=variantsFor(sid,c); return vs.filter(v=>owned.has(key(sid,c.id,v.id))).length}
+function counts(sid){
+  const items=masterItems(sid);
+  const total=(variantReadyBySet[sid] && items.length)?items.length:SETS[sid].masterTotal;
+  let n;
+  if(items.length){
+    n=items.filter(x=>owned.has(key(sid,x.card.id,x.variant.id))).length;
+  }else{
+    n=[...owned].filter(k=>k.startsWith(sid+'|')).length;
+  }
+  return [Math.min(n,total),total];
+}
+function renderStats(){
+ let gn=0,gt=0; Object.keys(SETS).forEach(s=>{let [n,t]=counts(s);gn+=n;gt+=t}); $('#globalOwned').textContent=`${gn} / ${gt}`; let gp=gt?Math.round(gn/gt*100):0;$('#globalPct').textContent=`${gp}% collected`;$('#globalProgress').style.width=gp+'%';
+ if(currentSet){let [n,t]=counts(currentSet);let p=t?Math.round(n/t*100):0;$('#setOwned').textContent=`${n} / ${t}`;$('#setPct').textContent=`${p}% complete`;$('#setProgress').style.width=p+'%'}
+ renderSetCards();
+}
+function renderSetCards(){
+ let box=$('#setCards'); if(!box)return; box.innerHTML=Object.values(SETS).map(s=>{let[n,t]=counts(s),p=t?Math.round(n/t*100):0;let prep=(s.id==='swsh12.5'&&!variantReadyBySet[s.id])?' · variant details prepare on first open':'';return `<article class="setCard"><div><div class="eyebrow" style="color:#777">${s.series}</div><h3>${s.name}</h3><p>${n} of ${t} master-set cards · ${Math.max(0,t-n)} missing${prep}</p></div><div class="setPct">${p}%<small>complete</small></div><div class="setActions"><button class="btn dark openSet" data-set="${s.id}">Open binder</button><button class="btn huntSet" data-set="${s.id}">Hunt missing</button></div></article>`}).join('');
+ $$('.openSet').forEach(b=>b.onclick=()=>openSet(b.dataset.set,'binder')); $$('.huntSet').forEach(b=>b.onclick=()=>openSet(b.dataset.set,'hunt'));
+}
+async function loadSet(sid){
+ if(cardsBySet[sid])return cardsBySet[sid];
+ const mainResponse=await fetch(`${API}/sets/${sid}`);
+ if(!mainResponse.ok) throw new Error(`Set ${sid} HTTP ${mainResponse.status}`);
+ const main=await mainResponse.json();
+ let cs=(main.cards||[]).map(x=>({...x}));
+
+ if(sid==='swsh12.5'){
+   try{
+     const ggResponse=await fetch(`${API}/sets/swsh12.5gg`);
+     if(!ggResponse.ok) throw new Error(`GG HTTP ${ggResponse.status}`);
+     const gg=await ggResponse.json();
+     const extra=(gg.cards||[]).map(x=>({...x,image:`https://assets.tcgdex.net/en/swsh/swsh12.5/${x.localId}`}));
+     cs=[...cs,...extra];
+   }catch(e){
+     console.warn('Galarian Gallery failed to load',e);
+     throw new Error('Crown Zenith Galarian Gallery could not load');
+   }
+ }
+ const map=new Map();cs.forEach(c=>map.set(c.id||c.localId,c));
+ cardsBySet[sid]=[...map.values()].sort(numSort);
+ return cardsBySet[sid];
+}
+
+async function ensureVariantMetadata(sid,onProgress){
+  if(variantReadyBySet[sid]) return true;
+  if(variantLoadPromiseBySet[sid]) return variantLoadPromiseBySet[sid];
+
+  variantLoadPromiseBySet[sid]=(async()=>{
+    const cards=await loadSet(sid);
+    const targets=cards.filter(c=>sid!=='swsh12.5' || (!String(c.localId).startsWith('GG') && +String(c.localId).replace(/\D/g,'')<=159));
+    let done=0,failed=0;
+    const cacheForStorage={};
+    const workers=8;
+    let cursor=0;
+
+    async function worker(){
+      while(cursor<targets.length){
+        const idx=cursor++;
+        const c=targets[idx];
+        try{
+          const d=await loadPriceFor(c);
+          if(d?.variants){
+            detailCache[c.id]=d;
+            variantCache[c.id]=d.variants;
+            cacheForStorage[c.id]=d.variants;
+          }else failed++;
+        }catch(e){ failed++; }
+        done++;
+        if(onProgress) onProgress(done,targets.length,failed);
+      }
+    }
+
+    await Promise.all(Array.from({length:workers},worker));
+    const usable=targets.filter(c=>(detailCache[c.id]?.variants||variantCache[c.id])).length;
+    if(usable === targets.length){
+      variantReadyBySet[sid]=true;
+      // Merge with any existing cache and persist only compact variant metadata.
+      try{
+        const existing=JSON.parse(localStorage.getItem('dexbinder_v044_variant_cache')||'{}');
+        variantCache={...existing,...variantCache,...cacheForStorage};
+        localStorage.setItem('dexbinder_v044_variant_cache',JSON.stringify(variantCache));
+      }catch(e){console.warn('Variant cache could not be saved',e)}
+      sanitizeOwnedVariants(sid);
+      save();
+      return true;
+    }
+    throw new Error(`Only ${usable}/${targets.length} card variants loaded`);
+  })().finally(()=>{delete variantLoadPromiseBySet[sid]});
+
+  return variantLoadPromiseBySet[sid];
+}
+
+function sanitizeOwnedVariants(sid){
+  if(!cardsBySet[sid]||!variantReadyBySet[sid]) return;
+  const valid=new Set(masterItems(sid).map(x=>key(sid,x.card.id,x.variant.id)));
+  [...owned].filter(k=>k.startsWith(sid+'|')&&!valid.has(k)).forEach(k=>owned.delete(k));
+}
+
+function migrateV1(){
+ try{
+   const raw=localStorage.getItem('dexbinder_sv03.5_owned_v1');
+   const old=raw?JSON.parse(raw):[];
+   if(Array.isArray(old)&&old.length&&!localStorage.getItem('dexbinder_v04_migrated')){
+     old.forEach(id=>owned.add(key('sv03.5',id,'base')));
+     localStorage.setItem('dexbinder_v04_migrated','1');
+     save();
+     toast(`Imported ${old.length} cards from v0.1`);
+   }
+ }catch(e){console.warn('v0.1 migration skipped',e)}
+}
+async function openSet(sid,target='binder'){
+ currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');
+ let s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;$('#setDesc').textContent=s.desc;$('#content').innerHTML='<div class="notice">Loading cards…</div>';
+ try{
+   await loadSet(sid);
+   renderStats();
+   renderSet();
+   if(sid==='swsh12.5'&&!variantReadyBySet[sid]){
+     const status=document.createElement('div');
+     status.id='variantStatus';
+     status.className='statusLine';
+     status.textContent='Preparing Crown Zenith master-set variants…';
+     $('#content').before(status);
+     ensureVariantMetadata(sid,(done,total,failed)=>{
+       if($('#variantStatus')) $('#variantStatus').textContent=`Preparing master-set variants… ${done}/${total}${failed?` · ${failed} retry needed`:''}`;
+     }).then(()=>{
+       $('#variantStatus')?.remove();
+       if(currentSet===sid){renderStats();renderSet();}
+       toast('Crown Zenith master-set data ready');
+     }).catch(e=>{
+       console.warn(e);
+       if($('#variantStatus')) $('#variantStatus').innerHTML='Master-set variant data could not fully load. Base cards remain usable; retry on a stable connection.';
+     });
+   }
+ }catch(e){
+   console.error(e);
+   $('#content').innerHTML='<div class="notice error">Could not load card data. Check your connection and try again.</div>';
+ }
+ setNav();
+}
+function setNav(){$$('#bottomNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
+function goHome(){currentSet=null;$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#homeScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');view='home';setNav();renderStats()}
+function renderSet(){
+ if(!currentSet)return; let cs=cardsBySet[currentSet]||[],q=$('#search').value.trim().toLowerCase(); cs=cs.filter(c=>!q||c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase().includes(q));
+ $('#viewTitle').textContent=view==='binder'?(binderMode==='compact'?'Binder · Compact':'Binder · Full master set'):view==='missing'?'Missing cards':'Hunt mode';
+ const needsVariants=(binderMode==='full'||view!=='binder');
+ if(currentSet==='swsh12.5'&&needsVariants&&!variantReadyBySet[currentSet]){
+   $('#meta').textContent='Preparing accurate master-set variants…';
+   $('#pager').classList.add('hidden');
+   $('#content').innerHTML='<div class="notice">Crown Zenith variant metadata is still loading. Compact Binder is available now; Full Binder, Missing and Hunt will unlock automatically when the master-set data is ready.</div>';
+   return;
+ }
+ let items=binderMode==='full'?cs.flatMap(c=>variantsFor(currentSet,c).map(v=>({card:c,variant:v}))):cs.map(c=>({card:c,variant:null}));
+ if(view!=='binder') items=items.flatMap(x=>x.variant?[x]:variantsFor(currentSet,x.card).map(v=>({card:x.card,variant:v}))).filter(x=>!owned.has(key(currentSet,x.card.id,x.variant.id)));
+ let size=+$('#pageSize').value,totalPages=Math.max(1,Math.ceil(items.length/size));page=Math.min(page,totalPages);let slice=items.slice((page-1)*size,page*size);
+ $('#meta').textContent=`${items.length} ${view==='binder'?'positions':'missing'} · Page ${page}/${totalPages}`;$('#pageLabel').textContent=`${page} / ${totalPages}`;$('#prev').disabled=page<=1;$('#next').disabled=page>=totalPages;$('#pager').classList.toggle('hidden',items.length<=size);
+ let c=$('#content');c.className=view==='hunt'?'hunt':view==='missing'?'missingView':'';
+ c.innerHTML=`<div class="grid">${slice.map(x=>cardHTML(x)).join('')}</div>`;
+ $$('.card').forEach(el=>el.onclick=()=>openCard(el.dataset.cid,el.dataset.variant||null));
+ const priceGen=++binderPriceGeneration;
+ slice.forEach(x=>loadPriceFor(x.card).then(()=>{if(priceGen===binderPriceGeneration)updateVisiblePrice(x)}));
+}
+function cardHTML(x){
+ let c=x.card,vs=variantsFor(currentSet,c),variant=x.variant;
+ let ownedCount=compactOwned(currentSet,c);
+ let fullyOwned=variant?owned.has(key(currentSet,c.id,variant.id)):ownedCount===vs.length;
+ let partial=!variant && ownedCount>0 && ownedCount<vs.length;
+ let stateClass=fullyOwned?'':(partial?'partial':'missing');
+ let label=variant?variant.label:`${ownedCount}/${vs.length}`;
+ let pk=variant?priceFor(c,variant.id):null;
+ return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="this.style.display='none'"><div class="fallback">#${c.localId}<br>${c.name}</div>${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
+}
+async function loadPriceFor(c){
+ const cached=detailCache[c.id];
+ if(cached && (cached.pricing!==undefined || cached.category!==undefined || cached.rarity!==undefined)) return cached;
+ try{
+   const r=await fetch(`${API}/cards/${c.id}`);
+   if(!r.ok) throw new Error(`Card detail HTTP ${r.status}`);
+   const d=await r.json();
+   detailCache[c.id]=d;
+   if(d?.variants) variantCache[c.id]=d.variants;
+   return d;
+ }catch(e){
+   console.warn('Card detail failed',c.id,e);
+   return null;
+ }
+}
+function priceData(c,variant){
+ let d=detailCache[c.id],t=d?.pricing?.tcgplayer;if(!t)return null; let p=variant==='reverse'?(t['reverse-holofoil']||t.reverse):(t.normal||t.holofoil||t.holo);return p||null
+}
+function priceFor(c,variant){let p=priceData(c,variant);if(!p)return '';let v=p.lowPrice??p.marketPrice;if(v==null)return '';return `$${Number(v).toFixed(2)}`}
+function updateVisiblePrice(x){if(!x.variant)return;let el=$(`.card[data-cid="${CSS.escape(x.card.id)}"][data-variant="${x.variant.id}"]`);if(el&&!el.querySelector('.price')){let p=priceFor(x.card,x.variant.id);if(p)el.insertAdjacentHTML('beforeend',`<div class="price">${p}</div>`)}}
+async function openCard(cid,forcedVariant){
+ let c=(cardsBySet[currentSet]||[]).find(x=>x.id===cid);if(!c)return;
+ selected=c;$('#detailImg').src=image(c,'high');$('#detailName').textContent=c.name;
+ $('#detailMeta').textContent=`${SETS[currentSet].name} · #${c.localId}${forcedVariant?` · ${variantsFor(currentSet,c).find(v=>v.id===forcedVariant)?.label||''}`:''}`;
+ $('#detailVariants').innerHTML='<div class="notice">Loading variants & prices…</div>';$('#cardModal').classList.add('open');
+ await loadPriceFor(c);
+ let vs=variantsFor(currentSet,c);
+ if(forcedVariant){vs=[...vs].sort((a,b)=>a.id===forcedVariant?-1:b.id===forcedVariant?1:0)}
+ $('#detailVariants').innerHTML=vs.map(v=>{let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>`}).join('');
+ $$('#detailVariants .toggle').forEach(b=>b.onclick=()=>{let k=key(currentSet,c.id,b.dataset.v);owned.has(k)?owned.delete(k):owned.add(k);save();openCard(cid,forcedVariant);renderSet()})
+}
+function renderBulk(){
+ let cs=cardsBySet[currentSet]||[];$('#bulkList').innerHTML=cs.map(c=>{let vs=variantsFor(currentSet,c);return `<div class="bulkRow"><div><b>#${c.localId} ${c.name}</b><span>${vs.map(v=>v.label).join(' + ')}</span></div>${vs.map(v=>`<button class="miniToggle ${owned.has(key(currentSet,c.id,v.id))?'on':''}" data-c="${c.id}" data-v="${v.id}">${v.id==='reverse'?'RH':v.label}</button>`).join('')}</div>`}).join('');
+ $$('#bulkList .miniToggle').forEach(b=>b.onclick=()=>{let k=key(currentSet,b.dataset.c,b.dataset.v);owned.has(k)?owned.delete(k):owned.add(k);save();renderBulk();renderSet()})
+}
+async function hydrateHuntPrices(items,generation){
+  const uniqueCards=[...new Map(items.map(x=>[x.card.id,x.card])).values()];
+  const batchSize=12;
+  for(let start=0; start<uniqueCards.length; start+=batchSize){
+    if(generation!==huntGeneration) return;
+    const batch=uniqueCards.slice(start,start+batchSize);
+    await Promise.allSettled(batch.map(c=>loadPriceFor(c)));
+    if(generation!==huntGeneration) return;
+
+    items.forEach((x,i)=>{
+      if(!batch.some(c=>c.id===x.card.id)) return;
+      const row=$(`#globalHuntList .row[data-key="${CSS.escape(key(x.sid,x.card.id,x.variant.id))}"]`);
+      if(!row)return;
+      const p=priceData(x.card,x.variant.id);
+      const val=p?.lowPrice??p?.marketPrice;
+      row.dataset.price=val==null?'':String(val);
+      row.dataset.priceLoaded='1';
+      row.querySelector('.p').textContent=val!=null?`$${val.toFixed(2)}`:'—';
+    });
+    applyHuntPriceFilter();
+    await new Promise(r=>setTimeout(r,35));
+  }
+}
+function applyHuntPriceFilter(){
+  $$('#globalHuntList .row').forEach(row=>{
+    if(priceFilter==='all'){row.style.display='grid';return;}
+    if(row.dataset.priceLoaded!=='1'){
+      row.style.display='grid';
+      row.querySelector('.p').textContent='checking…';
+      return;
+    }
+    const raw=row.dataset.price;
+    row.style.display=(raw!=='' && +raw<=+priceFilter)?'grid':'none';
+  });
+}
+async function openGlobalHunt(){
+ currentSet=null;view='global';huntGeneration++;
+ $('#homeScreen').classList.add('hidden');$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');
+ $('#globalHuntList').innerHTML='<div class="notice">Loading active collections…</div>';
+ const results=await Promise.allSettled(Object.keys(SETS).map(loadSet));
+ const failed=results.filter(r=>r.status==='rejected').length;
+ if(failed===Object.keys(SETS).length){
+   $('#globalHuntList').innerHTML='<div class="notice error">Could not load collection data. Check your connection and try again.</div>';
+   return;
+ }
+ if(!variantReadyBySet['swsh12.5'] && cardsBySet['swsh12.5']){
+   try{await ensureVariantMetadata('swsh12.5')}catch(e){console.warn('Global Hunt Crown Zenith variants unavailable',e)}
+ }
+ renderGlobalHunt();
+}
+async function renderGlobalHunt(){
+ const generation=++huntGeneration;
+ let sid=$('#huntSet').value,q=$('#huntSearch').value.toLowerCase();let items=[];
+ let skippedCrown=false;
+ Object.keys(SETS).filter(s=>sid==='all'||s===sid).forEach(s=>{
+   if(!cardsBySet[s]) return;
+   if(s==='swsh12.5'&&!variantReadyBySet[s]){skippedCrown=true;return;}
+   masterItems(s).forEach(x=>{if(!owned.has(key(s,x.card.id,x.variant.id)))items.push({...x,sid:s})});
+ });
+ items=items.filter(x=>!q||x.card.name.toLowerCase().includes(q)||String(x.card.localId).toLowerCase().includes(q));
+ const warning=skippedCrown?'<div class="notice error">Crown Zenith is temporarily excluded because its master-set variant metadata did not finish loading. Retry on a stable connection rather than using an incomplete hunt list.</div>':'';
+ const rows=items.length?items.map(x=>`<div class="row" data-key="${key(x.sid,x.card.id,x.variant.id)}" data-price="" data-price-loaded="0"><img class="thumb" src="${image(x.card)}"><div><h4>${x.card.name} · ${x.variant.label}</h4><p>${SETS[x.sid].name} · #${x.card.localId}</p></div><div class="rowPrice"><b class="p">…</b><small>TCGplayer reference</small></div></div>`).join(''):'<div class="notice">Nothing missing in this filter. Nice.</div>';
+ $('#globalHuntList').innerHTML=warning+rows;
+ items.forEach(x=>{let row=$(`#globalHuntList .row[data-key="${CSS.escape(key(x.sid,x.card.id,x.variant.id))}"]`);if(row)row.onclick=()=>openSet(x.sid,'hunt')});
+ applyHuntPriceFilter();
+ hydrateHuntPrices(items,generation);
+}
+function backup(){return JSON.stringify({version:'0.4.5',owned:[...owned],saved:new Date().toISOString()},null,2)}
+$$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
+$$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
+$('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
+$('#search').oninput=()=>{page=1;renderSet()};
+$('#pageSize').onchange=()=>{try{localStorage.setItem('dexbinder_page_size',$('#pageSize').value)}catch(e){}page=1;renderSet()};
+try{$('#pageSize').value=localStorage.getItem('dexbinder_page_size')||'9'}catch(e){$('#pageSize').value='9'};
+$('#prev').onclick=()=>{page--;renderSet();scrollTo({top:0,behavior:'smooth'})};$('#next').onclick=()=>{page++;renderSet();scrollTo({top:0,behavior:'smooth'})};
+$$('#chips [data-mode]').forEach(b=>b.onclick=()=>{binderMode=b.dataset.mode;$$('#chips [data-mode]').forEach(x=>x.classList.toggle('active',x===b));page=1;renderSet()});
+$('#bulkBtn').onclick=async()=>{
+ if(currentSet==='swsh12.5'&&!variantReadyBySet[currentSet]){
+   toast('Preparing Crown Zenith master-set data…');
+   try{await ensureVariantMetadata(currentSet)}catch(e){toast('Variant data is not ready yet');return}
+ }
+ renderBulk();$('#bulkModal').classList.add('open')
+};
+$('#allBase').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>owned.add(key(currentSet,c.id,'base')));save();renderBulk();renderSet()};
+$('#allReverse').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>variantsFor(currentSet,c).filter(v=>v.id==='reverse').forEach(v=>owned.add(key(currentSet,c.id,v.id))));save();renderBulk();renderSet()};
+$('#clearSet').onclick=()=>{[...owned].filter(k=>k.startsWith(currentSet+'|')).forEach(k=>owned.delete(k));save();renderBulk();renderSet()};
+$('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};$('#copyBackup').onclick=async()=>{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')};$('#restoreBackup').onclick=()=>{try{let d=JSON.parse($('#backupBox').value);owned=new Set(d.owned||[]);save();$('#backupModal').classList.remove('open');toast('Collection restored')}catch(e){toast('That backup could not be read')}};
+$$('#bottomNav button').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.view;if(v==='home'){goHome();return;}if(!currentSet){goHome();return;}view=v;page=1;setNav();renderSet();}));
+let huntSearchTimer=null;
+$('#huntSearch').oninput=()=>{clearTimeout(huntSearchTimer);huntSearchTimer=setTimeout(renderGlobalHunt,180)};
+$('#huntSet').onchange=renderGlobalHunt;$$('[data-price]').forEach(b=>b.onclick=()=>{priceFilter=b.dataset.price;$$('[data-price]').forEach(x=>x.classList.toggle('active',x===b));applyHuntPriceFilter()});
+document.addEventListener('click',e=>{if(e.target.closest('.huntSet')&&e.target.closest('.huntSet').dataset.set==='all')openGlobalHunt()});
+function initDexBinder(){
+  try{
+    migrateV1();
+    renderSetCards();
+    renderStats();
+    if(!document.getElementById('globalHuntHome')){
+      const gh=document.createElement('button');
+      gh.id='globalHuntHome';
+      gh.className='btn dark';
+      gh.style='width:100%;margin-top:12px';
+      gh.textContent='🎯 Open Global Hunt';
+      gh.addEventListener('click',openGlobalHunt);
+      $('#homeScreen').appendChild(gh);
+    }
+  }catch(e){
+    console.error('DexBinder failed to initialize',e);
+    const box=document.getElementById('setCards');
+    if(box){
+      box.innerHTML='<div class="notice"><b>DexBinder could not initialize.</b><br>Please refresh the page. If this remains visible, replace index.html with the latest build.</div>';
+    }
+  }
+}
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',initDexBinder,{once:true});
+}else{
+  initDexBinder();
+}
+</script>
+</body>
+</html>
