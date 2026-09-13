@@ -93,13 +93,35 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .cloudEmail{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;margin-top:10px;background:#fff}.cloudLinkHelp{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .syncBadge{font-size:.6rem;font-weight:850;color:var(--muted)}
 
+
+/* v0.7 collector data foundation */
+.collectorPanel{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:#f7f3ec;overflow:hidden}
+.collectorHead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 11px;border-bottom:1px solid var(--line)}
+.collectorHead b{font-size:.76rem}.collectorHead small{display:block;color:var(--muted);font-size:.62rem;margin-top:2px}
+.collectorBody{padding:10px;display:grid;gap:9px}
+.collectorGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.collectorField{display:grid;gap:4px}
+.collectorField.full{grid-column:1/-1}
+.collectorField label{font-size:.6rem;font-weight:850;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.collectorInput,.collectorSelect,.collectorNotes{width:100%;border:1px solid var(--line);border-radius:10px;background:#fff;padding:9px;font:inherit;font-size:.75rem}
+.collectorNotes{min-height:72px;resize:vertical}
+.qtyControl{display:grid;grid-template-columns:38px 1fr 38px;gap:6px;align-items:center}
+.qtyControl button{height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:900;font-size:1rem}
+.qtyValue{text-align:center;border:1px solid var(--line);border-radius:10px;background:#fff;height:38px;display:grid;place-items:center;font-weight:900}
+.tradeRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.tradeRow span{font-size:.72rem;font-weight:800}
+.collectorSave{width:100%}
+.collectorHint{font-size:.61rem;color:var(--muted);line-height:1.4}
+.collectBadge{position:absolute;top:6px;left:6px;background:rgba(20,20,20,.88);color:#fff;border-radius:999px;padding:3px 6px;font-size:.52rem;font-weight:900;z-index:2}
+.tradeBadge{position:absolute;top:6px;right:6px;background:#fff3c4;color:#5c4910;border-radius:999px;padding:3px 6px;font-size:.5rem;font-weight:900;z-index:2;border:1px solid rgba(0,0,0,.08)}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.3</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.0</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -225,7 +247,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 <div class="modal" id="backupModal"><div class="sheet">
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Backup & transfer</h2><p>Keep a portable copy of your Dex, or move it between Safari and the installed app.</p></div><button class="btn small close">Close</button></div>
-  <div class="backupExplain"><b>Your collection is stored on this device.</b><br>Until cloud sync arrives, Safari and the Home Screen app may keep separate copies. A DexBinder backup safely transfers ownership and active-set choices between them.</div>
+  <div class="backupExplain"><b>Your collection is stored on this device.</b><br>Until cloud sync arrives, Safari and the Home Screen app may keep separate copies. A DexBinder backup safely transfers ownership, active sets, and v0.7 collector details between them.</div>
   <textarea id="backupBox" style="width:100%;height:150px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace;margin-top:10px"></textarea>
   <div class="backupActions">
     <button class="btn dark" id="downloadBackup">Download backup file</button>
@@ -293,6 +315,11 @@ const CLOUD_DIRTY_KEY='dexbinder_v06c_cloud_dirty';
 const CLOUD_LAST_KEY='dexbinder_v06c_cloud_last_sync';
 
 let priceFetchedAt={};
+
+const COLLECTOR_META_KEY='dexbinder_v07_collector_meta';
+let collectorMeta={};
+try{collectorMeta=JSON.parse(localStorage.getItem(COLLECTOR_META_KEY)||'{}')||{}}catch(e){collectorMeta={}}
+
 try{priceFetchedAt=JSON.parse(localStorage.getItem('dexbinder_v06_price_timestamps')||'{}')}catch(e){priceFetchedAt={}}
 
 
@@ -832,7 +859,10 @@ function cardHTML(x){
  let stateClass=fullyOwned?'':(partial?'partial':'missing');
  let label=variant?variant.label:`${ownedCount}/${vs.length}`;
  let pk=variant?priceFor(c,variant.id):null;
- return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="retryImage(this)"><div class="fallback">#${c.localId}<br>${c.name}</div>${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
+ let summary=cardCollectorSummary(currentSet,c);
+ let quantityBadge=summary.quantity>ownedCount?`<div class="collectBadge">×${summary.quantity}</div>`:'';
+ let tradeBadge=summary.forTrade?`<div class="tradeBadge">Trade</div>`:'';
+ return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="retryImage(this)"><div class="fallback">#${c.localId}<br>${c.name}</div>${quantityBadge}${tradeBadge}${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
 }
 async function loadPriceFor(c){
  const cached=detailCache[c.id];
@@ -857,6 +887,128 @@ function priceData(c,variant){
 function priceFor(c,variant){let p=priceData(c,variant);if(!p)return '';let v=p.lowPrice??p.marketPrice;if(v==null)return '';return `$${Number(v).toFixed(2)}`}
 function updateVisiblePrice(x){if(!x.variant)return;let el=$$('.card').find(node=>node.dataset.cid===x.card.id && node.dataset.variant===x.variant.id);if(el&&!el.querySelector('.price')){let p=priceFor(x.card,x.variant.id);if(p)el.insertAdjacentHTML('beforeend',`<div class="price">${p}</div>`)}}
 
+
+function metaKey(sid,cid,variantId){return key(sid,cid,variantId)}
+function getCollectorMeta(sid,cid,variantId){
+  const k=metaKey(sid,cid,variantId);
+  const raw=collectorMeta[k]||{};
+  return {
+    quantity:Math.max(1,Number(raw.quantity)||1),
+    condition:raw.condition||'',
+    language:raw.language||'English',
+    purchasePrice:raw.purchasePrice??'',
+    purchaseDate:raw.purchaseDate||'',
+    notes:raw.notes||'',
+    forTrade:!!raw.forTrade
+  };
+}
+function saveCollectorMeta(){
+  try{localStorage.setItem(COLLECTOR_META_KEY,JSON.stringify(collectorMeta))}catch(e){console.warn('Collector metadata save failed',e)}
+}
+function setCollectorMeta(sid,cid,variantId,data){
+  collectorMeta[metaKey(sid,cid,variantId)]={...data};
+  saveCollectorMeta();
+}
+function deleteCollectorMeta(sid,cid,variantId){
+  delete collectorMeta[metaKey(sid,cid,variantId)];
+  saveCollectorMeta();
+}
+function cardCollectorSummary(sid,c){
+  let quantity=0,forTrade=false;
+  for(const v of variantsFor(sid,c)){
+    if(!owned.has(key(sid,c.id,v.id)))continue;
+    const m=getCollectorMeta(sid,c.id,v.id);
+    quantity+=m.quantity;
+    forTrade ||= m.forTrade;
+  }
+  return {quantity,forTrade};
+}
+function escapeHtml(v=''){
+  return String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
+}
+function collectorPanelHTML(c,v){
+  const m=getCollectorMeta(currentSet,c.id,v.id);
+  const prefix=`collector-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}`;
+  return `<div class="collectorPanel" data-collector="${v.id}">
+    <div class="collectorHead"><div><b>Collector details</b><small>${v.label} · optional</small></div><span>${m.quantity>1?`${m.quantity} copies`:'1 copy'}</span></div>
+    <div class="collectorBody">
+      <div class="collectorGrid">
+        <div class="collectorField">
+          <label>Quantity</label>
+          <div class="qtyControl">
+            <button type="button" data-qty-minus="${v.id}" aria-label="Decrease quantity">−</button>
+            <div class="qtyValue" id="${prefix}-qty">${m.quantity}</div>
+            <button type="button" data-qty-plus="${v.id}" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+        <div class="collectorField">
+          <label>Condition</label>
+          <select class="collectorSelect" id="${prefix}-condition">
+            <option value="" ${m.condition===''?'selected':''}>Not set</option>
+            <option value="NM" ${m.condition==='NM'?'selected':''}>Near Mint</option>
+            <option value="LP" ${m.condition==='LP'?'selected':''}>Lightly Played</option>
+            <option value="MP" ${m.condition==='MP'?'selected':''}>Moderately Played</option>
+            <option value="HP" ${m.condition==='HP'?'selected':''}>Heavily Played</option>
+            <option value="DMG" ${m.condition==='DMG'?'selected':''}>Damaged</option>
+          </select>
+        </div>
+        <div class="collectorField">
+          <label>Language</label>
+          <select class="collectorSelect" id="${prefix}-language">
+            ${['English','Japanese','Chinese','Korean','French','German','Italian','Spanish','Portuguese','Other'].map(x=>`<option value="${x}" ${m.language===x?'selected':''}>${x}</option>`).join('')}
+          </select>
+        </div>
+        <div class="collectorField">
+          <label>Purchase price</label>
+          <input class="collectorInput" id="${prefix}-price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="${escapeHtml(m.purchasePrice)}">
+        </div>
+        <div class="collectorField">
+          <label>Purchase date</label>
+          <input class="collectorInput" id="${prefix}-date" type="date" value="${escapeHtml(m.purchaseDate)}">
+        </div>
+        <div class="collectorField">
+          <label>Trade status</label>
+          <div class="tradeRow"><span>Available to trade</span><button class="toggle ${m.forTrade?'on':''}" type="button" data-trade-toggle="${v.id}">${m.forTrade?'Yes ✓':'No'}</button></div>
+        </div>
+        <div class="collectorField full">
+          <label>Notes</label>
+          <textarea class="collectorNotes" id="${prefix}-notes" placeholder="Where you found it, grading notes, memories…">${escapeHtml(m.notes)}</textarea>
+        </div>
+      </div>
+      <button class="btn dark collectorSave" type="button" data-save-collector="${v.id}">Save collector details</button>
+      <div class="collectorHint">These details are stored on this device and included in DexBinder backups. Cloud sync for collector details will follow after the v0.7 data model is proven stable.</div>
+    </div>
+  </div>`;
+}
+function bindCollectorPanel(c,v){
+  const prefix=`collector-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}`;
+  let draft=getCollectorMeta(currentSet,c.id,v.id);
+  const qtyEl=$(`#${prefix}-qty`);
+  const tradeBtn=$(`[data-trade-toggle="${v.id}"]`);
+  const refreshDraftUI=()=>{
+    qtyEl.textContent=draft.quantity;
+    if(tradeBtn){tradeBtn.classList.toggle('on',draft.forTrade);tradeBtn.textContent=draft.forTrade?'Yes ✓':'No'}
+  };
+  $(`[data-qty-minus="${v.id}"]`).onclick=()=>{draft.quantity=Math.max(1,draft.quantity-1);refreshDraftUI()};
+  $(`[data-qty-plus="${v.id}"]`).onclick=()=>{draft.quantity=Math.min(99,draft.quantity+1);refreshDraftUI()};
+  if(tradeBtn)tradeBtn.onclick=()=>{draft.forTrade=!draft.forTrade;refreshDraftUI()};
+  $(`[data-save-collector="${v.id}"]`).onclick=()=>{
+    draft={
+      quantity:draft.quantity,
+      condition:$(`#${prefix}-condition`).value,
+      language:$(`#${prefix}-language`).value,
+      purchasePrice:$(`#${prefix}-price`).value,
+      purchaseDate:$(`#${prefix}-date`).value,
+      notes:$(`#${prefix}-notes`).value.trim(),
+      forTrade:draft.forTrade
+    };
+    setCollectorMeta(currentSet,c.id,v.id,draft);
+    toast('Collector details saved');
+    renderSet();
+    openCard(c.id,v.id);
+  };
+}
+
 function currentAllScrollKey(){
   if(!currentSet || $('#pageSize').value!=='all')return null;
   return `${currentSet}|${view}|${binderMode}|${$('#search').value.trim().toLowerCase()}`;
@@ -875,8 +1027,17 @@ async function openCard(cid,forcedVariant){
  await loadPriceFor(c);
  let vs=variantsFor(currentSet,c);
  if(forcedVariant){vs=[...vs].sort((a,b)=>a.id===forcedVariant?-1:b.id===forcedVariant?1:0)}
- $('#detailVariants').innerHTML=vs.map(v=>{let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}${!navigator.onLine?' · cached':''}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>`}).join('');
- $$('#detailVariants .toggle').forEach(b=>b.onclick=()=>{let k=key(currentSet,c.id,b.dataset.v);owned.has(k)?owned.delete(k):owned.add(k);save();openCard(cid,forcedVariant);renderSet()})
+ $('#detailVariants').innerHTML=vs.map(v=>{
+   let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);
+   return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}${!navigator.onLine?' · cached':''}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>${on?collectorPanelHTML(c,v):''}`
+ }).join('');
+ $$('#detailVariants .toggle[data-v]').forEach(b=>b.onclick=()=>{
+   let k=key(currentSet,c.id,b.dataset.v);
+   if(owned.has(k)){owned.delete(k);deleteCollectorMeta(currentSet,c.id,b.dataset.v)}
+   else{owned.add(k)}
+   save();openCard(cid,forcedVariant);renderSet()
+ });
+ vs.forEach(v=>{if(owned.has(key(currentSet,c.id,v.id)))bindCollectorPanel(c,v)});
 }
 
 
@@ -1098,7 +1259,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -1148,6 +1309,7 @@ function restoreBackupObject(d){
   if(!d || !Array.isArray(d.owned))throw new Error('Invalid backup');
   owned=new Set(d.owned||[]);
   if(Array.isArray(d.activeSets)){activeSetIds=new Set(d.activeSets);saveActiveSets()}
+  if(d.collectorMeta && typeof d.collectorMeta==='object'){collectorMeta=d.collectorMeta;saveCollectorMeta()}
   save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
 }
 $('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};
