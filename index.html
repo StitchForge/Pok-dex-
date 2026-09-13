@@ -407,7 +407,7 @@ html{-webkit-text-size-adjust:100%}
 .quickSectionHead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 2px 9px}
 .quickSectionHead h2{margin:0;font-size:1.15rem;letter-spacing:-.035em}
 .quickSectionHead p{margin:3px 0 0;color:var(--muted);font-size:.72rem}
-.quickActions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quickActions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .quickAction{
   border:1px solid var(--line);
   background:var(--paper);
@@ -506,6 +506,18 @@ html{-webkit-text-size-adjust:100%}
   .priceTools{grid-template-columns:1fr}
 }
 
+
+/* v0.9.0 Wishlist & Collection Goals */
+.goalGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.goalCard{border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px}.goalCard b{display:block;font-size:.7rem;margin-bottom:3px}.goalCard small{display:block;color:var(--muted);font-size:.55rem;line-height:1.4}
+.goalProgress{height:7px;background:#ebe6df;border-radius:999px;overflow:hidden;margin-top:8px}.goalProgress>span{display:block;height:100%;background:var(--ink);border-radius:999px}
+.wishlistToolbar{display:grid;grid-template-columns:1fr 130px;gap:8px;margin:10px 0}.wishlistList{display:grid;gap:8px}
+.wishRow{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px}
+.wishRow img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:8px;background:#eee}.wishRow b{display:block;font-size:.67rem}.wishRow small{display:block;color:var(--muted);font-size:.53rem;line-height:1.4}
+.wishPriority{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:.48rem;font-weight:900;margin-top:4px;border:1px solid var(--line)}.wishPriority.high{background:#fff1ec}.wishPriority.medium{background:#fff8df}.wishPriority.low{background:#eef5ef}
+.wishActions{display:grid;gap:5px}.wishForm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.wishForm .full{grid-column:1/-1}.wishSummary{font-size:.58rem;color:var(--muted);line-height:1.45;margin:6px 0 10px}
+@media(max-width:430px){.goalGrid{grid-template-columns:1fr}.wishlistToolbar{grid-template-columns:1fr}.wishRow{grid-template-columns:50px minmax(0,1fr)}.wishRow img{width:50px}.wishActions{grid-column:1/-1;grid-template-columns:1fr 1fr}.wishForm{grid-template-columns:1fr}.wishForm .full{grid-column:auto}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -513,7 +525,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.8</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.0</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -522,6 +534,7 @@ html{-webkit-text-size-adjust:100%}
       <div class="quickActions">
         <button class="quickAction dark" id="fastAddBtn"><b>＋ Fast Add</b><small>Add cards quickly</small></button>
         <button class="quickAction" id="scanCardBtn"><b>📷 Scan</b><small>Photo-assisted entry</small></button>
+        <button class="quickAction" id="wishlistBtn"><b>♡ Wishlist</b><small>Goals & wanted cards</small></button>
         <button class="quickAction" id="tradeBtn"><b>↔ Trade</b><small>Manage trade cards</small></button>
         <button class="quickAction" id="globalHuntHome"><b>🎯 Global Hunt</b><small>Everything still missing</small></button>
       </div>
@@ -641,6 +654,20 @@ html{-webkit-text-size-adjust:100%}
 
 
 
+
+
+<div class="modal" id="wishlistModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Wishlist &amp; Goals</h2><p>Plan what you want to collect next.</p></div><button class="btn small close">Close</button></div>
+  <div class="goalGrid" id="goalSummary"></div>
+  <div class="wishlistToolbar">
+    <input class="collectorInput" id="wishlistSearch" type="search" placeholder="Search wanted cards…">
+    <select class="collectorSelect" id="wishlistPriorityFilter"><option value="all">All priorities</option><option value="high">High priority</option><option value="medium">Medium priority</option><option value="low">Low priority</option></select>
+  </div>
+  <div class="wishSummary" id="wishlistSummary"></div>
+  <details style="margin:8px 0 12px"><summary style="font-size:.65rem;font-weight:850;cursor:pointer">Set completion goals</summary><div id="setGoalControls" style="display:grid;gap:7px;margin-top:8px"></div></details>
+  <div class="wishlistList" id="wishlistList"></div>
+</div></div>
 
 <div class="modal" id="scanCardModal"><div class="sheet">
   <div class="grab"></div>
@@ -1124,6 +1151,65 @@ try{
 }catch(e){console.warn('Variant cache skipped',e)}
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const key=(sid,cid,variant='base')=>`${sid}|${cid}|${variant}`;
+
+const WISHLIST_KEY='dexbinder_v09_wishlist';
+const SET_GOALS_KEY='dexbinder_v09_set_goals';
+function loadWishlist(){try{const x=JSON.parse(localStorage.getItem(WISHLIST_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(e){return {}}}
+function saveWishlist(){try{localStorage.setItem(WISHLIST_KEY,JSON.stringify(wishlist))}catch(e){}}
+function loadSetGoals(){try{const x=JSON.parse(localStorage.getItem(SET_GOALS_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(e){return {}}}
+function saveSetGoals(){try{localStorage.setItem(SET_GOALS_KEY,JSON.stringify(setGoals))}catch(e){}}
+let wishlist=loadWishlist(),setGoals=loadSetGoals();
+const wishKey=(sid,cid,v)=>`${sid}|${cid}|${v}`;
+const getWish=(sid,cid,v)=>wishlist[wishKey(sid,cid,v)]||null;
+const isWanted=(sid,cid,v)=>!!getWish(sid,cid,v);
+function setWanted(sid,cid,v,data={}){
+ const k=wishKey(sid,cid,v),old=wishlist[k]||{};
+ wishlist[k]={priority:data.priority||old.priority||'medium',targetPrice:data.targetPrice??old.targetPrice??'',notes:data.notes??old.notes??'',addedAt:old.addedAt||new Date().toISOString()};
+ saveWishlist();
+}
+function removeWanted(sid,cid,v){delete wishlist[wishKey(sid,cid,v)];saveWishlist()}
+function wishlistEntries(){return Object.entries(wishlist).map(([k,w])=>{const [sid,cid,variantId]=k.split('|');return {k,sid,cid,variantId,w,c:(cardsBySet[sid]||[]).find(x=>x.id===cid)}})}
+function goalTarget(sid){return Number(setGoals[sid]||SETS[sid]?.masterTotal||0)}
+function goalProgress(sid){const [have]=counts(sid),target=goalTarget(sid);return {have,target,pct:target?Math.min(100,Math.round(have/target*100)):0,remaining:Math.max(0,target-have)}}
+function setGoalFor(sid,value){if(!value)delete setGoals[sid];else setGoals[sid]=Math.max(1,Math.min(Number(value)||1,SETS[sid]?.masterTotal||9999));saveSetGoals()}
+async function ensureWishlistSetsLoaded(){
+ for(const sid of [...new Set(Object.keys(wishlist).map(k=>k.split('|')[0]))]){
+  if(cardsBySet[sid])continue;
+  try{
+   if(!SETS[sid]){
+    await ensureGlobalCatalogue();
+    const b=(allSetBriefs||[]).find(x=>x.id===sid);
+    if(b)SETS[sid]={id:sid,name:b.name||sid,series:'Pokémon TCG',desc:'TCGdex catalogue set',baseTotal:b.cardCount?.total||0,masterTotal:b.cardCount?.total||0,variantStrategy:sid==='sv03.5'?'known-151':'detail'};
+   }
+   await loadSet(sid);
+  }catch(e){}
+ }
+}
+function wishlistStats(){
+ const rows=wishlistEntries(),priced=rows.map(x=>Number(x.w.targetPrice)).filter(x=>Number.isFinite(x)&&x>0);
+ return {total:rows.length,high:rows.filter(x=>x.w.priority==='high').length,budget:priced.reduce((a,b)=>a+b,0)}
+}
+function renderGoalSummary(){
+ const stats=wishlistStats(),active=[...activeSetIds],goals=active.map(sid=>({sid,...goalProgress(sid)}));
+ const closest=goals.filter(g=>g.target>0&&g.remaining>0).sort((a,b)=>a.remaining-b.remaining)[0];
+ $('#goalSummary').innerHTML=`<div class="goalCard"><b>${stats.total} wanted</b><small>${stats.high} high priority · ${stats.budget?`$${stats.budget.toFixed(2)} combined target prices`:'No target prices yet'}</small></div><div class="goalCard"><b>${closest?`${closest.remaining} to next goal`:'Goals looking good'}</b><small>${closest?`${SETS[closest.sid]?.name||closest.sid} · ${closest.have}/${closest.target}`:'No unfinished active-set goal found.'}</small>${closest?`<div class="goalProgress"><span style="width:${closest.pct}%"></span></div>`:''}</div>`;
+ const controls=$('#setGoalControls');
+ controls.innerHTML=active.map(sid=>{const g=goalProgress(sid),custom=!!setGoals[sid];return `<div class="goalCard"><b>${SETS[sid]?.name||sid}</b><small>${g.have}/${g.target} goal positions · ${g.remaining} remaining</small><div class="goalProgress"><span style="width:${g.pct}%"></span></div><div style="display:grid;grid-template-columns:1fr auto;gap:6px;margin-top:8px"><input class="collectorInput" data-set-goal="${sid}" type="number" min="1" max="${SETS[sid]?.masterTotal||9999}" placeholder="Master set (${SETS[sid]?.masterTotal||'—'})" value="${custom?setGoals[sid]:''}"><button class="btn small" data-save-set-goal="${sid}">Save</button></div></div>`}).join('');
+ $$('[data-save-set-goal]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveSetGoal,v=$(`[data-set-goal="${sid}"]`)?.value;setGoalFor(sid,v);toast(v?'Set goal saved':'Using master-set goal');renderWishlist()});
+}
+function renderWishlist(){
+ renderGoalSummary();
+ const q=$('#wishlistSearch').value.trim().toLowerCase(),pf=$('#wishlistPriorityFilter').value,rank={high:0,medium:1,low:2};
+ let rows=wishlistEntries().filter(x=>{const hay=`${x.c?.name||''} ${SETS[x.sid]?.name||x.sid} ${x.c?.localId||''}`.toLowerCase();return (!q||hay.includes(q))&&(pf==='all'||x.w.priority===pf)});
+ rows.sort((a,b)=>(rank[a.w.priority]??1)-(rank[b.w.priority]??1)||String(a.c?.name||a.cid).localeCompare(String(b.c?.name||b.cid)));
+ const stats=wishlistStats();
+ $('#wishlistSummary').textContent=`${stats.total} wanted card${stats.total===1?'':'s'} · ${stats.high} high priority`;
+ $('#wishlistList').innerHTML=rows.length?rows.map(x=>{const label=x.c?(variantsFor(x.sid,x.c).find(v=>v.id===x.variantId)?.label||x.variantId):x.variantId;return `<div class="wishRow">${x.c?`<img src="${image(x.c,'low')}" data-fallback="${assetFallback(x.c,'low')}" onerror="retryImage(this)">`:'<div></div>'}<div><b>${x.c?.name||x.cid}</b><small>${SETS[x.sid]?.name||x.sid}${x.c?` · #${x.c.localId}`:''} · ${label}</small><span class="wishPriority ${x.w.priority}">${x.w.priority.toUpperCase()}</span>${x.w.targetPrice?`<small>Target ≤ $${Number(x.w.targetPrice).toFixed(2)}</small>`:''}${x.w.notes?`<small>${escapeHtml(x.w.notes)}</small>`:''}</div><div class="wishActions"><button class="btn small" data-wish-open="${x.sid}|${x.cid}|${x.variantId}">Open</button><button class="btn small" data-wish-remove="${x.sid}|${x.cid}|${x.variantId}">Remove</button></div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
+ $$('[data-wish-remove]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishRemove.split('|');removeWanted(s,c,v);renderWishlist()});
+ $$('[data-wish-open]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.wishOpen.split('|');if(!activeSetIds.has(s)){activeSetIds.add(s);saveActiveSets()}if(!cardsBySet[s])await loadSet(s);currentSet=s;$('#wishlistModal').classList.remove('open');await openCard(c,v)});
+}
+async function openWishlist(){$('#wishlistModal').classList.add('open');$('#wishlistList').innerHTML='<div class="tradeEmpty">Loading wishlist…</div>';await ensureWishlistSetsLoaded();renderWishlist()}
+
 function saveActiveSets(){
   try{localStorage.setItem('dexbinder_v05_active_sets',JSON.stringify([...activeSetIds]))}catch(e){console.warn('Active sets save failed',e)}
   if(typeof setCloudDirty==='function')setCloudDirty();
@@ -3425,7 +3511,9 @@ async function openCard(cid,forcedVariant){
  if(forcedVariant){vs=[...vs].sort((a,b)=>a.id===forcedVariant?-1:b.id===forcedVariant?1:0)}
  $('#detailVariants').innerHTML=vs.map(v=>{
    let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);
-   return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}${!navigator.onLine?' · cached':''}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>${on?collectorPanelHTML(c,v):''}`
+   let wanted=isWanted(currentSet,c.id,v.id),wish=getWish(currentSet,c.id,v.id);
+   return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}${!navigator.onLine?' · cached':''}`:'Price unavailable'}</small>${wanted?`<small>♡ Wanted · ${wish.priority} priority${wish.targetPrice?` · target $${Number(wish.targetPrice).toFixed(2)}`:''}</small>`:''}</div><div style="display:grid;gap:5px"><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button><button class="btn small" data-want-v="${v.id}">${wanted?'Edit wish':'♡ Want'}</button></div></div>
+   <div class="wishForm ${wanted?'':'hidden'}" data-wish-form="${v.id}"><select class="collectorSelect" data-wish-priority="${v.id}"><option value="high" ${wish?.priority==='high'?'selected':''}>High priority</option><option value="medium" ${!wish||wish?.priority==='medium'?'selected':''}>Medium priority</option><option value="low" ${wish?.priority==='low'?'selected':''}>Low priority</option></select><input class="collectorInput" data-wish-price="${v.id}" type="number" min="0" step="0.01" placeholder="Target price" value="${escapeHtml(wish?.targetPrice||'')}"><input class="collectorInput full" data-wish-notes="${v.id}" placeholder="Wishlist note" value="${escapeHtml(wish?.notes||'')}"><button class="btn dark" data-wish-save="${v.id}">Save wish</button>${wanted?`<button class="btn" data-wish-delete="${v.id}">Remove wish</button>`:'<span></span>'}</div>${on?collectorPanelHTML(c,v):''}`
  }).join('');
  $$('#detailVariants .toggle[data-v]').forEach(b=>b.onclick=()=>{
    let k=key(currentSet,c.id,b.dataset.v);
@@ -3433,6 +3521,11 @@ async function openCard(cid,forcedVariant){
    else{owned.add(k)}
    save();openCard(cid,forcedVariant);renderSet()
  });
+ 
+ $$('#detailVariants [data-want-v]').forEach(b=>b.onclick=()=>{$(`[data-wish-form="${b.dataset.wantV}"]`)?.classList.toggle('hidden')});
+ $$('#detailVariants [data-wish-save]').forEach(b=>b.onclick=()=>{const v=b.dataset.wishSave;setWanted(currentSet,c.id,v,{priority:$(`[data-wish-priority="${v}"]`)?.value||'medium',targetPrice:$(`[data-wish-price="${v}"]`)?.value||'',notes:$(`[data-wish-notes="${v}"]`)?.value.trim()||''});toast('Added to wishlist');openCard(cid,forcedVariant)});
+ $$('#detailVariants [data-wish-delete]').forEach(b=>b.onclick=()=>{removeWanted(currentSet,c.id,b.dataset.wishDelete);toast('Removed from wishlist');openCard(cid,forcedVariant)});
+
  vs.forEach(v=>{if(owned.has(key(currentSet,c.id,v.id)))bindCollectorPanel(c,v)});
 }
 
@@ -3704,7 +3797,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -3767,6 +3860,9 @@ $('#dataSyncBtn').onclick=()=>$('#dataSyncModal').classList.add('open');
 $('#setLibraryHome').onclick=openLibrary;
 $('#globalHuntHome').onclick=openGlobalHunt;
 
+$('#wishlistBtn').onclick=openWishlist;
+$('#wishlistSearch').oninput=renderWishlist;
+$('#wishlistPriorityFilter').onchange=renderWishlist;
 $('#scanCardBtn').onclick=openScanCard;
 $('#scanTakePhoto').onclick=()=>$('#scanImageInput').click();
 $('#scanImageInput').onchange=()=>{
@@ -3858,6 +3954,8 @@ function restoreBackupObject(d){
   if(Array.isArray(d.activeSets)){activeSetIds=new Set(d.activeSets);saveActiveSets()}
   if(d.collectorMeta && typeof d.collectorMeta==='object'){collectorMeta=d.collectorMeta;saveCollectorMeta()}
   if(Array.isArray(d.tradeHistory)){tradeHistory=d.tradeHistory;saveTradeHistory()}
+  if(d.wishlist && typeof d.wishlist==='object' && !Array.isArray(d.wishlist)){wishlist=d.wishlist;saveWishlist()}
+  if(d.setGoals && typeof d.setGoals==='object' && !Array.isArray(d.setGoals)){setGoals=d.setGoals;saveSetGoals()}
   save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
 }
 $('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};
