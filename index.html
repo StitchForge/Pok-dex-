@@ -84,15 +84,28 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .cacheNote{font-size:.66rem;color:var(--muted);margin-top:5px}
 .offlineBadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:#f2eee6;padding:5px 8px;font-size:.62rem;font-weight:850;color:var(--muted)}
 
+
+.cloudStatus{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f2eee6;border:1px solid var(--line);border-radius:14px;padding:10px;margin:10px 0}
+.cloudStatusText{min-width:0}.cloudStatusText b{display:block;font-size:.78rem}.cloudStatusText small{display:block;color:var(--muted);font-size:.65rem;margin-top:2px;overflow:hidden;text-overflow:ellipsis}
+.cloudDot{width:9px;height:9px;border-radius:50%;background:#a59d91;flex:0 0 auto}.cloudDot.on{background:#2d8a57}.cloudDot.wait{background:#b88835}
+.cloudActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cloudExplain{font-size:.7rem;color:var(--muted);line-height:1.45;background:#f7f3ec;border-radius:12px;padding:10px}
+.cloudEmail{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;margin-top:10px;background:#fff}
+.syncBadge{font-size:.6rem;font-weight:850;color:var(--muted)}
+
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+initCloud();
+</script>
+<script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6B.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -164,6 +177,30 @@ body.isStandalone .pwaInstallNote{display:none!important}
   <div class="pagePickerGrid" id="pagePickerGrid"></div>
 </div></div>
 
+
+
+<div class="modal" id="cloudModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>DexBinder Cloud</h2><p>Keep one collection across your devices.</p></div><button class="btn small close">Close</button></div>
+  <div class="cloudStatus">
+    <div class="cloudDot" id="cloudDot"></div>
+    <div class="cloudStatusText" style="flex:1"><b id="cloudTitle">Cloud not connected</b><small id="cloudSubtitle">Your local collection continues to work normally.</small></div>
+    <span class="syncBadge" id="cloudSyncBadge"></span>
+  </div>
+  <div id="cloudSignedOut">
+    <div class="cloudExplain"><b>Magic-link sign in</b><br>Enter your email and DexBinder will send you a secure sign-in link. There is no password to remember.</div>
+    <input class="cloudEmail" id="cloudEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">
+    <button class="btn dark" id="cloudSignIn" style="width:100%;margin-top:8px">Email me a sign-in link</button>
+  </div>
+  <div id="cloudSignedIn" class="hidden">
+    <div class="cloudExplain" id="cloudAccountExplain">Signed in. Changes are saved locally first and then synced to your cloud collection.</div>
+    <div class="cloudActions">
+      <button class="btn dark" id="cloudSyncNow">Sync now</button>
+      <button class="btn" id="cloudSignOut">Sign out</button>
+    </div>
+  </div>
+  <div class="cacheNote" style="margin-top:10px">Offline changes remain on this device and sync when DexBinder is online again. Backup remains available as an emergency export.</div>
+</div></div>
 
 <div class="modal" id="snapshotModal"><div class="sheet">
   <div class="grab"></div>
@@ -247,6 +284,10 @@ let binderPriceGeneration=0;
 let allScrollMemory={};
 let touchStartX=0,touchStartY=0,touchStartTime=0;
 let snapshotPage=1;
+let cloudClient=null,cloudUser=null,cloudSyncTimer=null,cloudSyncing=false,cloudReady=false;
+const CLOUD_DIRTY_KEY='dexbinder_v06c_cloud_dirty';
+const CLOUD_LAST_KEY='dexbinder_v06c_cloud_last_sync';
+
 let priceFetchedAt={};
 try{priceFetchedAt=JSON.parse(localStorage.getItem('dexbinder_v06_price_timestamps')||'{}')}catch(e){priceFetchedAt={}}
 
@@ -279,6 +320,110 @@ function saveActiveSets(){
 }
 const save=()=>{try{localStorage.setItem('dexbinder_v04_owned',JSON.stringify([...owned]));}catch(e){console.warn('DexBinder storage save failed',e)}renderStats()};
 
+
+
+function cloudConfigured(){
+  return !!(window.DEXBINDER_CLOUD?.url && window.DEXBINDER_CLOUD?.publishableKey &&
+    !window.DEXBINDER_CLOUD.url.includes('YOUR_') && !window.DEXBINDER_CLOUD.publishableKey.includes('YOUR_'));
+}
+function setCloudDirty(){
+  try{localStorage.setItem(CLOUD_DIRTY_KEY,'1')}catch(e){}
+  scheduleCloudSync();
+}
+function cloudPayload(){
+  return {
+    schema_version:1,
+    owned:[...owned],
+    active_sets:[...activeSetIds],
+    updated_at:new Date().toISOString()
+  };
+}
+function updateCloudUI(message=''){
+  const signed=!!cloudUser;
+  $('#cloudSignedOut')?.classList.toggle('hidden',signed);
+  $('#cloudSignedIn')?.classList.toggle('hidden',!signed);
+  const dot=$('#cloudDot'),title=$('#cloudTitle'),sub=$('#cloudSubtitle'),badge=$('#cloudSyncBadge');
+  if(!cloudConfigured()){
+    title.textContent='Cloud setup required';sub.textContent='Add your Supabase project details to cloud-config.js.';dot.className='cloudDot';badge.textContent='';
+  }else if(!signed){
+    title.textContent='Cloud ready';sub.textContent='Sign in to sync this collection.';dot.className='cloudDot wait';badge.textContent='';
+  }else{
+    title.textContent='Cloud connected';sub.textContent=cloudUser.email||'Signed in';dot.className='cloudDot on';
+    const last=localStorage.getItem(CLOUD_LAST_KEY);
+    badge.textContent=cloudSyncing?'Syncing…':(message|| (last?'Synced':'Ready'));
+  }
+}
+async function initCloud(){
+  if(!cloudConfigured() || !window.supabase?.createClient){updateCloudUI();return}
+  try{
+    cloudClient=window.supabase.createClient(window.DEXBINDER_CLOUD.url,window.DEXBINDER_CLOUD.publishableKey,{
+      auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}
+    });
+    const {data}=await cloudClient.auth.getSession();
+    cloudUser=data?.session?.user||null;cloudReady=true;updateCloudUI();
+    cloudClient.auth.onAuthStateChange((event,session)=>{
+      const was=cloudUser;cloudUser=session?.user||null;updateCloudUI();
+      if(cloudUser && !was)setTimeout(()=>initialCloudMerge(),0);
+    });
+    if(cloudUser)await initialCloudMerge();
+  }catch(e){console.warn('Cloud init',e);updateCloudUI('Unavailable')}
+}
+async function fetchCloudRow(){
+  if(!cloudClient||!cloudUser)return null;
+  const {data,error}=await cloudClient.from('collections').select('owned,active_sets,updated_at').eq('user_id',cloudUser.id).maybeSingle();
+  if(error)throw error;return data;
+}
+async function pushCloud(){
+  if(!cloudClient||!cloudUser||!navigator.onLine||cloudSyncing)return false;
+  cloudSyncing=true;updateCloudUI();
+  try{
+    const p=cloudPayload();
+    const {error}=await cloudClient.from('collections').upsert({
+      user_id:cloudUser.id,owned:p.owned,active_sets:p.active_sets,updated_at:p.updated_at
+    },{onConflict:'user_id'});
+    if(error)throw error;
+    localStorage.removeItem(CLOUD_DIRTY_KEY);
+    localStorage.setItem(CLOUD_LAST_KEY,new Date().toISOString());
+    updateCloudUI('Synced');return true;
+  }catch(e){console.warn('Cloud push',e);updateCloudUI('Retry later');return false}
+  finally{cloudSyncing=false}
+}
+async function initialCloudMerge(){
+  if(!cloudUser||!navigator.onLine)return;
+  cloudSyncing=true;updateCloudUI();
+  try{
+    const remote=await fetchCloudRow();
+    if(!remote){
+      cloudSyncing=false;await pushCloud();return;
+    }
+    // Conflict-safe first merge: never discard cards owned on either side.
+    const mergedOwned=new Set([...(remote.owned||[]),...owned]);
+    const mergedSets=new Set([...(remote.active_sets||[]),...activeSetIds]);
+    const changed=mergedOwned.size!==owned.size || mergedSets.size!==activeSetIds.size;
+    owned=mergedOwned;activeSetIds=mergedSets;save();saveActiveSets();
+    if(changed){renderStats();renderSetCards()}
+    cloudSyncing=false;await pushCloud();
+  }catch(e){console.warn('Cloud merge',e);cloudSyncing=false;updateCloudUI('Retry later')}
+}
+function scheduleCloudSync(){
+  if(!cloudUser||!navigator.onLine)return;
+  clearTimeout(cloudSyncTimer);
+  cloudSyncTimer=setTimeout(()=>pushCloud(),900);
+}
+async function cloudSignIn(){
+  if(!cloudConfigured()){toast('Cloud setup is not configured yet');return}
+  const email=$('#cloudEmail').value.trim();
+  if(!email || !email.includes('@')){toast('Enter a valid email');return}
+  const redirectTo=location.origin+location.pathname;
+  const {error}=await cloudClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo}});
+  if(error){console.warn(error);toast('Could not send sign-in link');return}
+  toast('Check your email for the DexBinder sign-in link');
+  $('#cloudSubtitle').textContent='Sign-in link sent · check your email';
+}
+async function cloudSignOut(){
+  if(!cloudClient)return;
+  await cloudClient.auth.signOut();cloudUser=null;updateCloudUI();toast('Signed out · local collection kept');
+}
 
 function applyPwaMode(){
   const standalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
@@ -519,7 +664,13 @@ async function openSet(sid,target='binder'){
  }
  setNav();
 }
-function setNav(){$$('#bottomNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
+function setNav(){
+$('#cloudBtn').onclick=()=>{updateCloudUI();$('#cloudModal').classList.add('open')};
+$('#cloudSignIn').onclick=cloudSignIn;
+$('#cloudSignOut').onclick=cloudSignOut;
+$('#cloudSyncNow').onclick=async()=>{if(await pushCloud())toast('Cloud sync complete')};
+
+$$('#bottomNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
 function goHome(){rememberAllScroll();currentSet=null;$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#libraryScreen').classList.add('hidden');$('#homeScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');view='home';setNav();renderStats()}
 function renderSet(){
  if(!currentSet)return;
@@ -866,7 +1017,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6B.1',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6C',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;

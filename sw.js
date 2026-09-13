@@ -1,8 +1,8 @@
-const CACHE='dexbinder-shell-v06b';
+const CACHE='dexbinder-shell-v06c';
 const APP_SHELL=[
   './',
   './index.html',
-  './manifest.webmanifest',
+  './manifest.webmanifest','./cloud-config.js',
   './icon-192.png',
   './icon-512.png',
   './icon-maskable-512.png',
