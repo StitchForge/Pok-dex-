@@ -1,37 +1,35 @@
-# DexBinder v0\.1 — Pokémon 151
+# DexBinder v0.6A — first PWA release
 
-A mobile\-first digital binder prototype for the English Scarlet & Violet—151 set\.
+This build is intentionally conservative. It proves the installable-app layer before v0.6B adds heavier offline card-data and image caching.
 
-## What works
+## What changed
+- PWA manifest.
+- 192px, 512px, maskable, and Apple touch icons.
+- Standalone app display mode.
+- iPhone/iPad Home Screen metadata.
+- Service worker registration.
+- Offline app-shell cache.
+- Network-first navigation with cached DexBinder fallback.
+- Online / offline status indicator.
+- Existing LocalStorage collection data continues to work offline.
+- Static homepage total corrected from the old 632 placeholder to 702.
 
-- Loads all 207 numbered cards from TCGdex &#40;`sv03.5`&#41;
-- 9 / 12 / 16 cards per page
-- Missing cards are dimmed/desaturated
-- Tap a card to mark it owned/missing
-- Binder completion count and percentage
-- Search by card name or number
-- Missing\-only view
-- Hunt Mode: missing cards appear in full colour; tap to mark found
-- Collection state saved in browser localStorage
-- Export/import JSON backup
-- Mobile responsive layout
+## What v0.6A does offline
+Once you have successfully opened DexBinder online at least once after deploying this build:
+- DexBinder itself can launch without a network connection.
+- Your locally stored ownership data remains available.
+- Previously loaded external card data may still depend on browser cache.
+- Live TCGdex card metadata, artwork, and prices are NOT yet guaranteed offline.
 
-## Deploy on Vercel
+That deeper caching is intentionally reserved for v0.6B.
 
-1. Create a new GitHub repository, e\.g\. `dexbinder`\.
-2. Upload `index.html` from this folder to the repository root\.
-3. In Vercel, create a New Project and import that GitHub repository\.
-4. Leave framework preset as **Other** / no framework if prompted\.
-5. Deploy\.
+## Install on iPhone
+1. Deploy all files and folders in this package to the root of the Vercel project.
+2. Open the deployed DexBinder URL in Safari.
+3. Reload once after deployment.
+4. Tap Share.
+5. Tap Add to Home Screen.
+6. Confirm DexBinder.
+7. Launch DexBinder from the new Home Screen icon.
 
-There is no build step and no API key required\.
-
-## Data source
-
-TCGdex REST API: `https://api.tcgdex.net/v2/en/sets/sv03.5`
-
-Card images use TCGdex’s low\-resolution WebP assets in the binder and high\-resolution WebP assets in the card detail sheet\.
-
-## Important v0\.1 limitation
-
-Progress is stored locally on each browser/device\. It does not yet sync between iPhone/iPad/desktop\. Use Export / Import to move or back up collection state\.
+If you have an older Home Screen shortcut, remove it first and install again so the new PWA metadata/icon is picked up.

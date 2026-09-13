@@ -3,8 +3,16 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<meta name="theme-color" content="#121212"/>
-<title>DexBinder v0.4</title>
+<meta name="theme-color" content="#171717"/>
+<meta name="application-name" content="DexBinder"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="DexBinder"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<link rel="manifest" href="./manifest.webmanifest"/>
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png"/>
+<title>DexBinder</title>
 <style>
 :root{--bg:#f3efe7;--paper:#fffdf8;--ink:#171717;--muted:#756f66;--line:#ded7cc;--yellow:#ffd24d;--red:#e94d3c;--green:#287a4b;--blue:#3e6fd8;--shadow:0 14px 40px rgba(0,0,0,.10)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,select{font:inherit}button{cursor:pointer}
@@ -42,19 +50,26 @@
   .pagePickerGrid{grid-template-columns:repeat(6,1fr)}
 }
 
+
+.netStatus{position:fixed;z-index:80;top:calc(8px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-16px);opacity:0;pointer-events:none;background:#171717;color:#fff;border-radius:999px;padding:7px 11px;font-size:.68rem;font-weight:900;box-shadow:0 8px 24px rgba(0,0,0,.18);transition:.2s}
+.netStatus.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.netStatus.offline{background:#8a3d2f}
+.pwaInstallNote{font-size:.68rem;color:var(--muted);margin-top:10px;text-align:center}
+
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.5.2</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6A</div></div>
 
   <section id="homeScreen">
-    <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 632</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
+    <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
     <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
     </div>
+  <div class="pwaInstallNote">Tip: on iPhone, Safari → Share → Add to Home Screen installs DexBinder like an app.</div>
   </section>
 
   <section id="setScreen" class="hidden">
@@ -123,6 +138,7 @@
 
 <div class="modal" id="backupModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Collection backup</h2><p>Copy this JSON somewhere safe, or paste it back to restore.</p></div><button class="btn small close">Close</button></div><textarea id="backupBox" style="width:100%;height:190px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace"></textarea><button class="btn dark" style="width:100%;margin-top:8px" id="copyBackup">Copy backup</button><button class="btn" style="width:100%;margin-top:7px" id="restoreBackup">Restore pasted backup</button></div></div>
 <div class="toast" id="toast"></div>
+<div class="netStatus" id="netStatus" role="status" aria-live="polite"></div>
 
 <script>
 const API='https://api.tcgdex.net/v2/en';
@@ -805,6 +821,29 @@ function bindSwipeNavigation(){
   },{passive:true});
 }
 
+
+function showNetworkStatus(force=false){
+  const el=$('#netStatus'); if(!el)return;
+  const online=navigator.onLine;
+  el.textContent=online?'Back online':'Offline · saved collection still available';
+  el.classList.toggle('offline',!online);
+  el.classList.add('show');
+  clearTimeout(showNetworkStatus._t);
+  showNetworkStatus._t=setTimeout(()=>el.classList.remove('show'),online?1800:3200);
+}
+window.addEventListener('online',()=>showNetworkStatus(true));
+window.addEventListener('offline',()=>showNetworkStatus(true));
+
+async function registerDexBinderServiceWorker(){
+  if(!('serviceWorker' in navigator))return;
+  try{
+    const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./'});
+    console.log('DexBinder service worker registered',reg.scope);
+  }catch(e){
+    console.warn('DexBinder service worker registration failed',e);
+  }
+}
+
 function runSelfTest(){
   const problems=[];
   Object.values(SETS).forEach(s=>{
@@ -826,6 +865,7 @@ function showBootError(stage,e){
   }
 }
 function initDexBinder(){
+  registerDexBinderServiceWorker();
   // Stage 1: render the core UI first. Optional migration/cache work must never block it.
   try{
     runSelfTest();
