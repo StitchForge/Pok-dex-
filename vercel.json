@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/tcgplayer-gg/page/:page",
+      "destination": "https://www.tcgplayer.com/search/pokemon/swsh-crown-zenith-galarian-gallery?productLineName=pokemon&setName=swsh-crown-zenith-galarian-gallery&productTypeName=Cards&view=grid&page=:page"
+    }
+  ]
+}

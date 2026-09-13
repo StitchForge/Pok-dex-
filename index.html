@@ -487,7 +487,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.4</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.5</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -1605,6 +1605,150 @@ function cardHTML(x){
  let tradeBadge=summary.forTrade?`<div class="tradeBadge">Trade</div>`:'';
  return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="retryImage(this)"><div class="fallback">#${c.localId}<br>${c.name}</div>${quantityBadge}${tradeBadge}${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
 }
+
+const GG_PRICE_CACHE_KEY='dexbinder_v085_gg_tcgplayer_prices';
+const GG_PRICE_TTL=6*60*60*1000;
+let ggPriceMap=null;
+let ggPriceMapPromise=null;
+
+function isGalarianGalleryCard(c){
+  return /^GG\d{2}$/i.test(String(c?.localId||''));
+}
+function decodeTcgplayerText(html){
+  return String(html||'')
+    .replace(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>/gi,' ')
+    .replace(/<\/script>/gi,' ')
+    .replace(/<[^>]+>/g,' ')
+    .replace(/&nbsp;|&#160;/gi,' ')
+    .replace(/&amp;/gi,'&')
+    .replace(/&quot;|&#34;/gi,'"')
+    .replace(/&#39;|&apos;/gi,"'")
+    .replace(/\s+/g,' ');
+}
+function parseGGPricesFromTcgplayerHTML(html){
+  const prices={};
+  const clean=decodeTcgplayerText(html);
+
+  // Human-readable result cards:
+  // #GG01/GG70 Hisuian Voltorb ... Market Price:$3.20
+  const visible=/#(GG\d{2})\/GG70[\s\S]{0,700}?Market Price:\s*\$([0-9]+(?:\.[0-9]{1,2})?)/gi;
+  let m;
+  while((m=visible.exec(clean))){
+    const key=m[1].toUpperCase();
+    const value=Number(m[2]);
+    if(Number.isFinite(value) && value>=0)prices[key]=value;
+  }
+
+  // Defensive pass for embedded JSON / hydrated page data.
+  const raw=String(html||'');
+  const ids=[...raw.matchAll(/GG\d{2}/gi)].map(x=>({id:x[0].toUpperCase(),index:x.index||0}));
+  for(const hit of ids){
+    if(prices[hit.id]!=null)continue;
+    const start=Math.max(0,hit.index-500);
+    const end=Math.min(raw.length,hit.index+2500);
+    const chunk=raw.slice(start,end);
+
+    let pm=chunk.match(/["']?marketPrice["']?\s*[:=]\s*["']?([0-9]+(?:\.[0-9]{1,2})?)/i);
+    if(!pm)pm=chunk.match(/Market Price(?::|\\u003A)?\s*(?:\$|\\u0024)\s*([0-9]+(?:\.[0-9]{1,2})?)/i);
+    if(pm){
+      const value=Number(pm[1]);
+      if(Number.isFinite(value) && value>=0)prices[hit.id]=value;
+    }
+  }
+  return prices;
+}
+function readGGPriceCache(){
+  try{
+    const raw=JSON.parse(localStorage.getItem(GG_PRICE_CACHE_KEY)||'null');
+    if(!raw || !raw.prices || !raw.fetchedAt)return null;
+    if(Date.now()-Number(raw.fetchedAt)>GG_PRICE_TTL)return null;
+    return raw.prices;
+  }catch(e){return null}
+}
+function writeGGPriceCache(prices){
+  try{
+    localStorage.setItem(GG_PRICE_CACHE_KEY,JSON.stringify({
+      fetchedAt:Date.now(),
+      prices
+    }));
+  }catch(e){}
+}
+async function loadGGPriceMap(force=false){
+  if(!force && ggPriceMap && Object.keys(ggPriceMap).length)return ggPriceMap;
+
+  if(!force){
+    const cached=readGGPriceCache();
+    if(cached && Object.keys(cached).length){
+      ggPriceMap=cached;
+      return ggPriceMap;
+    }
+  }
+
+  if(ggPriceMapPromise)return ggPriceMapPromise;
+
+  ggPriceMapPromise=(async()=>{
+    const merged={};
+    const pages=[1,2,3,4];
+    const results=await Promise.allSettled(
+      pages.map(async page=>{
+        const r=await fetch(`/tcgplayer-gg/page/${page}`,{
+          headers:{'accept':'text/html'}
+        });
+        if(!r.ok)throw new Error(`TCGplayer fallback page ${page} HTTP ${r.status}`);
+        return parseGGPricesFromTcgplayerHTML(await r.text());
+      })
+    );
+
+    for(const result of results){
+      if(result.status==='fulfilled')Object.assign(merged,result.value);
+    }
+
+    if(!Object.keys(merged).length){
+      throw new Error('TCGplayer fallback returned no Galarian Gallery prices');
+    }
+
+    ggPriceMap=merged;
+    writeGGPriceCache(merged);
+    return merged;
+  })().finally(()=>{ggPriceMapPromise=null});
+
+  return ggPriceMapPromise;
+}
+async function applyGGPriceFallback(c){
+  if(!isGalarianGalleryCard(c))return null;
+
+  try{
+    const map=await loadGGPriceMap();
+    const value=map[String(c.localId).toUpperCase()];
+    if(value==null)return null;
+
+    const existing=detailCache[c.id]||{};
+    const pricing={...(existing.pricing||{})};
+    const tcgplayer={...(pricing.tcgplayer||{})};
+
+    // Synthetic compatible pricing object so every existing DexBinder
+    // price consumer (Global Hunt, sorting, collection value, binder tags)
+    // can use the fallback without special-case code.
+    tcgplayer.holofoil={
+      ...(tcgplayer.holofoil||{}),
+      marketPrice:Number(value),
+      lowPrice:Number(value),
+      __source:'tcgplayer-fallback'
+    };
+
+    pricing.tcgplayer=tcgplayer;
+    detailCache[c.id]={
+      ...existing,
+      pricing,
+      __priceSource:'tcgplayer-fallback'
+    };
+    return detailCache[c.id];
+  }catch(e){
+    console.warn('TCGplayer GG fallback unavailable',c?.localId,e);
+    return null;
+  }
+}
+
 function cardDetailCandidates(c){
  const id=String(c?.id||'');
  const local=String(c?.localId||'');
@@ -1618,9 +1762,18 @@ function cardDetailCandidates(c){
 }
 async function loadPriceFor(c){
  const cached=detailCache[c.id];
- if(cached && (cached.pricing!==undefined || cached.category!==undefined || cached.rarity!==undefined)) return cached;
 
+ // If this already has usable pricing, do not refetch.
+ const cachedTcg=cached?.pricing?.tcgplayer;
+ const cachedGGPrice=isGalarianGalleryCard(c)
+   ? (cachedTcg?.holofoil?.lowPrice??cachedTcg?.holofoil?.marketPrice??cachedTcg?.holo?.lowPrice??cachedTcg?.holo?.marketPrice??cachedTcg?.normal?.lowPrice??cachedTcg?.normal?.marketPrice)
+   : null;
+ if(cached && (!isGalarianGalleryCard(c) || cachedGGPrice!=null))return cached;
+
+ let resolved=cached||null;
  let lastError=null;
+
+ // Primary source remains TCGdex.
  for(const detailId of cardDetailCandidates(c)){
    try{
      const r=await fetch(`${API}/cards/${detailId}`);
@@ -1629,15 +1782,32 @@ async function loadPriceFor(c){
        continue;
      }
      const d=await r.json();
+     resolved=d;
      detailCache[c.id]=d;
-     if(d?.variants) variantCache[c.id]=d.variants;
+     if(d?.variants)variantCache[c.id]=d.variants;
      priceFetchedAt[c.id]=Date.now();
      try{localStorage.setItem('dexbinder_v06_price_timestamps',JSON.stringify(priceFetchedAt))}catch(e){}
-     return d;
+
+     const t=d?.pricing?.tcgplayer;
+     const galleryValue=isGalarianGalleryCard(c)
+       ? (t?.holofoil?.lowPrice??t?.holofoil?.marketPrice??t?.holo?.lowPrice??t?.holo?.marketPrice??t?.normal?.lowPrice??t?.normal?.marketPrice)
+       : null;
+
+     // Non-GG cards can return immediately. GG cards return only if
+     // TCGdex actually supplied a usable marketplace value.
+     if(!isGalarianGalleryCard(c) || galleryValue!=null)return d;
    }catch(e){
      lastError=e;
    }
  }
+
+ // v0.8.5: actual TCGplayer website fallback for GG01–GG70.
+ if(isGalarianGalleryCard(c)){
+   const fallback=await applyGGPriceFallback(c);
+   if(fallback)return fallback;
+ }
+
+ if(resolved)return resolved;
  console.warn('Card detail failed',c.id,lastError);
  return null;
 }
@@ -1649,7 +1819,18 @@ function priceData(c,variant){
  if(isGallery)return t.holofoil||t.holo||t.normal||null;
  return t.normal||t.holofoil||t.holo||null;
 }
-function priceFor(c,variant){let p=priceData(c,variant);if(!p)return '';let v=p.lowPrice??p.marketPrice;if(v==null)return '';return `$${Number(v).toFixed(2)}`}
+function priceSourceFor(c){
+ return detailCache[c?.id]?.__priceSource||'tcgdex';
+}
+function priceFor(c,variant){
+ let p=priceData(c,variant);
+ if(!p)return '';
+ let v=p.__source==='tcgplayer-fallback'
+   ? (p.marketPrice??p.lowPrice)
+   : (p.lowPrice??p.marketPrice);
+ if(v==null)return '';
+ return `$${Number(v).toFixed(2)}`;
+}
 function updateVisiblePrice(x){if(!x.variant)return;let el=$$('.card').find(node=>node.dataset.cid===x.card.id && node.dataset.variant===x.variant.id);if(el&&!el.querySelector('.price')){let p=priceFor(x.card,x.variant.id);if(p)el.insertAdjacentHTML('beforeend',`<div class="price">${p}</div>`)}}
 
 
@@ -3149,10 +3330,14 @@ async function hydrateHuntPrices(items,generation){
       const row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);
       if(!row)return;
       const p=priceData(x.card,x.variant.id);
-      const val=p?.lowPrice??p?.marketPrice;
+      const isFallback=p?.__source==='tcgplayer-fallback'||priceSourceFor(x.card)==='tcgplayer-fallback';
+      const val=isFallback?(p?.marketPrice??p?.lowPrice):(p?.lowPrice??p?.marketPrice);
       row.dataset.price=val==null?'':String(val);
       row.dataset.priceLoaded='1';
-      row.querySelector('.p').textContent=val!=null?`$${val.toFixed(2)}`:'—';
+      row.dataset.priceSource=isFallback?'tcgplayer-fallback':'tcgdex';
+      row.querySelector('.p').textContent=val!=null?`$${Number(val).toFixed(2)}`:'—';
+      const sourceLabel=row.querySelector('.rowPrice small');
+      if(sourceLabel)sourceLabel.textContent=isFallback?'TCGplayer fallback':'TCGplayer reference';
     });
     applyHuntPriceFilter();
     sortGlobalHuntRows();

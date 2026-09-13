@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v084';
+const CACHE='dexbinder-shell-v085';
 const APP_SHELL=[
   './',
   './index.html',
@@ -18,7 +18,7 @@ self.addEventListener('install',event=>{
 });
 
 self.addEventListener('activate',event=>{
-  const keep=new Set([CACHE,'dexbinder-data-v06b','dexbinder-images-v06b']);
+  const keep=new Set([CACHE,'dexbinder-data-v085','dexbinder-images-v085']);
   event.waitUntil(
     caches.keys()
       .then(keys=>Promise.all(keys.filter(k=>k.startsWith('dexbinder-')&&!keep.has(k)).map(k=>caches.delete(k))))
@@ -26,8 +26,8 @@ self.addEventListener('activate',event=>{
   );
 });
 
-const DATA_CACHE='dexbinder-data-v06b';
-const IMAGE_CACHE='dexbinder-images-v06b';
+const DATA_CACHE='dexbinder-data-v085';
+const IMAGE_CACHE='dexbinder-images-v085';
 
 async function trimCache(name,max){
   const cache=await caches.open(name),keys=await cache.keys();
@@ -69,6 +69,11 @@ self.addEventListener('fetch',event=>{
         const copy=res.clone();caches.open(CACHE).then(c=>c.put('./index.html',copy));return res;
       }).catch(()=>caches.match('./index.html'))
     );
+    return;
+  }
+
+  if(url.origin===self.location.origin && url.pathname.startsWith('/tcgplayer-gg/')){
+    event.respondWith(fetch(req));
     return;
   }
 
