@@ -475,13 +475,19 @@ html{-webkit-text-size-adjust:100%}
   .quickAction small{font-size:.5rem}
 }
 
+
+/* v0.8.4 Global Hunt sorting */
+.huntControls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.huntControls select{width:100%;min-width:0}
+@media(max-width:390px){.huntControls{grid-template-columns:1fr}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.3</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.4</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -547,7 +553,18 @@ html{-webkit-text-size-adjust:100%}
   <section id="globalHuntScreen" class="hidden">
     <button class="btn small" id="huntBack">← My Dex</button>
     <div class="hero" style="margin-top:10px"><div class="eyebrow">Card show mode</div><h1>Global Hunt</h1><p>Everything missing across your active collections, with TCGplayer pricing when available.</p></div>
-    <div class="toolbar"><input class="search" id="huntSearch" placeholder="Search all missing cards…"/><select class="select" id="huntSet"><option value="all">All active sets</option></select></div>
+    <div class="toolbar"><input class="search" id="huntSearch" placeholder="Search all missing cards…"/></div>
+    <div class="huntControls">
+      <select class="select" id="huntSet"><option value="all">All active sets</option></select>
+      <select class="select" id="huntSort">
+        <option value="number-asc">Card number · low to high</option>
+        <option value="number-desc">Card number · high to low</option>
+        <option value="price-asc">Price · low to high</option>
+        <option value="price-desc">Price · high to low</option>
+        <option value="name-asc">Name · A–Z</option>
+        <option value="set-asc">Set · A–Z</option>
+      </select>
+    </div>
     <div class="chips"><button class="chip active" data-price="all">All prices</button><button class="chip" data-price="5">Under $5</button><button class="chip" data-price="10">Under $10</button><button class="chip" data-price="25">Under $25</button></div>
     <div class="notice">Prices are TCGplayer reference data supplied by TCGdex. Marketplace-to-variant matching is still being improved upstream, and prices may be cached or delayed. Verify expensive purchases before buying.</div>
     <div class="list" id="globalHuntList"></div>
@@ -990,7 +1007,7 @@ const SETS={
    masterTotal:342,variantStrategy:'detail'
  }
 };
-let currentSet=null,cardsBySet={},owned=new Set(),view='binder',binderMode='compact',page=1,selected=null,detailCache={},priceFilter='all';
+let currentSet=null,cardsBySet={},owned=new Set(),view='binder',binderMode='compact',page=1,selected=null,detailCache={},priceFilter='all',huntSort='number-asc';
 let variantReadyBySet={'sv03.5':true,'swsh12.5':false};
 let variantCache={};
 let variantLoadPromiseBySet={};
@@ -1588,25 +1605,49 @@ function cardHTML(x){
  let tradeBadge=summary.forTrade?`<div class="tradeBadge">Trade</div>`:'';
  return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="retryImage(this)"><div class="fallback">#${c.localId}<br>${c.name}</div>${quantityBadge}${tradeBadge}${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
 }
+function cardDetailCandidates(c){
+ const id=String(c?.id||'');
+ const local=String(c?.localId||'');
+ const ids=[id];
+ if(local.startsWith('GG')){
+   ids.push(`swsh12.5gg-${local}`);
+   ids.push(`swsh12pt5gg-${local}`);
+   ids.push(`swsh12.5-${local}`);
+ }
+ return [...new Set(ids.filter(Boolean))];
+}
 async function loadPriceFor(c){
  const cached=detailCache[c.id];
  if(cached && (cached.pricing!==undefined || cached.category!==undefined || cached.rarity!==undefined)) return cached;
- try{
-   const r=await fetch(`${API}/cards/${c.id}`);
-   if(!r.ok) throw new Error(`Card detail HTTP ${r.status}`);
-   const d=await r.json();
-   detailCache[c.id]=d;
-   if(d?.variants) variantCache[c.id]=d.variants;
-   priceFetchedAt[c.id]=Date.now();
-   try{localStorage.setItem('dexbinder_v06_price_timestamps',JSON.stringify(priceFetchedAt))}catch(e){}
-   return d;
- }catch(e){
-   console.warn('Card detail failed',c.id,e);
-   return null;
+
+ let lastError=null;
+ for(const detailId of cardDetailCandidates(c)){
+   try{
+     const r=await fetch(`${API}/cards/${detailId}`);
+     if(!r.ok){
+       lastError=new Error(`Card detail ${detailId} HTTP ${r.status}`);
+       continue;
+     }
+     const d=await r.json();
+     detailCache[c.id]=d;
+     if(d?.variants) variantCache[c.id]=d.variants;
+     priceFetchedAt[c.id]=Date.now();
+     try{localStorage.setItem('dexbinder_v06_price_timestamps',JSON.stringify(priceFetchedAt))}catch(e){}
+     return d;
+   }catch(e){
+     lastError=e;
+   }
  }
+ console.warn('Card detail failed',c.id,lastError);
+ return null;
 }
 function priceData(c,variant){
- let d=detailCache[c.id],t=d?.pricing?.tcgplayer;if(!t)return null; let p=variant==='reverse'?(t['reverse-holofoil']||t.reverse):(t.normal||t.holofoil||t.holo);return p||null
+ let d=detailCache[c.id],t=d?.pricing?.tcgplayer;
+ if(!t)return null;
+ if(variant==='reverse')return t['reverse-holofoil']||t.reverse||null;
+ const isGallery=String(c?.localId||'').startsWith('GG');
+ if(isGallery)return t.holofoil||t.holo||t.normal||null;
+ return t.normal||t.holofoil||t.holo||null;
 }
 function priceFor(c,variant){let p=priceData(c,variant);if(!p)return '';let v=p.lowPrice??p.marketPrice;if(v==null)return '';return `$${Number(v).toFixed(2)}`}
 function updateVisiblePrice(x){if(!x.variant)return;let el=$$('.card').find(node=>node.dataset.cid===x.card.id && node.dataset.variant===x.variant.id);if(el&&!el.querySelector('.price')){let p=priceFor(x.card,x.variant.id);if(p)el.insertAdjacentHTML('beforeend',`<div class="price">${p}</div>`)}}
@@ -3050,6 +3091,49 @@ function renderBulk(){
  let cs=cardsBySet[currentSet]||[];$('#bulkList').innerHTML=cs.map(c=>{let vs=variantsFor(currentSet,c);return `<div class="bulkRow"><div><b>#${c.localId} ${c.name}</b><span>${vs.map(v=>v.label).join(' + ')}</span></div>${vs.map(v=>`<button class="miniToggle ${owned.has(key(currentSet,c.id,v.id))?'on':''}" data-c="${c.id}" data-v="${v.id}">${v.id==='reverse'?'RH':v.label}</button>`).join('')}</div>`}).join('');
  $$('#bulkList .miniToggle').forEach(b=>b.onclick=()=>{let k=key(currentSet,b.dataset.c,b.dataset.v);owned.has(k)?owned.delete(k):owned.add(k);save();renderBulk();renderSet()})
 }
+
+function huntNumberValue(raw){
+ const s=String(raw||'');
+ const m=s.match(/(\d+)/);
+ return m?Number(m[1]):Number.MAX_SAFE_INTEGER;
+}
+function sortGlobalHuntRows(){
+ const list=$('#globalHuntList');
+ if(!list)return;
+ const rows=[...list.querySelectorAll('.row')];
+ rows.sort((a,b)=>{
+   const mode=huntSort||'number-asc';
+
+   if(mode==='price-asc'||mode==='price-desc'){
+     const ap=a.dataset.priceLoaded==='1' && a.dataset.price!=='' ? Number(a.dataset.price) : null;
+     const bp=b.dataset.priceLoaded==='1' && b.dataset.price!=='' ? Number(b.dataset.price) : null;
+     if(ap==null && bp==null)return 0;
+     if(ap==null)return 1;
+     if(bp==null)return -1;
+     return mode==='price-asc'?ap-bp:bp-ap;
+   }
+
+   if(mode==='number-asc'||mode==='number-desc'){
+     const setCmp=(a.dataset.setName||'').localeCompare(b.dataset.setName||'');
+     const numCmp=huntNumberValue(a.dataset.number)-huntNumberValue(b.dataset.number);
+     const result=setCmp||numCmp;
+     return mode==='number-asc'?result:-result;
+   }
+
+   if(mode==='name-asc'){
+     return (a.dataset.name||'').localeCompare(b.dataset.name||'') ||
+            (a.dataset.setName||'').localeCompare(b.dataset.setName||'');
+   }
+
+   if(mode==='set-asc'){
+     return (a.dataset.setName||'').localeCompare(b.dataset.setName||'') ||
+            huntNumberValue(a.dataset.number)-huntNumberValue(b.dataset.number);
+   }
+   return 0;
+ });
+ rows.forEach(r=>list.appendChild(r));
+}
+
 async function hydrateHuntPrices(items,generation){
   const uniqueCards=[...new Map(items.map(x=>[x.card.id,x.card])).values()];
   const batchSize=12;
@@ -3071,6 +3155,7 @@ async function hydrateHuntPrices(items,generation){
       row.querySelector('.p').textContent=val!=null?`$${val.toFixed(2)}`:'—';
     });
     applyHuntPriceFilter();
+    sortGlobalHuntRows();
     await new Promise(r=>setTimeout(r,35));
   }
 }
@@ -3116,10 +3201,11 @@ async function renderGlobalHunt(){
  });
  items=items.filter(x=>!q||x.card.name.toLowerCase().includes(q)||String(x.card.localId).toLowerCase().includes(q));
  const warning=skippedCrown?'<div class="notice error">One or more active sets are temporarily excluded because their master-set variant metadata did not finish loading. Retry on a stable connection rather than using an incomplete hunt list.</div>':'';
- const rows=items.length?items.map(x=>`<div class="row" data-key="${key(x.sid,x.card.id,x.variant.id)}" data-price="" data-price-loaded="0"><img class="thumb" src="${image(x.card)}"><div><h4>${x.card.name} · ${x.variant.label}</h4><p>${SETS[x.sid].name} · #${x.card.localId}</p></div><div class="rowPrice"><b class="p">…</b><small>TCGplayer reference</small></div></div>`).join(''):'<div class="notice">Nothing missing in this filter. Nice.</div>';
+ const rows=items.length?items.map(x=>`<div class="row" data-key="${key(x.sid,x.card.id,x.variant.id)}" data-price="" data-price-loaded="0" data-number="${x.card.localId}" data-name="${String(x.card.name||'').replace(/"/g,'&quot;')}" data-set-name="${String(SETS[x.sid].name||'').replace(/"/g,'&quot;')}"><img class="thumb" src="${image(x.card)}"><div><h4>${x.card.name} · ${x.variant.label}</h4><p>${SETS[x.sid].name} · #${x.card.localId}</p></div><div class="rowPrice"><b class="p">…</b><small>TCGplayer reference</small></div></div>`).join(''):'<div class="notice">Nothing missing in this filter. Nice.</div>';
  $('#globalHuntList').innerHTML=warning+rows;
  items.forEach(x=>{const wanted=key(x.sid,x.card.id,x.variant.id);let row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);if(row)row.onclick=()=>openSet(x.sid,'missing')});
  applyHuntPriceFilter();
+ sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
 function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,saved:new Date().toISOString()},null,2)}
@@ -3281,7 +3367,17 @@ $('#shareSnapshot').onclick=shareSnapshotImage;
 $$('#bottomNav button').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.view;if(v==='home'){goHome();return;}if(!currentSet){goHome();return;}rememberAllScroll();view=v;page=1;setNav();renderSet();}));
 let huntSearchTimer=null;
 $('#huntSearch').oninput=()=>{clearTimeout(huntSearchTimer);huntSearchTimer=setTimeout(renderGlobalHunt,180)};
-$('#huntSet').onchange=renderGlobalHunt;$$('[data-price]').forEach(b=>b.onclick=()=>{priceFilter=b.dataset.price;$$('[data-price]').forEach(x=>x.classList.toggle('active',x===b));applyHuntPriceFilter()});
+$('#huntSet').onchange=renderGlobalHunt;
+$('#huntSort').onchange=()=>{
+  huntSort=$('#huntSort').value;
+  sortGlobalHuntRows();
+};
+$$('[data-price]').forEach(b=>b.onclick=()=>{
+  priceFilter=b.dataset.price;
+  $$('[data-price]').forEach(x=>x.classList.toggle('active',x===b));
+  applyHuntPriceFilter();
+  sortGlobalHuntRows();
+});
 document.addEventListener('click',e=>{if(e.target.closest('.huntSet')&&e.target.closest('.huntSet').dataset.set==='all')openGlobalHunt()});
 
 async function resolveSupportedLibrary(){
