@@ -583,6 +583,34 @@ html{-webkit-text-size-adjust:100%}
  .acqRow img{width:46px}.acqValue{grid-column:1/-1;text-align:left}
 }
 
+
+/* v0.9.4 Achievements & Milestones */
+.achievementSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.achievementMetric{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px}
+.achievementMetric b{display:block;font-size:.82rem}.achievementMetric small{display:block;color:var(--muted);font-size:.5rem;margin-top:2px;line-height:1.3}
+.achievementFilters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin:8px 0}
+.achievementFilters button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 10px;font-size:.52rem;font-weight:900}
+.achievementFilters button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.achievementGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+.achievementCard{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;display:grid;gap:7px}
+.achievementCard.locked{opacity:.58}
+.achievementTop{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.achievementIcon{font-size:1.35rem;line-height:1}
+.achievementCard h3{margin:0;font-size:.72rem;line-height:1.2}
+.achievementCard p{margin:2px 0 0;color:var(--muted);font-size:.52rem;line-height:1.35}
+.achievementTier{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:.44rem;font-weight:950;border:1px solid var(--line);background:#f7f3ec}
+.achievementCard.unlocked .achievementTier{background:#eef5ef}
+.achievementProgress{height:6px;background:#eee6dc;border-radius:999px;overflow:hidden}
+.achievementProgress i{display:block;height:100%;background:var(--ink);border-radius:999px}
+.achievementMeta{display:flex;justify-content:space-between;gap:8px;font-size:.46rem;color:var(--muted)}
+.dashboardMilestone{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;margin:10px 0}
+.dashboardMilestoneHead{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.dashboardMilestoneHead b{font-size:.68rem}.dashboardMilestoneHead button{font-size:.5rem}
+.dashboardMilestoneBody{display:flex;align-items:center;gap:9px;margin-top:7px}
+.dashboardMilestoneBody .achievementIcon{font-size:1.25rem}
+.dashboardMilestoneBody small{display:block;color:var(--muted);font-size:.5rem;line-height:1.35}
+@media(max-width:430px){.achievementSummary{grid-template-columns:1fr 1fr}.achievementGrid{grid-template-columns:1fr}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -590,7 +618,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.3</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -606,6 +634,11 @@ html{-webkit-text-size-adjust:100%}
         <button class="btn small" id="dataSyncBtn">☁️ Data &amp; Sync</button>
         <button class="btn small" id="setLibraryHome">＋ Manage Sets</button>
       </div>
+    </section>
+
+    <section class="dashboardMilestone" id="dashboardMilestone">
+      <div class="dashboardMilestoneHead"><b>Latest milestone</b><button class="btn small" id="dashboardAchievementsBtn">View achievements</button></div>
+      <div class="dashboardMilestoneBody" id="dashboardMilestoneBody"><span class="achievementIcon">🏅</span><div><b>Building your collection…</b><small>Achievements will appear here as your Dex grows.</small></div></div>
     </section>
 
     <div class="activeHead"><div><h2>Active collections</h2><p>Tap anywhere on a set to open its binder.</p></div></div>
@@ -1036,6 +1069,7 @@ html{-webkit-text-size-adjust:100%}
     <button class="collectorHubCard" id="duplicatesBtn"><b>Duplicates</b><small>Find extra copies and move them into your trade binder.</small></button>
     <button class="collectorHubCard" id="collectionValueBtn"><b>Collection Value</b><small>Estimated collection, duplicate and trade reference values.</small></button>
     <button class="collectorHubCard" id="acquisitionHistoryBtn"><b>Acquisition History</b><small>See when and how your collection grew.</small></button>
+    <button class="collectorHubCard" id="achievementsBtn"><b>Achievements</b><small>Milestones for collection, sets, trades and grading.</small></button>
     <button class="collectorHubCard" id="csvExportBtn"><b>Export CSV</b><small>Download a human-readable collection spreadsheet.</small></button>
   </div>
 
@@ -1043,6 +1077,26 @@ html{-webkit-text-size-adjust:100%}
   <div class="csvNote">Master-set completion counts collectible positions. Physical card count includes duplicate copies and mixed conditions/grades, so these numbers are intentionally different.</div>
 </div></div>
 
+
+
+<div class="modal" id="achievementsModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Achievements</h2><p>A collector trophy cabinet built from your real DexBinder progress.</p></div><button class="btn small close">Close</button></div>
+  <div class="achievementSummary">
+    <div class="achievementMetric"><b id="achievementUnlockedCount">0</b><small>Milestones unlocked</small></div>
+    <div class="achievementMetric"><b id="achievementTotalCount">0</b><small>Total milestones</small></div>
+    <div class="achievementMetric"><b id="achievementNextLabel">—</b><small>Next milestone</small></div>
+  </div>
+  <div class="achievementFilters">
+    <button class="on" data-ach-filter="all">All</button>
+    <button data-ach-filter="collection">Collection</button>
+    <button data-ach-filter="sets">Sets</button>
+    <button data-ach-filter="trades">Trades</button>
+    <button data-ach-filter="grading">Grading</button>
+    <button data-ach-filter="acquisition">Acquisition</button>
+  </div>
+  <div class="achievementGrid" id="achievementGrid"></div>
+</div></div>
 
 <div class="modal" id="acquisitionHistoryModal"><div class="sheet">
   <div class="grab"></div>
@@ -1752,6 +1806,7 @@ function counts(sid){
   return [Math.min(n,total||n),total||n];
 }
 function renderStats(){
+  try{renderDashboardMilestone()}catch(e){}
  let gn=0,gt=0; [...activeSetIds].forEach(s=>{if(!SETS[s])return;let [n,t]=counts(s);gn+=n;gt+=t}); $('#globalOwned').textContent=`${gn} / ${gt}`; let gp=gt?Math.round(gn/gt*100):0;$('#globalPct').textContent=`${gp}% collected`;$('#globalProgress').style.width=gp+'%';
  if(currentSet){let [n,t]=counts(currentSet);let p=t?Math.round(n/t*100):0;$('#setOwned').textContent=`${n} / ${t}`;$('#setPct').textContent=`${p}% complete`;$('#setProgress').style.width=p+'%'}
  renderSetCards();
@@ -3608,8 +3663,95 @@ async function openAcquisitionHistory(){
  renderAcquisitionHistory();
 }
 
+
+let achievementFilter='all';
+
+function achievementStats(){
+ const stats=localCollectorStats();
+ let graded=0,purchaseLots=0,tradeLots=0,giftLots=0,pullLots=0;
+ const eraProgress={};
+ for(const [k,raw] of Object.entries(collectorMeta)){
+   const sid=k.split('|')[0];
+   const series=SETS[sid]?.series||'Other';
+   if(!eraProgress[series])eraProgress[series]={owned:0,total:0};
+   for(const l of legacyMetaToLots(raw)){
+     if(l.type==='graded')graded+=l.quantity;
+     if(l.acquisitionType==='purchase')purchaseLots+=l.quantity;
+     if(l.acquisitionType==='trade')tradeLots+=l.quantity;
+     if(l.acquisitionType==='gift')giftLots+=l.quantity;
+     if(l.acquisitionType==='pull')pullLots+=l.quantity;
+   }
+ }
+ for(const sid of activeSetIds){
+   const series=SETS[sid]?.series||'Other';
+   if(!eraProgress[series])eraProgress[series]={owned:0,total:0};
+   eraProgress[series].total+=(SETS[sid]?.masterTotal||0);
+   for(const k of owned)if(k.startsWith(`${sid}|`))eraProgress[series].owned++;
+ }
+ return {...stats,graded,completedTrades:tradeHistory.length,purchaseLots,tradeLots,giftLots,pullLots,eraProgress};
+}
+
+function achievementDefinitions(){
+ const s=achievementStats(),defs=[];
+ const add=(id,category,title,desc,icon,current,target,tier='Bronze')=>{
+   const unlocked=current>=target;
+   defs.push({id,category,title,desc,icon,current,target,tier,unlocked,progress:Math.max(0,Math.min(1,target?current/target:0))});
+ };
+ [['Bronze',100],['Silver',250],['Gold',500],['Diamond',1000]].forEach(([tier,target])=>add(`cards-${target}`,'collection',`${target} physical cards`,`Own ${target} physical cards across your collection.`,'🗂️',s.physical,target,tier));
+ [['Bronze',1],['Silver',2],['Gold',3],['Diamond',5]].forEach(([tier,target])=>add(`sets-${target}`,'sets',target===1?'First completed set':`${target} completed sets`,`Complete ${target} master set${target===1?'':'s'}.`,'🏆',s.completedSets,target,tier));
+ [['Bronze',1],['Silver',5],['Gold',10],['Diamond',25]].forEach(([tier,target])=>add(`trades-${target}`,'trades',target===1?'First completed trade':`${target} completed trades`,`Complete ${target} trade${target===1?'':'s'} in DexBinder.`,'🤝',s.completedTrades,target,tier));
+ [['Bronze',1],['Silver',5],['Gold',10],['Diamond',25]].forEach(([tier,target])=>add(`graded-${target}`,'grading',target===1?'First graded card':`${target} graded cards`,`Own ${target} graded card${target===1?'':'s'}.`,'💎',s.graded,target,tier));
+ add('first-purchase','acquisition','First recorded purchase','Record your first purchased card.','🛍️',s.purchaseLots,1,'Bronze');
+ add('first-trade-acq','acquisition','First trade acquisition','Receive your first card through a completed trade.','🔄',s.tradeLots,1,'Bronze');
+ add('first-gift','acquisition','First gifted card','Record a card received as a gift.','🎁',s.giftLots,1,'Bronze');
+ add('first-pull','acquisition','First recorded pull','Record a card you pulled yourself.','✨',s.pullLots,1,'Bronze');
+
+ for(const sid of activeSetIds){
+   const total=SETS[sid]?.masterTotal||0;
+   if(!total)continue;
+   let n=0;for(const k of owned)if(k.startsWith(`${sid}|`))n++;
+   const pct=Math.min(100,Math.round(n/total*100));
+   [['Bronze',25],['Silver',50],['Gold',75],['Diamond',100]].forEach(([tier,target])=>add(`set-${sid}-${target}`,'sets',`${SETS[sid]?.name||sid} · ${target}%`,`Reach ${target}% completion in ${SETS[sid]?.name||sid}.`,'📚',pct,target,tier));
+ }
+ for(const [era,p] of Object.entries(s.eraProgress)){
+   if(!p.total)continue;
+   const pct=Math.min(100,Math.round(p.owned/p.total*100));
+   add(`era-${era}-50`,'collection',`${era} · halfway`,`Reach 50% across your active ${era} sets.`,'🌟',pct,50,'Gold');
+   add(`era-${era}-100`,'collection',`${era} · complete`,`Complete every active ${era} master-set position.`,'👑',pct,100,'Diamond');
+ }
+ return defs;
+}
+
+function renderAchievements(){
+ const defs=achievementDefinitions(),visible=achievementFilter==='all'?defs:defs.filter(x=>x.category===achievementFilter);
+ const unlocked=defs.filter(x=>x.unlocked).length;
+ const next=defs.filter(x=>!x.unlocked).sort((a,b)=>(b.progress-a.progress)||a.target-b.target)[0];
+ $('#achievementUnlockedCount').textContent=unlocked;
+ $('#achievementTotalCount').textContent=defs.length;
+ $('#achievementNextLabel').textContent=next?`${Math.round(next.progress*100)}%`:'Complete';
+ $('#achievementGrid').innerHTML=visible.length?visible.map(a=>`<article class="achievementCard ${a.unlocked?'unlocked':'locked'}"><div class="achievementTop"><div style="display:flex;gap:8px;align-items:flex-start"><span class="achievementIcon">${a.icon}</span><div><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.desc)}</p></div></div><span class="achievementTier">${a.tier}</span></div><div class="achievementProgress"><i style="width:${Math.round(a.progress*100)}%"></i></div><div class="achievementMeta"><span>${a.unlocked?'Unlocked':'In progress'}</span><span>${Math.min(a.current,a.target)} / ${a.target}</span></div></article>`).join(''):'<div class="tradeEmpty">No achievements in this category yet.</div>';
+}
+
+function latestUnlockedAchievement(){
+ const unlocked=achievementDefinitions().filter(x=>x.unlocked);
+ if(!unlocked.length)return null;
+ const tierRank={Bronze:1,Silver:2,Gold:3,Diamond:4};
+ return [...unlocked].sort((a,b)=>(tierRank[b.tier]||0)-(tierRank[a.tier]||0)||b.target-a.target)[0];
+}
+
+function renderDashboardMilestone(){
+ const a=latestUnlockedAchievement(),body=$('#dashboardMilestoneBody');
+ if(!body)return;
+ if(!a){body.innerHTML='<span class="achievementIcon">🏅</span><div><b>No milestones yet</b><small>Your first achievement will appear here as your collection grows.</small></div>';return}
+ const unlocked=achievementDefinitions().filter(x=>x.unlocked).length;
+ body.innerHTML=`<span class="achievementIcon">${a.icon}</span><div><b>${escapeHtml(a.title)} · ${a.tier}</b><small>${unlocked} milestone${unlocked===1?'':'s'} unlocked so far.</small></div>`;
+}
+
+function openAchievements(){ $('#achievementsModal').classList.add('open'); renderAchievements(); }
+
 function renderCollectorTools(){
   const s=localCollectorStats();
+  renderDashboardMilestone();
   $('#metricMasterProgress').textContent=`${s.masterOwned}/${s.masterTotal}`;
   $('#metricPhysicalCards').textContent=s.physical;
   $('#metricDuplicates').textContent=s.duplicates;
@@ -4323,7 +4465,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.4',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -4394,6 +4536,9 @@ function updatePhysicalCountLabels(){
 
 
 $('#acquisitionHistoryBtn').onclick=openAcquisitionHistory;
+$('#achievementsBtn').onclick=openAchievements;
+$('#dashboardAchievementsBtn').onclick=openAchievements;
+$$('[data-ach-filter]').forEach(b=>b.onclick=()=>{achievementFilter=b.dataset.achFilter;$$('[data-ach-filter]').forEach(x=>x.classList.toggle('on',x===b));renderAchievements()});
 $('#acqTypeFilter').onchange=renderAcquisitionHistory;
 $('#acqSort').onchange=renderAcquisitionHistory;
 $('#globalSearchBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#globalSearchModal').classList.add('open');$('#globalCardSearchInput').focus();renderGlobalSearch()};
