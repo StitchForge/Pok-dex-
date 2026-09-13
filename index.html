@@ -223,13 +223,40 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .inventoryHint{font-size:.56rem;color:var(--muted);line-height:1.45;margin-top:8px}
 .lotTag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;font-size:.5rem;font-weight:850;margin-right:4px}
 
+
+/* v0.7.3c iPhone collector-form containment */
+.copyGroup,.copyGroupGrid,.copyGroupGrid>*,.collectorField,.gradeFields{min-width:0;max-width:100%}
+.collectorInput,.collectorSelect,.collectorNotes{
+  min-width:0;
+  max-width:100%;
+  width:100%;
+}
+.collectorInput[type="date"],
+.collectorInput[type="number"]{
+  min-width:0;
+  max-width:100%;
+}
+.copyGroupHead{align-items:flex-start;flex-wrap:wrap}
+.copyGroupHead>div{min-width:0;flex:1 1 180px}
+.copyGroupHead b{display:block;line-height:1.25}
+.copyGroupHead small{display:block;margin-top:3px;line-height:1.25}
+.copyGroupHead .lotTag{flex:0 0 auto}
+@media(max-width:430px){
+  .copyGroupGrid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .collectorInput,.collectorSelect,.collectorNotes{font-size:.7rem}
+}
+@media(max-width:360px){
+  .copyGroupGrid{grid-template-columns:1fr}
+  .copyGroupGrid .full,.gradeFields.full{grid-column:1}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3a</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3c</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -575,10 +602,10 @@ let incomingTradeBasket=new Map();
 const TRADE_HISTORY_KEY='dexbinder_v072_trade_history';
 let tradeHistory=[];
 try{tradeHistory=JSON.parse(localStorage.getItem(TRADE_HISTORY_KEY)||'[]')||[]}catch(e){tradeHistory=[]}
-setTimeout(()=>{try{migrateCollectorDataV073()}catch(e){}},0);
 let tradeFilter='all';
 
 try{collectorMeta=JSON.parse(localStorage.getItem(COLLECTOR_META_KEY)||'{}')||{}}catch(e){collectorMeta={}}
+setTimeout(()=>{try{migrateCollectorDataV073()}catch(e){console.warn('Collector migration skipped',e)}},0);
 
 try{priceFetchedAt=JSON.parse(localStorage.getItem('dexbinder_v06_price_timestamps')||'{}')}catch(e){priceFetchedAt={}}
 
@@ -1622,11 +1649,11 @@ function collectorOwnedRows(){
 function collectionStats(){
   const rows=collectorOwnedRows();
   const masterOwned=rows.length;
-  const masterTotal=activeSetIds.reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
+  const masterTotal=[...activeSetIds].reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
   const physical=rows.reduce((s,r)=>s+r.meta.quantity,0);
   const duplicates=rows.reduce((s,r)=>s+r.duplicateQty,0);
   const tradeQty=rows.reduce((s,r)=>s+r.meta.tradeQuantity,0);
-  const completedSets=activeSetIds.filter(sid=>{
+  const completedSets=[...activeSetIds].filter(sid=>{
     const set=SETS[sid];if(!set)return false;
     const count=rows.filter(r=>r.sid===sid).length;
     return count>=set.masterTotal;
@@ -1658,7 +1685,7 @@ async function ensurePricesForRows(rows){
 
 function localCollectorStats(){
   const masterOwned=owned.size;
-  const masterTotal=activeSetIds.reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
+  const masterTotal=[...activeSetIds].reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
   let physical=0,duplicates=0,tradeQty=0;
   for(const k of owned){
     const raw=collectorMeta[k];
@@ -1668,7 +1695,7 @@ function localCollectorStats(){
     duplicates+=Math.max(0,q-1);
     tradeQty+=lots.reduce((s,l)=>s+l.tradeQuantity,0);
   }
-  const completedSets=activeSetIds.filter(sid=>{
+  const completedSets=[...activeSetIds].filter(sid=>{
     let n=0;
     for(const k of owned)if(k.startsWith(`${sid}|`))n++;
     return n>=(SETS[sid]?.masterTotal||Infinity);
@@ -1689,9 +1716,16 @@ function renderCollectorTools(){
 }
 async function openCollectorTools(){
   $('#collectorToolsModal').classList.add('open');
-  migrateCollectorDataV073();
-  renderCollectorTools(); // local stats first — no network wait
-  ensureAllActiveSetsLoaded().then(()=>renderCollectorTools()).catch(()=>{});
+  try{
+    migrateCollectorDataV073();
+    renderCollectorTools();
+  }catch(e){
+    console.error('Collector Tools local stats failed',e);
+    $('#dataHealthBox').textContent=`Collector Tools error: ${e?.message||'Could not calculate local statistics.'}`;
+  }
+  ensureAllActiveSetsLoaded().then(()=>{
+    try{renderCollectorTools()}catch(e){console.warn('Collector Tools refresh skipped',e)}
+  }).catch(()=>{});
 }
 function globalSearchRows(q){
   q=q.trim().toLowerCase();
