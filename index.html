@@ -260,17 +260,48 @@ body.isStandalone .pwaInstallNote{display:none!important}
 #collectionHero:active{transform:scale(.995);opacity:.97}
 #collectionHero:focus-visible{outline:3px solid #f0c94a;outline-offset:3px}
 
+
+/* v0.8.0 Fast Add */
+.fastAddSearch{display:grid;grid-template-columns:1fr auto;gap:8px;margin:10px 0}
+.fastAddResults{display:grid;gap:8px;max-height:48vh;overflow:auto}
+.fastAddCard{display:grid;grid-template-columns:58px 1fr;gap:9px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:8px}
+.fastAddCard img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:7px}
+.fastAddCard b{display:block;font-size:.72rem}
+.fastAddCard small{display:block;color:var(--muted);font-size:.55rem;line-height:1.35;margin-top:2px}
+.fastAddVariants{display:flex;gap:5px;flex-wrap:wrap;margin-top:7px}
+.fastAddVariants button{border:1px solid var(--line);background:#f7f3ec;border-radius:8px;padding:5px 7px;font-size:.55rem;font-weight:850}
+.fastAddEditor{display:none;margin-top:10px}
+.fastAddEditor.open{display:block}
+.fastAddSelected{display:grid;grid-template-columns:72px 1fr;gap:10px;align-items:start;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px}
+.fastAddSelected img{width:72px;aspect-ratio:245/337;object-fit:cover;border-radius:8px}
+.fastAddSelected h3{margin:0;font-size:.9rem}
+.fastAddSelected p{margin:4px 0 0;color:var(--muted);font-size:.58rem;line-height:1.35}
+.fastAddForm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.fastAddForm .full{grid-column:1/-1}
+.fastAddActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.fastAddRecent{margin-top:12px}
+.fastAddRecentList{display:grid;gap:6px}
+.fastAddRecentItem{display:flex;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:10px;padding:8px;background:#fff;font-size:.6rem}
+.fastAddRecentItem small{color:var(--muted)}
+.fastAddModeTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.fastAddModeTabs button{border:1px solid var(--line);background:#f7f3ec;border-radius:9px;padding:8px;font-size:.62rem;font-weight:850}
+.fastAddModeTabs button.on{background:#171717;color:#fff}
+@media(max-width:390px){
+  .fastAddForm{grid-template-columns:1fr}
+  .fastAddForm .full{grid-column:1}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3d</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.0</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="fastAddBtn">＋ Fast Add</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -345,6 +376,120 @@ body.isStandalone .pwaInstallNote{display:none!important}
 
 
 
+
+
+<div class="modal" id="fastAddModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Fast Add</h2><p>Search, record, save, repeat.</p></div><button class="btn small close">Close</button></div>
+
+  <div class="fastAddSearch">
+    <input class="collectorInput" id="fastAddSearchInput" type="search" placeholder="Search active sets by card name or number…">
+    <button class="btn small" id="fastAddClearBtn">Clear</button>
+  </div>
+  <div class="fastAddResults" id="fastAddResults"></div>
+
+  <div class="fastAddEditor" id="fastAddEditor">
+    <div class="fastAddSelected">
+      <img id="fastAddImage" alt="">
+      <div><h3 id="fastAddName">Card</h3><p id="fastAddMeta"></p></div>
+    </div>
+
+    <div class="fastAddForm">
+      <div class="collectorField full">
+        <label>Card type</label>
+        <div class="fastAddModeTabs">
+          <button type="button" id="fastAddRawBtn" class="on">Raw</button>
+          <button type="button" id="fastAddGradedBtn">Graded</button>
+        </div>
+      </div>
+
+      <div class="collectorField">
+        <label>Quantity</label>
+        <div class="qtyControl">
+          <button type="button" id="fastAddQtyMinus">−</button>
+          <div class="qtyValue" id="fastAddQty">1</div>
+          <button type="button" id="fastAddQtyPlus">+</button>
+        </div>
+      </div>
+      <div class="collectorField">
+        <label>Trade quantity</label>
+        <div class="tradeQtyControl">
+          <button type="button" id="fastAddTradeMinus">−</button>
+          <div class="tradeQtyValue" id="fastAddTradeQty">0 of 1</div>
+          <button type="button" id="fastAddTradePlus">+</button>
+        </div>
+      </div>
+
+      <div class="collectorField" id="fastAddConditionWrap">
+        <label>Condition</label>
+        <select class="collectorSelect" id="fastAddCondition">
+          <option value="">Not set</option>
+          <option value="NM">Near Mint</option>
+          <option value="LP">Lightly Played</option>
+          <option value="MP">Moderately Played</option>
+          <option value="HP">Heavily Played</option>
+          <option value="DMG">Damaged</option>
+        </select>
+      </div>
+
+      <div class="collectorField">
+        <label>Language</label>
+        <select class="collectorSelect" id="fastAddLanguage">
+          <option>English</option><option>Japanese</option><option>Chinese</option><option>Korean</option>
+          <option>French</option><option>German</option><option>Italian</option><option>Spanish</option>
+          <option>Portuguese</option><option>Other</option>
+        </select>
+      </div>
+
+      <div class="gradeFields hidden full" id="fastAddGradeFields">
+        <div class="fastAddForm">
+          <div class="collectorField">
+            <label>Grading company</label>
+            <select class="collectorSelect" id="fastAddCompany">
+              <option>PSA</option><option>CGC</option><option>BGS</option><option>SGC</option><option>ACE</option><option>Other</option>
+            </select>
+          </div>
+          <div class="collectorField">
+            <label>Grade</label>
+            <select class="collectorSelect" id="fastAddGrade">
+              <option value="">Not set</option>
+              <option>10</option><option>9.5</option><option>9</option><option>8.5</option><option>8</option>
+              <option>7.5</option><option>7</option><option>6</option><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option>
+              <option>Authentic</option><option>Other</option>
+            </select>
+          </div>
+          <div class="collectorField full">
+            <label>Certification number</label>
+            <input class="collectorInput" id="fastAddCert" type="text" placeholder="Optional">
+          </div>
+        </div>
+      </div>
+
+      <div class="collectorField">
+        <label>Purchase price / card</label>
+        <input class="collectorInput" id="fastAddPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
+      </div>
+      <div class="collectorField">
+        <label>Purchase date</label>
+        <input class="collectorInput" id="fastAddDate" type="date">
+      </div>
+      <div class="collectorField full">
+        <label>Notes</label>
+        <textarea class="collectorNotes" id="fastAddNotes" placeholder="Optional notes…"></textarea>
+      </div>
+    </div>
+
+    <div class="fastAddActions">
+      <button class="btn" id="fastAddSaveStay">Save</button>
+      <button class="btn dark" id="fastAddSaveNext">Save & Next</button>
+    </div>
+  </div>
+
+  <div class="fastAddRecent">
+    <div class="collectorHead"><div><b>Recently added</b><small>This session</small></div></div>
+    <div class="fastAddRecentList" id="fastAddRecentList"></div>
+  </div>
+</div></div>
 
 <div class="modal" id="collectorToolsModal"><div class="sheet">
   <div class="grab"></div>
@@ -1619,6 +1764,124 @@ async function openTradeList(){
 
 const COLLECTOR_MIGRATION_KEY='dexbinder_v073_migrated';
 
+let fastAddSelection=null;
+let fastAddDraft={qty:1,tradeQty:0,type:'raw'};
+let fastAddRecent=[];
+
+function resetFastAddDraft(){
+  fastAddDraft={qty:1,tradeQty:0,type:'raw'};
+  $('#fastAddQty').textContent='1';
+  $('#fastAddTradeQty').textContent='0 of 1';
+  $('#fastAddRawBtn').classList.add('on');
+  $('#fastAddGradedBtn').classList.remove('on');
+  $('#fastAddConditionWrap').classList.remove('hidden');
+  $('#fastAddGradeFields').classList.add('hidden');
+  $('#fastAddCondition').value='';
+  $('#fastAddLanguage').value='English';
+  $('#fastAddCompany').value='PSA';
+  $('#fastAddGrade').value='';
+  $('#fastAddCert').value='';
+  $('#fastAddPrice').value='';
+  $('#fastAddDate').value='';
+  $('#fastAddNotes').value='';
+}
+function renderFastAddResults(){
+  const q=$('#fastAddSearchInput').value.trim().toLowerCase();
+  if(q.length<2){$('#fastAddResults').innerHTML='<div class="tradeEmpty">Type at least 2 characters.</div>';return}
+  const matches=[];
+  for(const sid of activeSetIds){
+    for(const c of (cardsBySet[sid]||[])){
+      if(c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase()===q||String(c.id).toLowerCase().includes(q)){
+        matches.push({sid,c}); if(matches.length>=30)break;
+      }
+    }
+    if(matches.length>=30)break;
+  }
+  $('#fastAddResults').innerHTML=matches.length?matches.map(({sid,c})=>`
+    <div class="fastAddCard">
+      <img src="${image(c,'low')}" data-fallback="${assetFallback(c,'low')}" onerror="retryImage(this)">
+      <div><b>${c.name}</b><small>${SETS[sid]?.name||sid} · #${c.localId}</small>
+        <div class="fastAddVariants">${variantsFor(sid,c).map(v=>`<button data-fast-add-select="${sid}|${c.id}|${v.id}">${v.label}</button>`).join('')}</div>
+      </div>
+    </div>`).join(''):'<div class="tradeEmpty">No matching cards in active sets.</div>';
+  $$('[data-fast-add-select]').forEach(b=>b.onclick=()=>{
+    const [sid,cid,variantId]=b.dataset.fastAddSelect.split('|');
+    const c=(cardsBySet[sid]||[]).find(x=>x.id===cid); if(!c)return;
+    const v=variantsFor(sid,c).find(x=>x.id===variantId); if(!v)return;
+    fastAddSelection={sid,c,v};
+    resetFastAddDraft();
+    $('#fastAddImage').src=image(c,'low');
+    $('#fastAddImage').dataset.fallback=assetFallback(c,'low');
+    $('#fastAddName').textContent=c.name;
+    $('#fastAddMeta').textContent=`${SETS[sid]?.name||sid} · #${c.localId} · ${v.label}`;
+    $('#fastAddEditor').classList.add('open');
+  });
+}
+function renderFastAddRecent(){
+  $('#fastAddRecentList').innerHTML=fastAddRecent.length?fastAddRecent.slice(0,8).map(x=>`
+    <div class="fastAddRecentItem"><span>${x.qty}× ${x.name} · ${x.variant}</span><small>${x.type==='graded'?(x.company+' '+(x.grade||'')):(x.condition||'Raw')}</small></div>
+  `).join(''):'<div class="tradeEmpty">Nothing added this session yet.</div>';
+}
+function fastAddAdjustQty(delta){
+  fastAddDraft.qty=Math.max(1,Math.min(99,fastAddDraft.qty+delta));
+  fastAddDraft.tradeQty=Math.min(fastAddDraft.tradeQty,fastAddDraft.qty);
+  $('#fastAddQty').textContent=fastAddDraft.qty;
+  $('#fastAddTradeQty').textContent=`${fastAddDraft.tradeQty} of ${fastAddDraft.qty}`;
+}
+function fastAddAdjustTrade(delta){
+  fastAddDraft.tradeQty=Math.max(0,Math.min(fastAddDraft.qty,fastAddDraft.tradeQty+delta));
+  $('#fastAddTradeQty').textContent=`${fastAddDraft.tradeQty} of ${fastAddDraft.qty}`;
+}
+function fastAddSetType(type){
+  fastAddDraft.type=type;
+  $('#fastAddRawBtn').classList.toggle('on',type==='raw');
+  $('#fastAddGradedBtn').classList.toggle('on',type==='graded');
+  $('#fastAddConditionWrap').classList.toggle('hidden',type==='graded');
+  $('#fastAddGradeFields').classList.toggle('hidden',type!=='graded');
+}
+function fastAddSave(next=false){
+  if(!fastAddSelection){toast('Choose a card first');return}
+  const {sid,c,v}=fastAddSelection;
+  const k=key(sid,c.id,v.id);
+  const existing=owned.has(k)?getCollectorLots(sid,c.id,v.id):[];
+  const lot=normaliseCollectorLot({
+    quantity:fastAddDraft.qty,
+    tradeQuantity:fastAddDraft.tradeQty,
+    type:fastAddDraft.type,
+    condition:fastAddDraft.type==='raw'?$('#fastAddCondition').value:'',
+    language:$('#fastAddLanguage').value,
+    gradingCompany:fastAddDraft.type==='graded'?$('#fastAddCompany').value:'',
+    grade:fastAddDraft.type==='graded'?$('#fastAddGrade').value:'',
+    certNumber:fastAddDraft.type==='graded'?$('#fastAddCert').value.trim():'',
+    purchasePrice:$('#fastAddPrice').value,
+    purchaseDate:$('#fastAddDate').value,
+    notes:$('#fastAddNotes').value.trim()
+  });
+  owned.add(k);
+  setCollectorLots(sid,c.id,v.id,[...existing,lot]);
+  save();
+  fastAddRecent.unshift({
+    name:c.name,variant:v.label,qty:lot.quantity,type:lot.type,condition:lot.condition,company:lot.gradingCompany,grade:lot.grade
+  });
+  renderFastAddRecent();
+  renderSet();
+  toast(`${lot.quantity}× ${c.name} added`);
+  if(next){
+    $('#fastAddEditor').classList.remove('open');
+    fastAddSelection=null;
+    resetFastAddDraft();
+    $('#fastAddSearchInput').focus();
+    $('#fastAddSearchInput').select();
+  }
+}
+async function openFastAdd(){
+  $('#fastAddModal').classList.add('open');
+  await ensureAllActiveSetsLoaded();
+  renderFastAddRecent();
+  $('#fastAddSearchInput').focus();
+}
+
+
 function migrateCollectorDataV073(){
   let changed=0;
   for(const [k,raw] of Object.entries(collectorMeta)){
@@ -2343,6 +2606,24 @@ $('#duplicateSetFilter').onchange=renderDuplicates;
 $('#collectionValueBtn').onclick=async()=>{$('#collectionValueModal').classList.add('open');await renderCollectionValue()};
 $('#csvExportBtn').onclick=exportCollectionCSV;
 
+
+
+$('#fastAddBtn').onclick=openFastAdd;
+$('#fastAddSearchInput').oninput=renderFastAddResults;
+$('#fastAddClearBtn').onclick=()=>{
+  $('#fastAddSearchInput').value='';
+  $('#fastAddResults').innerHTML='';
+  $('#fastAddEditor').classList.remove('open');
+  fastAddSelection=null;
+};
+$('#fastAddQtyMinus').onclick=()=>fastAddAdjustQty(-1);
+$('#fastAddQtyPlus').onclick=()=>fastAddAdjustQty(1);
+$('#fastAddTradeMinus').onclick=()=>fastAddAdjustTrade(-1);
+$('#fastAddTradePlus').onclick=()=>fastAddAdjustTrade(1);
+$('#fastAddRawBtn').onclick=()=>fastAddSetType('raw');
+$('#fastAddGradedBtn').onclick=()=>fastAddSetType('graded');
+$('#fastAddSaveStay').onclick=()=>fastAddSave(false);
+$('#fastAddSaveNext').onclick=()=>fastAddSave(true);
 
 const collectionHero=$('#collectionHero');
 if(collectionHero){
