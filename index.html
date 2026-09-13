@@ -144,13 +144,48 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .tradeFilterRow .chip{white-space:nowrap}
 .tradeSourceNote{font-size:.58rem;color:var(--muted);line-height:1.4;margin-top:8px}
 
+
+/* v0.7.2 real-world trade workflow */
+.tradeQtyControl{display:grid;grid-template-columns:34px 1fr 34px;gap:6px;align-items:center}
+.tradeQtyControl button{height:34px;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:900}
+.tradeQtyValue{height:34px;display:grid;place-items:center;border:1px solid var(--line);border-radius:9px;background:#fff;font-weight:900;font-size:.75rem}
+.compareGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
+.compareSide{border:1px solid var(--line);border-radius:15px;background:#f7f3ec;overflow:hidden}
+.compareHead{padding:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.compareHead b{font-size:.76rem}.compareHead strong{font-size:.9rem}
+.compareList{display:grid;gap:7px;padding:8px}
+.compareItem{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px}
+.compareItemTop{display:grid;grid-template-columns:42px 1fr;gap:8px;align-items:center}
+.compareItem img{width:42px;aspect-ratio:245/337;object-fit:cover;border-radius:5px}
+.compareItem b{font-size:.66rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.compareItem small{font-size:.54rem;color:var(--muted);line-height:1.25}
+.compareItemControls{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.compareItemControls .btn{padding:6px 8px;font-size:.58rem}
+.compareQty{display:inline-flex;gap:4px;align-items:center}
+.compareQty button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:#fff;font-weight:900}
+.compareQty span{min-width:22px;text-align:center;font-weight:900;font-size:.65rem}
+.compareDifference{padding:12px;border-radius:15px;background:#171717;color:#fff;margin:10px 0;text-align:center}
+.compareDifference b{display:block;font-size:1.3rem}.compareDifference small{color:#cfc7bb;font-size:.62rem}
+.tradeSearchWrap{margin:10px 0}
+.tradeSearchResults{display:grid;gap:7px;max-height:320px;overflow:auto;margin-top:8px}
+.tradeSearchCard{display:grid;grid-template-columns:50px 1fr;gap:8px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:7px}
+.tradeSearchCard img{width:50px;aspect-ratio:245/337;object-fit:cover;border-radius:6px}
+.tradeSearchCard b{font-size:.7rem}.tradeSearchCard small{display:block;color:var(--muted);font-size:.55rem;margin:2px 0 5px}
+.tradeVariantButtons{display:flex;gap:5px;flex-wrap:wrap}
+.tradeVariantButtons button{border:1px solid var(--line);background:#f7f3ec;border-radius:8px;padding:5px 7px;font-size:.55rem;font-weight:850}
+.tradeCompareActions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.historyList{display:grid;gap:8px;max-height:430px;overflow:auto}
+.historyItem{border:1px solid var(--line);border-radius:13px;padding:10px;background:#fff}
+.historyItem b{font-size:.72rem}.historyItem small{display:block;color:var(--muted);font-size:.58rem;margin-top:3px;line-height:1.4}
+.historyValues{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:.65rem;font-weight:900}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.2</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -264,8 +299,47 @@ body.isStandalone .pwaInstallNote{display:none!important}
 
   <div class="tradeBasketBar hidden" id="tradeBasketBar">
     <div><b id="tradeBasketTotal">$0.00</b><small id="tradeBasketMeta">0 cards in basket</small></div>
-    <button id="clearTradeBasket">Clear</button>
+    <div style="display:flex;gap:6px"><button id="compareTradeBasket">Compare</button><button id="clearTradeBasket">Clear</button></div>
   </div>
+</div></div>
+
+
+<div class="modal" id="tradeCompareModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Compare Trade</h2><p>Build both sides, compare reference values, then complete the trade.</p></div><button class="btn small close">Close</button></div>
+
+  <div class="compareGrid">
+    <div class="compareSide">
+      <div class="compareHead"><b>You Give</b><strong id="giveTotal">$0.00</strong></div>
+      <div class="compareList" id="giveList"></div>
+    </div>
+    <div class="compareSide">
+      <div class="compareHead"><b>You Get</b><strong id="getTotal">$0.00</strong></div>
+      <div class="compareList" id="getList"></div>
+    </div>
+  </div>
+
+  <div class="compareDifference">
+    <b id="tradeDifference">$0.00</b>
+    <small id="tradeDifferenceMeta">Reference value difference</small>
+  </div>
+
+  <div class="tradeSearchWrap">
+    <input class="collectorInput" id="incomingTradeSearch" type="search" placeholder="Search cards to add to You Get…">
+    <div class="tradeSearchResults" id="incomingTradeResults"></div>
+  </div>
+
+  <div class="tradeCompareActions">
+    <button class="btn" id="tradeHistoryBtn">Trade history</button>
+    <button class="btn dark" id="completeTradeBtn">Complete trade</button>
+  </div>
+  <div class="tradeSourceNote">Reference values are informational only. Use Override on any line to enter an agreed trade value without changing the card's stored market data.</div>
+</div></div>
+
+<div class="modal" id="tradeHistoryModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Trade History</h2><p>Completed trades saved on this device.</p></div><button class="btn small close">Close</button></div>
+  <div class="historyList" id="tradeHistoryList"></div>
 </div></div>
 
 <div class="modal" id="cloudModal"><div class="sheet">
@@ -388,7 +462,11 @@ let priceFetchedAt={};
 const COLLECTOR_META_KEY='dexbinder_v07_collector_meta';
 let collectorMeta={};
 
-let tradeBasket=new Set();
+let tradeBasket=new Map();
+let incomingTradeBasket=new Map();
+const TRADE_HISTORY_KEY='dexbinder_v072_trade_history';
+let tradeHistory=[];
+try{tradeHistory=JSON.parse(localStorage.getItem(TRADE_HISTORY_KEY)||'[]')||[]}catch(e){tradeHistory=[]}
 let tradeFilter='all';
 
 try{collectorMeta=JSON.parse(localStorage.getItem(COLLECTOR_META_KEY)||'{}')||{}}catch(e){collectorMeta={}}
@@ -965,14 +1043,18 @@ function metaKey(sid,cid,variantId){return key(sid,cid,variantId)}
 function getCollectorMeta(sid,cid,variantId){
   const k=metaKey(sid,cid,variantId);
   const raw=collectorMeta[k]||{};
+  const quantity=Math.max(1,Number(raw.quantity)||1);
+  const legacyTrade=raw.forTrade?quantity:0;
+  const tradeQuantity=Math.max(0,Math.min(quantity,Number(raw.tradeQuantity ?? legacyTrade)||0));
   return {
-    quantity:Math.max(1,Number(raw.quantity)||1),
+    quantity,
+    tradeQuantity,
     condition:raw.condition||'',
     language:raw.language||'English',
     purchasePrice:raw.purchasePrice??'',
     purchaseDate:raw.purchaseDate||'',
     notes:raw.notes||'',
-    forTrade:!!raw.forTrade,
+    forTrade:tradeQuantity>0,
     tradeAddedAt:raw.tradeAddedAt||''
   };
 }
@@ -982,10 +1064,15 @@ function saveCollectorMeta(){
 function setCollectorMeta(sid,cid,variantId,data){
   const k=metaKey(sid,cid,variantId);
   const prev=collectorMeta[k]||{};
-  const wasTrade=!!prev.forTrade;
-  const nowTrade=!!data.forTrade;
+  const quantity=Math.max(1,Number(data.quantity)||1);
+  let tradeQuantity=Math.max(0,Math.min(quantity,Number(data.tradeQuantity ?? (data.forTrade?quantity:0))||0));
+  const wasTrade=Number(prev.tradeQuantity ?? (prev.forTrade?prev.quantity||1:0))>0;
+  const nowTrade=tradeQuantity>0;
   collectorMeta[k]={
     ...data,
+    quantity,
+    tradeQuantity,
+    forTrade:nowTrade,
     tradeAddedAt: nowTrade ? (wasTrade && prev.tradeAddedAt ? prev.tradeAddedAt : new Date().toISOString()) : ''
   };
   saveCollectorMeta();
@@ -1010,12 +1097,12 @@ function tradeEntries(){
         const k=key(sid,c.id,v.id);
         if(!owned.has(k))continue;
         const m=getCollectorMeta(sid,c.id,v.id);
-        if(!m.forTrade)continue;
+        if(m.tradeQuantity<=0)continue;
         const unit=tradeReferencePrice(c,v.id);
         rows.push({
           sid,c,v,key:k,meta:m,
           unitValue:unit,
-          totalValue:unit==null?null:unit*m.quantity,
+          totalValue:unit==null?null:unit*m.tradeQuantity,
           setName:SETS[sid]?.name||sid
         });
       }
@@ -1043,8 +1130,8 @@ function tradeSortRows(rows){
     if(sort==='set')return a.setName.localeCompare(b.setName)||Number(a.c.localId)-Number(b.c.localId);
     if(sort==='number')return Number(a.c.localId)-Number(b.c.localId);
     if(sort==='condition')return (conditionRank[a.meta.condition]??9)-(conditionRank[b.meta.condition]??9);
-    if(sort==='quantity')return b.meta.quantity-a.meta.quantity;
-    if(sort==='duplicates')return (b.meta.quantity>1)-(a.meta.quantity>1)||b.meta.quantity-a.meta.quantity;
+    if(sort==='quantity')return b.meta.tradeQuantity-a.meta.tradeQuantity;
+    if(sort==='duplicates')return (b.meta.quantity>1)-(a.meta.quantity>1)||b.meta.tradeQuantity-a.meta.tradeQuantity;
     return String(b.meta.tradeAddedAt||'').localeCompare(String(a.meta.tradeAddedAt||''));
   });
   return rows;
@@ -1061,7 +1148,7 @@ function formatTradeMoney(v){return v==null?'—':`$${v.toFixed(2)}`}
 function renderTradeList(){
   const all=tradeEntries();
   const rows=filteredTradeRows();
-  const qty=all.reduce((s,r)=>s+r.meta.quantity,0);
+  const qty=all.reduce((s,r)=>s+r.meta.tradeQuantity,0);
   const ref=all.reduce((s,r)=>s+(r.totalValue||0),0);
   $('#tradeCountStat').textContent=all.length;
   $('#tradeQtyStat').textContent=qty;
@@ -1086,7 +1173,7 @@ function renderTradeList(){
         <div class="tradeThumb"><img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)"></div>
         <div class="tradeMain">
           <b>${r.c.name}</b>
-          <div class="tradeMeta">${r.setName} · #${r.c.localId} · ${r.v.label}<br>${cond} · ${lang} · Qty ${r.meta.quantity}</div>
+          <div class="tradeMeta">${r.setName} · #${r.c.localId} · ${r.v.label}<br>${cond} · ${lang}<br><b>${r.meta.tradeQuantity} available</b> · ${r.meta.quantity} owned</div>
           <div class="tradeValue">${total} <small>${unit}</small></div>
         </div>
         <div class="tradeActions">
@@ -1099,7 +1186,9 @@ function renderTradeList(){
 
   $$('[data-basket]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.basket;
-    tradeBasket.has(k)?tradeBasket.delete(k):tradeBasket.add(k);
+    const r=all.find(x=>x.key===k);
+    if(!r)return;
+    tradeBasket.has(k)?tradeBasket.delete(k):tradeBasket.set(k,{qty:Math.min(1,r.meta.tradeQuantity),manualValue:null});
     renderTradeList();
   });
 
@@ -1107,7 +1196,7 @@ function renderTradeList(){
     const k=b.dataset.removeTrade;
     const r=all.find(x=>x.key===k);if(!r)return;
     const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
-    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,forTrade:false});
+    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,tradeQuantity:0,forTrade:false});
     tradeBasket.delete(k);
     renderTradeList();
     renderSet();
@@ -1121,11 +1210,174 @@ function renderTradeBasketBar(allRows=tradeEntries()){
   const bar=$('#tradeBasketBar');
   if(!chosen.length){bar.classList.add('hidden');return}
   bar.classList.remove('hidden');
-  const total=chosen.reduce((s,r)=>s+(r.totalValue||0),0);
-  const qty=chosen.reduce((s,r)=>s+r.meta.quantity,0);
+  const total=chosen.reduce((s,r)=>{
+    const sel=tradeBasket.get(r.key),unit=sel?.manualValue??r.unitValue;
+    return s+(unit==null?0:unit*(sel?.qty||1));
+  },0);
+  const qty=chosen.reduce((s,r)=>s+(tradeBasket.get(r.key)?.qty||1),0);
   $('#tradeBasketTotal').textContent=formatTradeMoney(total);
   $('#tradeBasketMeta').textContent=`${chosen.length} trade line${chosen.length===1?'':'s'} · ${qty} card${qty===1?'':'s'}`;
 }
+
+function tradeLineFromOwned(r){
+  const sel=tradeBasket.get(r.key)||{qty:1,manualValue:null};
+  return {...r,selectedQty:Math.min(sel.qty,r.meta.tradeQuantity),manualValue:sel.manualValue};
+}
+function incomingLineKey(sid,cid,variantId){return `${sid}|${cid}|${variantId}`}
+function incomingRows(){
+  const out=[];
+  for(const [k,sel] of incomingTradeBasket){
+    const set=cardsBySet[sel.sid]||[],c=set.find(x=>x.id===sel.cid);if(!c)continue;
+    const v=variantsFor(sel.sid,c).find(x=>x.id===sel.variantId);if(!v)continue;
+    const unit=tradeReferencePrice(c,v.id);
+    out.push({key:k,sid:sel.sid,c,v,setName:SETS[sel.sid]?.name||sel.sid,selectedQty:sel.qty||1,manualValue:sel.manualValue??null,unitValue:unit});
+  }
+  return out;
+}
+function lineUnitValue(r){return r.manualValue??r.unitValue}
+function lineTotalValue(r){const u=lineUnitValue(r);return u==null?0:u*r.selectedQty}
+function compareItemHTML(r,side){
+  const u=lineUnitValue(r),total=u==null?'—':formatTradeMoney(u*r.selectedQty);
+  return `<div class="compareItem">
+    <div class="compareItemTop">
+      <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)">
+      <div><b>${r.c.name}</b><small>${r.setName} · #${r.c.localId} · ${r.v.label}<br>${total}${u==null?'':' · '+formatTradeMoney(u)+' each'}</small></div>
+    </div>
+    <div class="compareItemControls">
+      <div class="compareQty"><button data-compare-minus="${side}|${r.key}">−</button><span>${r.selectedQty}</span><button data-compare-plus="${side}|${r.key}">+</button></div>
+      <button class="btn small" data-override="${side}|${r.key}">${r.manualValue!=null?'Override '+formatTradeMoney(r.manualValue):'Override value'}</button>
+      <button class="btn small" data-remove-line="${side}|${r.key}">Remove</button>
+    </div>
+  </div>`;
+}
+function renderTradeCompare(){
+  const ownedMap=new Map(tradeEntries().map(r=>[r.key,r]));
+  const give=[...tradeBasket.keys()].map(k=>ownedMap.get(k)).filter(Boolean).map(tradeLineFromOwned);
+  const get=incomingRows();
+  $('#giveList').innerHTML=give.length?give.map(r=>compareItemHTML(r,'give')).join(''):'<div class="tradeEmpty">Add cards from your Trade List.</div>';
+  $('#getList').innerHTML=get.length?get.map(r=>compareItemHTML(r,'get')).join(''):'<div class="tradeEmpty">Search below for cards you will receive.</div>';
+  const giveTotal=give.reduce((s,r)=>s+lineTotalValue(r),0),getTotal=get.reduce((s,r)=>s+lineTotalValue(r),0);
+  $('#giveTotal').textContent=formatTradeMoney(giveTotal);
+  $('#getTotal').textContent=formatTradeMoney(getTotal);
+  const diff=getTotal-giveTotal;
+  $('#tradeDifference').textContent=`${diff>=0?'+':'−'}${formatTradeMoney(Math.abs(diff))}`;
+  const pct=giveTotal>0?Math.abs(diff)/giveTotal*100:0;
+  $('#tradeDifferenceMeta').textContent=`You get ${diff>=0?'more':'less'} reference value${giveTotal?` · ${pct.toFixed(1)}% difference`:''}`;
+
+  $$('[data-compare-minus]').forEach(b=>b.onclick=()=>adjustCompareQty(b.dataset.compareMinus,-1));
+  $$('[data-compare-plus]').forEach(b=>b.onclick=()=>adjustCompareQty(b.dataset.comparePlus,1));
+  $$('[data-remove-line]').forEach(b=>b.onclick=()=>removeCompareLine(b.dataset.removeLine));
+  $$('[data-override]').forEach(b=>b.onclick=()=>overrideCompareValue(b.dataset.override));
+}
+function adjustCompareQty(token,delta){
+  const [side,...rest]=token.split('|'),k=rest.join('|');
+  if(side==='give'){
+    const r=tradeEntries().find(x=>x.key===k);if(!r)return;
+    const sel=tradeBasket.get(k)||{qty:1,manualValue:null};
+    sel.qty=Math.max(1,Math.min(r.meta.tradeQuantity,(sel.qty||1)+delta));tradeBasket.set(k,sel);
+  }else{
+    const sel=incomingTradeBasket.get(k);if(!sel)return;
+    sel.qty=Math.max(1,Math.min(99,(sel.qty||1)+delta));incomingTradeBasket.set(k,sel);
+  }
+  renderTradeCompare();renderTradeBasketBar();
+}
+function removeCompareLine(token){
+  const [side,...rest]=token.split('|'),k=rest.join('|');
+  side==='give'?tradeBasket.delete(k):incomingTradeBasket.delete(k);
+  renderTradeCompare();renderTradeList();
+}
+function overrideCompareValue(token){
+  const [side,...rest]=token.split('|'),k=rest.join('|');
+  const map=side==='give'?tradeBasket:incomingTradeBasket,sel=map.get(k);if(!sel)return;
+  const current=sel.manualValue??'';
+  const val=prompt('Reference value per card for this trade. Leave blank to use market reference.',current);
+  if(val===null)return;
+  if(val.trim()==='')sel.manualValue=null;
+  else{
+    const n=Number(val);if(!Number.isFinite(n)||n<0){toast('Enter a valid value');return}
+    sel.manualValue=n;
+  }
+  map.set(k,sel);renderTradeCompare();renderTradeBasketBar();
+}
+async function prepareTradeCompare(){
+  $('#tradeCompareModal').classList.add('open');
+  $('#tradeModal').classList.remove('open');
+  for(const sid of activeSetIds){if(!cardsBySet[sid]){try{await loadSet(sid)}catch(e){}}}
+  renderTradeCompare();
+}
+function searchIncomingCards(){
+  const q=$('#incomingTradeSearch').value.trim().toLowerCase();
+  if(q.length<2){$('#incomingTradeResults').innerHTML='';return}
+  const matches=[];
+  for(const sid of activeSetIds){
+    for(const c of (cardsBySet[sid]||[])){
+      if(c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase()===q){
+        matches.push({sid,c});if(matches.length>=18)break;
+      }
+    }
+    if(matches.length>=18)break;
+  }
+  $('#incomingTradeResults').innerHTML=matches.length?matches.map(({sid,c})=>`
+    <div class="tradeSearchCard">
+      <img src="${image(c,'low')}" data-fallback="${assetFallback(c,'low')}" onerror="retryImage(this)">
+      <div><b>${c.name}</b><small>${SETS[sid]?.name||sid} · #${c.localId}</small>
+      <div class="tradeVariantButtons">${variantsFor(sid,c).map(v=>`<button data-add-incoming="${sid}|${c.id}|${v.id}">${v.label}</button>`).join('')}</div></div>
+    </div>`).join(''):'<div class="tradeEmpty">No matching cards in your active sets.</div>';
+  $$('[data-add-incoming]').forEach(b=>b.onclick=async()=>{
+    const [sid,cid,variantId]=b.dataset.addIncoming.split('|');
+    const c=(cardsBySet[sid]||[]).find(x=>x.id===cid);if(!c)return;
+    try{await loadPriceFor(c)}catch(e){}
+    const k=incomingLineKey(sid,cid,variantId);
+    const prev=incomingTradeBasket.get(k)||{sid,cid,variantId,qty:0,manualValue:null};
+    prev.qty=Math.min(99,(prev.qty||0)+1);incomingTradeBasket.set(k,prev);
+    renderTradeCompare();toast('Added to You Get');
+  });
+}
+function saveTradeHistory(){
+  localStorage.setItem(TRADE_HISTORY_KEY,JSON.stringify(tradeHistory));
+}
+function renderTradeHistory(){
+  $('#tradeHistoryList').innerHTML=tradeHistory.length?tradeHistory.map(t=>`
+    <div class="historyItem"><b>${new Date(t.completedAt).toLocaleDateString()} · ${t.give.length} given / ${t.get.length} received</b>
+    <small>${t.give.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing given'}<br>↔ ${t.get.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing received'}</small>
+    <div class="historyValues"><span>Gave ${formatTradeMoney(t.giveValue)}</span><span>Got ${formatTradeMoney(t.getValue)}</span></div></div>`).join(''):'<div class="tradeEmpty">No completed trades yet.</div>';
+}
+function completeTrade(){
+  const ownedMap=new Map(tradeEntries().map(r=>[r.key,r]));
+  const give=[...tradeBasket.keys()].map(k=>ownedMap.get(k)).filter(Boolean).map(tradeLineFromOwned);
+  const get=incomingRows();
+  if(!give.length&&!get.length){toast('Add cards to the trade first');return}
+  const giveValue=give.reduce((s,r)=>s+lineTotalValue(r),0),getValue=get.reduce((s,r)=>s+lineTotalValue(r),0);
+  const summary=`Complete this trade?\n\nYou give: ${give.reduce((s,r)=>s+r.selectedQty,0)} card(s) · ${formatTradeMoney(giveValue)}\nYou get: ${get.reduce((s,r)=>s+r.selectedQty,0)} card(s) · ${formatTradeMoney(getValue)}\n\nThis will update your DexBinder collection.`;
+  if(!confirm(summary))return;
+
+  for(const r of give){
+    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
+    const remaining=Math.max(0,m.quantity-r.selectedQty);
+    if(remaining===0){
+      owned.delete(key(r.sid,r.c.id,r.v.id));deleteCollectorMeta(r.sid,r.c.id,r.v.id);
+    }else{
+      setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,quantity:remaining,tradeQuantity:Math.max(0,m.tradeQuantity-r.selectedQty)});
+    }
+  }
+  for(const r of get){
+    const k=key(r.sid,r.c.id,r.v.id),wasOwned=owned.has(k);
+    owned.add(k);
+    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
+    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,quantity:wasOwned?m.quantity+r.selectedQty:r.selectedQty,tradeQuantity:wasOwned?m.tradeQuantity:0});
+  }
+  tradeHistory.unshift({
+    id:`trade-${Date.now()}`,completedAt:new Date().toISOString(),giveValue,getValue,
+    give:give.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)})),
+    get:get.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)}))
+  });
+  tradeHistory=tradeHistory.slice(0,250);saveTradeHistory();save();
+  tradeBasket.clear();incomingTradeBasket.clear();
+  renderSet();renderTradeCompare();renderTradeHistory();
+  $('#tradeCompareModal').classList.remove('open');
+  toast('Trade completed · collection updated');
+}
+
 async function openTradeList(){
   $('#tradeModal').classList.add('open');
   renderTradeList();
@@ -1143,7 +1395,7 @@ function cardCollectorSummary(sid,c){
     if(!owned.has(key(sid,c.id,v.id)))continue;
     const m=getCollectorMeta(sid,c.id,v.id);
     quantity+=m.quantity;
-    forTrade ||= m.forTrade;
+    forTrade ||= m.tradeQuantity>0;
   }
   return {quantity,forTrade};
 }
@@ -1191,8 +1443,12 @@ function collectorPanelHTML(c,v){
           <input class="collectorInput" id="${prefix}-date" type="date" value="${escapeHtml(m.purchaseDate)}">
         </div>
         <div class="collectorField">
-          <label>Trade status</label>
-          <div class="tradeRow"><span>Available to trade</span><button class="toggle ${m.forTrade?'on':''}" type="button" data-trade-toggle="${v.id}">${m.forTrade?'Yes ✓':'No'}</button></div>
+          <label>Trade quantity</label>
+          <div class="tradeQtyControl">
+            <button type="button" data-trade-minus="${v.id}">−</button>
+            <div class="tradeQtyValue" id="${prefix}-tradeqty">${m.tradeQuantity} of ${m.quantity}</div>
+            <button type="button" data-trade-plus="${v.id}">+</button>
+          </div>
         </div>
         <div class="collectorField full">
           <label>Notes</label>
@@ -1208,23 +1464,26 @@ function bindCollectorPanel(c,v){
   const prefix=`collector-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}`;
   let draft=getCollectorMeta(currentSet,c.id,v.id);
   const qtyEl=$(`#${prefix}-qty`);
-  const tradeBtn=$(`[data-trade-toggle="${v.id}"]`);
+  const tradeQtyEl=$(`#${prefix}-tradeqty`);
   const refreshDraftUI=()=>{
+    draft.tradeQuantity=Math.min(draft.quantity,draft.tradeQuantity||0);
     qtyEl.textContent=draft.quantity;
-    if(tradeBtn){tradeBtn.classList.toggle('on',draft.forTrade);tradeBtn.textContent=draft.forTrade?'Yes ✓':'No'}
+    if(tradeQtyEl)tradeQtyEl.textContent=`${draft.tradeQuantity} of ${draft.quantity}`;
   };
-  $(`[data-qty-minus="${v.id}"]`).onclick=()=>{draft.quantity=Math.max(1,draft.quantity-1);refreshDraftUI()};
+  $(`[data-qty-minus="${v.id}"]`).onclick=()=>{draft.quantity=Math.max(1,draft.quantity-1);draft.tradeQuantity=Math.min(draft.tradeQuantity,draft.quantity);refreshDraftUI()};
   $(`[data-qty-plus="${v.id}"]`).onclick=()=>{draft.quantity=Math.min(99,draft.quantity+1);refreshDraftUI()};
-  if(tradeBtn)tradeBtn.onclick=()=>{draft.forTrade=!draft.forTrade;refreshDraftUI()};
+  $(`[data-trade-minus="${v.id}"]`).onclick=()=>{draft.tradeQuantity=Math.max(0,(draft.tradeQuantity||0)-1);refreshDraftUI()};
+  $(`[data-trade-plus="${v.id}"]`).onclick=()=>{draft.tradeQuantity=Math.min(draft.quantity,(draft.tradeQuantity||0)+1);refreshDraftUI()};
   $(`[data-save-collector="${v.id}"]`).onclick=()=>{
     draft={
       quantity:draft.quantity,
+      tradeQuantity:draft.tradeQuantity||0,
       condition:$(`#${prefix}-condition`).value,
       language:$(`#${prefix}-language`).value,
       purchasePrice:$(`#${prefix}-price`).value,
       purchaseDate:$(`#${prefix}-date`).value,
       notes:$(`#${prefix}-notes`).value.trim(),
-      forTrade:draft.forTrade
+      forTrade:(draft.tradeQuantity||0)>0
     };
     setCollectorMeta(currentSet,c.id,v.id,draft);
     toast('Collector details saved');
@@ -1483,7 +1742,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -1532,6 +1791,10 @@ $$('[data-trade-filter]').forEach(b=>b.onclick=()=>{
   renderTradeList();
 });
 $('#clearTradeBasket').onclick=()=>{tradeBasket.clear();renderTradeList()};
+$('#compareTradeBasket').onclick=prepareTradeCompare;
+$('#incomingTradeSearch').oninput=searchIncomingCards;
+$('#completeTradeBtn').onclick=completeTrade;
+$('#tradeHistoryBtn').onclick=()=>{renderTradeHistory();$('#tradeHistoryModal').classList.add('open')};
 
 $('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
 $('#copyBackup').onclick=async()=>{try{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')}catch(e){toast('Copy unavailable — select the text manually')}};
@@ -1545,6 +1808,7 @@ function restoreBackupObject(d){
   owned=new Set(d.owned||[]);
   if(Array.isArray(d.activeSets)){activeSetIds=new Set(d.activeSets);saveActiveSets()}
   if(d.collectorMeta && typeof d.collectorMeta==='object'){collectorMeta=d.collectorMeta;saveCollectorMeta()}
+  if(Array.isArray(d.tradeHistory)){tradeHistory=d.tradeHistory;saveTradeHistory()}
   save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
 }
 $('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};
