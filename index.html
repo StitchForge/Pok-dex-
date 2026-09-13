@@ -115,17 +115,46 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .collectBadge{position:absolute;top:6px;left:6px;background:rgba(20,20,20,.88);color:#fff;border-radius:999px;padding:3px 6px;font-size:.52rem;font-weight:900;z-index:2}
 .tradeBadge{position:absolute;top:6px;right:6px;background:#fff3c4;color:#5c4910;border-radius:999px;padding:3px 6px;font-size:.5rem;font-weight:900;z-index:2;border:1px solid rgba(0,0,0,.08)}
 
+
+/* v0.7.1 Trade List + Trade Basket */
+.tradeToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.tradeToolbar .select{width:100%}
+.tradeSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.tradeStat{background:#f7f3ec;border:1px solid var(--line);border-radius:13px;padding:10px}
+.tradeStat b{display:block;font-size:1rem;line-height:1}.tradeStat small{display:block;color:var(--muted);font-size:.58rem;margin-top:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:850}
+.tradeList{display:grid;gap:9px}
+.tradeItem{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;background:#fffdf9;border:1px solid var(--line);border-radius:15px;padding:9px}
+.tradeThumb{width:64px;aspect-ratio:245/337;border-radius:8px;overflow:hidden;background:#d8d1c6}
+.tradeThumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tradeMain{min-width:0}
+.tradeMain b{display:block;font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tradeMeta{font-size:.6rem;color:var(--muted);margin-top:3px;line-height:1.35}
+.tradeValue{font-size:.72rem;font-weight:900;margin-top:4px}
+.tradeValue small{font-size:.55rem;color:var(--muted);font-weight:700}
+.tradeActions{display:grid;gap:6px;justify-items:end}
+.tradeBasketBtn{min-width:76px}
+.tradeBasketBtn.on{background:#171717;color:#fff}
+.tradeRemove{font-size:.55rem;color:var(--muted);background:none;border:0;text-decoration:underline;padding:0}
+.tradeEmpty{padding:22px 14px;text-align:center;border:1px dashed var(--line);border-radius:15px;color:var(--muted);font-size:.72rem}
+.tradeBasketBar{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));z-index:8;background:#171717;color:#fff;border-radius:16px;padding:10px 12px;margin-top:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.tradeBasketBar b{font-size:.8rem}.tradeBasketBar small{display:block;color:#cfc7bb;font-size:.58rem;margin-top:2px}
+.tradeBasketBar button{background:#fff;color:#171717;border:0;border-radius:10px;padding:8px 10px;font-weight:900}
+.tradePriceUnknown{color:#9a8f80}
+.tradeFilterRow{display:flex;gap:8px;overflow:auto;padding-bottom:2px}
+.tradeFilterRow .chip{white-space:nowrap}
+.tradeSourceNote{font-size:.58rem;color:var(--muted);line-height:1.4;margin-top:8px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.0</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.1</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -198,6 +227,46 @@ body.isStandalone .pwaInstallNote{display:none!important}
 </div></div>
 
 
+
+
+<div class="modal" id="tradeModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Trade List</h2><p>Cards you've marked as available to trade.</p></div><button class="btn small close">Close</button></div>
+
+  <div class="tradeSummary">
+    <div class="tradeStat"><b id="tradeCountStat">0</b><small>Trade cards</small></div>
+    <div class="tradeStat"><b id="tradeQtyStat">0</b><small>Total copies</small></div>
+    <div class="tradeStat"><b id="tradeValueStat">$0.00</b><small>Reference value</small></div>
+  </div>
+
+  <div class="tradeToolbar">
+    <select class="select" id="tradeSort">
+      <option value="recent">Recently added</option>
+      <option value="value-desc">Highest value</option>
+      <option value="value-asc">Lowest value</option>
+      <option value="set">Set</option>
+      <option value="number">Card number</option>
+      <option value="condition">Condition</option>
+      <option value="quantity">Quantity</option>
+      <option value="duplicates">Duplicates first</option>
+    </select>
+    <select class="select" id="tradeSetFilter"><option value="all">All sets</option></select>
+  </div>
+
+  <div class="tradeFilterRow">
+    <button class="chip active" data-trade-filter="all">All trades</button>
+    <button class="chip" data-trade-filter="duplicates">Duplicates only</button>
+    <button class="chip" data-trade-filter="priced">Priced only</button>
+  </div>
+
+  <div class="tradeList" id="tradeList"></div>
+  <div class="tradeSourceNote">Trade values use the same TCGplayer reference pricing DexBinder already displays for each variant. They are reference values only and may not reflect condition, language, local demand, or a vendor's actual offer.</div>
+
+  <div class="tradeBasketBar hidden" id="tradeBasketBar">
+    <div><b id="tradeBasketTotal">$0.00</b><small id="tradeBasketMeta">0 cards in basket</small></div>
+    <button id="clearTradeBasket">Clear</button>
+  </div>
+</div></div>
 
 <div class="modal" id="cloudModal"><div class="sheet">
   <div class="grab"></div>
@@ -318,6 +387,10 @@ let priceFetchedAt={};
 
 const COLLECTOR_META_KEY='dexbinder_v07_collector_meta';
 let collectorMeta={};
+
+let tradeBasket=new Set();
+let tradeFilter='all';
+
 try{collectorMeta=JSON.parse(localStorage.getItem(COLLECTOR_META_KEY)||'{}')||{}}catch(e){collectorMeta={}}
 
 try{priceFetchedAt=JSON.parse(localStorage.getItem('dexbinder_v06_price_timestamps')||'{}')}catch(e){priceFetchedAt={}}
@@ -899,20 +972,171 @@ function getCollectorMeta(sid,cid,variantId){
     purchasePrice:raw.purchasePrice??'',
     purchaseDate:raw.purchaseDate||'',
     notes:raw.notes||'',
-    forTrade:!!raw.forTrade
+    forTrade:!!raw.forTrade,
+    tradeAddedAt:raw.tradeAddedAt||''
   };
 }
 function saveCollectorMeta(){
   try{localStorage.setItem(COLLECTOR_META_KEY,JSON.stringify(collectorMeta))}catch(e){console.warn('Collector metadata save failed',e)}
 }
 function setCollectorMeta(sid,cid,variantId,data){
-  collectorMeta[metaKey(sid,cid,variantId)]={...data};
+  const k=metaKey(sid,cid,variantId);
+  const prev=collectorMeta[k]||{};
+  const wasTrade=!!prev.forTrade;
+  const nowTrade=!!data.forTrade;
+  collectorMeta[k]={
+    ...data,
+    tradeAddedAt: nowTrade ? (wasTrade && prev.tradeAddedAt ? prev.tradeAddedAt : new Date().toISOString()) : ''
+  };
   saveCollectorMeta();
 }
 function deleteCollectorMeta(sid,cid,variantId){
   delete collectorMeta[metaKey(sid,cid,variantId)];
   saveCollectorMeta();
 }
+
+function tradeReferencePrice(c,variantId){
+  const p=priceData(c,variantId);
+  if(!p)return null;
+  if(Number.isFinite(p.marketPrice))return p.marketPrice;
+  if(Number.isFinite(p.lowPrice))return p.lowPrice;
+  return null;
+}
+function tradeEntries(){
+  const rows=[];
+  for(const [sid,cards] of Object.entries(cardsBySet)){
+    for(const c of (cards||[])){
+      for(const v of variantsFor(sid,c)){
+        const k=key(sid,c.id,v.id);
+        if(!owned.has(k))continue;
+        const m=getCollectorMeta(sid,c.id,v.id);
+        if(!m.forTrade)continue;
+        const unit=tradeReferencePrice(c,v.id);
+        rows.push({
+          sid,c,v,key:k,meta:m,
+          unitValue:unit,
+          totalValue:unit==null?null:unit*m.quantity,
+          setName:SETS[sid]?.name||sid
+        });
+      }
+    }
+  }
+  return rows;
+}
+async function ensureTradePrices(rows){
+  const targets=rows.filter(r=>tradeReferencePrice(r.c,r.v.id)==null);
+  const seen=new Set();
+  for(const r of targets){
+    if(seen.has(r.c.id))continue;
+    seen.add(r.c.id);
+    try{await loadPriceFor(r.c)}catch(e){}
+  }
+}
+function tradeSortRows(rows){
+  const sort=$('#tradeSort')?.value||'recent';
+  const conditionRank={'NM':1,'LP':2,'MP':3,'HP':4,'DMG':5,'':9};
+  const val=r=>r.totalValue==null?-1:r.totalValue;
+  rows=[...rows];
+  rows.sort((a,b)=>{
+    if(sort==='value-desc')return val(b)-val(a);
+    if(sort==='value-asc')return (a.totalValue==null?Infinity:a.totalValue)-(b.totalValue==null?Infinity:b.totalValue);
+    if(sort==='set')return a.setName.localeCompare(b.setName)||Number(a.c.localId)-Number(b.c.localId);
+    if(sort==='number')return Number(a.c.localId)-Number(b.c.localId);
+    if(sort==='condition')return (conditionRank[a.meta.condition]??9)-(conditionRank[b.meta.condition]??9);
+    if(sort==='quantity')return b.meta.quantity-a.meta.quantity;
+    if(sort==='duplicates')return (b.meta.quantity>1)-(a.meta.quantity>1)||b.meta.quantity-a.meta.quantity;
+    return String(b.meta.tradeAddedAt||'').localeCompare(String(a.meta.tradeAddedAt||''));
+  });
+  return rows;
+}
+function filteredTradeRows(){
+  let rows=tradeEntries();
+  const setFilter=$('#tradeSetFilter')?.value||'all';
+  if(setFilter!=='all')rows=rows.filter(r=>r.sid===setFilter);
+  if(tradeFilter==='duplicates')rows=rows.filter(r=>r.meta.quantity>1);
+  if(tradeFilter==='priced')rows=rows.filter(r=>r.totalValue!=null);
+  return tradeSortRows(rows);
+}
+function formatTradeMoney(v){return v==null?'—':`$${v.toFixed(2)}`}
+function renderTradeList(){
+  const all=tradeEntries();
+  const rows=filteredTradeRows();
+  const qty=all.reduce((s,r)=>s+r.meta.quantity,0);
+  const ref=all.reduce((s,r)=>s+(r.totalValue||0),0);
+  $('#tradeCountStat').textContent=all.length;
+  $('#tradeQtyStat').textContent=qty;
+  $('#tradeValueStat').textContent=formatTradeMoney(ref);
+
+  const filter=$('#tradeSetFilter');
+  const current=filter.value||'all';
+  const setIds=[...new Set(all.map(r=>r.sid))].sort((a,b)=>(SETS[a]?.name||a).localeCompare(SETS[b]?.name||b));
+  filter.innerHTML=`<option value="all">All sets</option>`+setIds.map(s=>`<option value="${s}">${SETS[s]?.name||s}</option>`).join('');
+  filter.value=setIds.includes(current)?current:'all';
+
+  if(!rows.length){
+    $('#tradeList').innerHTML='<div class="tradeEmpty">No cards match this trade filter yet.</div>';
+  }else{
+    $('#tradeList').innerHTML=rows.map(r=>{
+      const inBasket=tradeBasket.has(r.key);
+      const cond=r.meta.condition||'Condition not set';
+      const lang=r.meta.language||'English';
+      const unit=r.unitValue==null?'<span class="tradePriceUnknown">Price unavailable</span>':`${formatTradeMoney(r.unitValue)} each`;
+      const total=r.totalValue==null?'—':formatTradeMoney(r.totalValue);
+      return `<div class="tradeItem">
+        <div class="tradeThumb"><img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)"></div>
+        <div class="tradeMain">
+          <b>${r.c.name}</b>
+          <div class="tradeMeta">${r.setName} · #${r.c.localId} · ${r.v.label}<br>${cond} · ${lang} · Qty ${r.meta.quantity}</div>
+          <div class="tradeValue">${total} <small>${unit}</small></div>
+        </div>
+        <div class="tradeActions">
+          <button class="btn small tradeBasketBtn ${inBasket?'on':''}" data-basket="${r.key}">${inBasket?'Added ✓':'Add'}</button>
+          <button class="tradeRemove" data-remove-trade="${r.key}">Remove trade</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  $$('[data-basket]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.basket;
+    tradeBasket.has(k)?tradeBasket.delete(k):tradeBasket.add(k);
+    renderTradeList();
+  });
+
+  $$('[data-remove-trade]').forEach(b=>b.onclick=()=>{
+    const k=b.dataset.removeTrade;
+    const r=all.find(x=>x.key===k);if(!r)return;
+    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
+    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,forTrade:false});
+    tradeBasket.delete(k);
+    renderTradeList();
+    renderSet();
+    toast('Removed from trade list');
+  });
+
+  renderTradeBasketBar(all);
+}
+function renderTradeBasketBar(allRows=tradeEntries()){
+  const chosen=allRows.filter(r=>tradeBasket.has(r.key));
+  const bar=$('#tradeBasketBar');
+  if(!chosen.length){bar.classList.add('hidden');return}
+  bar.classList.remove('hidden');
+  const total=chosen.reduce((s,r)=>s+(r.totalValue||0),0);
+  const qty=chosen.reduce((s,r)=>s+r.meta.quantity,0);
+  $('#tradeBasketTotal').textContent=formatTradeMoney(total);
+  $('#tradeBasketMeta').textContent=`${chosen.length} trade line${chosen.length===1?'':'s'} · ${qty} card${qty===1?'':'s'}`;
+}
+async function openTradeList(){
+  $('#tradeModal').classList.add('open');
+  renderTradeList();
+  const rows=tradeEntries();
+  if(rows.some(r=>r.unitValue==null)){
+    $('#tradeValueStat').textContent='Loading…';
+    await ensureTradePrices(rows);
+    renderTradeList();
+  }
+}
+
 function cardCollectorSummary(sid,c){
   let quantity=0,forTrade=false;
   for(const v of variantsFor(sid,c)){
@@ -1298,6 +1522,17 @@ $('#bulkBtn').onclick=async()=>{
 $('#allBase').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>owned.add(key(currentSet,c.id,'base')));save();renderBulk();renderSet()};
 $('#allReverse').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>variantsFor(currentSet,c).filter(v=>v.id==='reverse').forEach(v=>owned.add(key(currentSet,c.id,v.id))));save();renderBulk();renderSet()};
 $('#clearSet').onclick=()=>{[...owned].filter(k=>k.startsWith(currentSet+'|')).forEach(k=>owned.delete(k));save();renderBulk();renderSet()};
+
+$('#tradeBtn').onclick=openTradeList;
+$('#tradeSort').onchange=renderTradeList;
+$('#tradeSetFilter').onchange=renderTradeList;
+$$('[data-trade-filter]').forEach(b=>b.onclick=()=>{
+  tradeFilter=b.dataset.tradeFilter;
+  $$('[data-trade-filter]').forEach(x=>x.classList.toggle('active',x===b));
+  renderTradeList();
+});
+$('#clearTradeBasket').onclick=()=>{tradeBasket.clear();renderTradeList()};
+
 $('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
 $('#copyBackup').onclick=async()=>{try{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')}catch(e){toast('Copy unavailable — select the text manually')}};
 $('#downloadBackup').onclick=()=>{
