@@ -90,7 +90,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .cloudDot{width:9px;height:9px;border-radius:50%;background:#a59d91;flex:0 0 auto}.cloudDot.on{background:#2d8a57}.cloudDot.wait{background:#b88835}
 .cloudActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
 .cloudExplain{font-size:.7rem;color:var(--muted);line-height:1.45;background:#f7f3ec;border-radius:12px;padding:10px}
-.cloudEmail{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;margin-top:10px;background:#fff}
+.cloudEmail{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;font:inherit;margin-top:10px;background:#fff}.cloudLinkHelp{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
 .syncBadge{font-size:.6rem;font-weight:850;color:var(--muted)}
 
 </style>
@@ -99,7 +99,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.2</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -189,6 +189,11 @@ body.isStandalone .pwaInstallNote{display:none!important}
     <div class="cloudExplain"><b>Magic-link sign in</b><br>Enter your email and DexBinder will send you a secure sign-in link. There is no password to remember.</div>
     <input class="cloudEmail" id="cloudEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">
     <button class="btn dark" id="cloudSignIn" style="width:100%;margin-top:8px">Email me a sign-in link</button>
+    <div class="cloudLinkHelp hidden" id="cloudLinkHelp">
+      <div class="cloudExplain"><b>Using the Home Screen app?</b><br>iPhone may open the email link in Safari instead. Long-press <b>Sign in</b> in the email, choose <b>Copy Link</b>, then paste it here. This signs in this installed copy directly.</div>
+      <input class="cloudEmail" id="cloudMagicLink" type="url" inputmode="url" autocomplete="off" placeholder="Paste copied sign-in link">
+      <button class="btn" id="cloudUseMagicLink" style="width:100%;margin-top:8px">Connect this app</button>
+    </div>
   </div>
   <div id="cloudSignedIn" class="hidden">
     <div class="cloudExplain" id="cloudAccountExplain">Signed in. Changes are saved locally first and then synced to your cloud collection.</div>
@@ -418,6 +423,30 @@ async function cloudSignIn(){
   if(error){console.warn(error);toast('Could not send sign-in link');return}
   toast('Check your email for the DexBinder sign-in link');
   $('#cloudSubtitle').textContent='Sign-in link sent · check your email';
+  $('#cloudLinkHelp')?.classList.remove('hidden');
+}
+async function cloudUseMagicLink(){
+  if(!cloudClient){toast('Cloud is still starting · try again');return}
+  const raw=$('#cloudMagicLink')?.value.trim();
+  if(!raw){toast('Paste the copied sign-in link first');return}
+  try{
+    const u=new URL(raw);
+    const tokenHash=u.searchParams.get('token_hash')||u.searchParams.get('token');
+    let type=u.searchParams.get('type')||'magiclink';
+    if(type==='signup') type='signup';
+    if(!tokenHash){toast('That does not look like a Supabase sign-in link');return}
+    const {data,error}=await cloudClient.auth.verifyOtp({token_hash:tokenHash,type});
+    if(error)throw error;
+    cloudUser=data?.session?.user||data?.user||null;
+    if(!cloudUser){toast('Sign-in link could not create a session');return}
+    updateCloudUI('Connected');
+    $('#cloudMagicLink').value='';
+    toast('This DexBinder app is connected');
+    await initialCloudMerge();
+  }catch(e){
+    console.warn('Magic link handoff',e);
+    toast('Could not use that link · request a fresh sign-in email');
+  }
 }
 async function cloudSignOut(){
   if(!cloudClient)return;
@@ -437,6 +466,11 @@ function bindCloudControls(){
   if(signIn && !signIn.dataset.bound){
     signIn.dataset.bound='1';
     signIn.addEventListener('click',cloudSignIn);
+  }
+  const useMagic=$('#cloudUseMagicLink');
+  if(useMagic && !useMagic.dataset.bound){
+    useMagic.dataset.bound='1';
+    useMagic.addEventListener('click',cloudUseMagicLink);
   }
   const signOut=$('#cloudSignOut');
   if(signOut && !signOut.dataset.bound){
