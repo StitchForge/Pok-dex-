@@ -563,7 +563,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2a</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2b</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -4045,24 +4045,57 @@ function applyHuntPriceFilter(){
     row.style.display=(raw!=='' && +raw<=+priceFilter)?'grid':'none';
   });
 }
+
+async function loadSetWithRetry(sid,attempts=2){
+ let lastError=null;
+ for(let i=0;i<attempts;i++){
+  try{return await loadSet(sid)}
+  catch(e){
+   lastError=e;
+   if(i<attempts-1)await new Promise(r=>setTimeout(r,350*(i+1)));
+  }
+ }
+ throw lastError||new Error(`Could not load ${sid}`);
+}
+
 async function openGlobalHunt(){
  currentSet=null;view='global';huntGeneration++;
  $('#homeScreen').classList.add('hidden');$('#setScreen').classList.add('hidden');$('#tradeListScreen').classList.add('hidden');$('#tradeCompareScreen').classList.add('hidden');$('#globalHuntScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');
  $('#globalHuntList').innerHTML='<div class="notice">Loading active collections…</div>';
+
+ const activeIds=[...activeSetIds];
  const huntSelect=$('#huntSet');
- huntSelect.innerHTML='<option value="all">All active sets</option>'+[...activeSetIds].map(id=>SETS[id]?`<option value="${id}">${SETS[id].name}</option>`:'').join('');
- const activeIds=[...activeSetIds]; const results=await Promise.allSettled(activeIds.map(loadSet));
- const failed=results.filter(r=>r.status==='rejected').length;
- if(failed===activeIds.length){
-   $('#globalHuntList').innerHTML='<div class="notice error">Could not load collection data. Check your connection and try again.</div>';
+ huntSelect.innerHTML='<option value="all">All active sets</option>'+activeIds.map(id=>SETS[id]?`<option value="${id}">${SETS[id].name}</option>`:'').join('');
+
+ if(!activeIds.length){
+   $('#globalHuntList').innerHTML='<div class="notice">No active collections yet. Add a set from Manage Sets, then Global Hunt will show everything you are missing.</div>';
    return;
  }
- for(const sid of activeIds){
+
+ const results=await Promise.allSettled(activeIds.map(id=>loadSetWithRetry(id,2)));
+ const failedIds=results.map((r,i)=>r.status==='rejected'?activeIds[i]:null).filter(Boolean);
+ const loadedIds=activeIds.filter(id=>cardsBySet[id]?.length);
+
+ if(!loadedIds.length){
+   const names=failedIds.map(id=>SETS[id]?.name||id).join(', ');
+   $('#globalHuntList').innerHTML=`<div class="notice error"><b>Collection data did not load.</b><br>${names?`Affected: ${escapeHtml(names)}.<br>`:''}This can happen if the card-data service is temporarily unavailable. Your collection data is safe.<br><br><button class="btn small" id="retryGlobalHunt">Try again</button></div>`;
+   $('#retryGlobalHunt').onclick=openGlobalHunt;
+   return;
+ }
+
+ for(const sid of loadedIds){
    if(sid!=='sv03.5' && cardsBySet[sid] && !variantReadyBySet[sid]){
      try{await ensureVariantMetadata(sid)}catch(e){console.warn('Global Hunt variant metadata unavailable',sid,e)}
    }
  }
+
  renderGlobalHunt();
+
+ if(failedIds.length){
+   const names=failedIds.map(id=>SETS[id]?.name||id).join(', ');
+   $('#globalHuntList').insertAdjacentHTML('afterbegin',`<div class="notice error"><b>Some collections could not refresh.</b><br>${escapeHtml(names)}. Showing the collections that are available.<br><button class="btn small" id="retryPartialHunt">Retry missing collections</button></div>`);
+   $('#retryPartialHunt').onclick=openGlobalHunt;
+ }
 }
 async function renderGlobalHunt(){
  const generation=++huntGeneration;
@@ -4082,7 +4115,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.2a',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.2b',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;

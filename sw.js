@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v092a';
+const CACHE='dexbinder-shell-v092b';
 const APP_SHELL=[
   './',
   './index.html',
@@ -17,17 +17,35 @@ self.addEventListener('install',event=>{
   );
 });
 
-self.addEventListener('activate',event=>{
-  const keep=new Set([CACHE,'dexbinder-data-v092a','dexbinder-images-v092a']);
-  event.waitUntil(
-    caches.keys()
-      .then(keys=>Promise.all(keys.filter(k=>k.startsWith('dexbinder-')&&!keep.has(k)).map(k=>caches.delete(k))))
-      .then(()=>self.clients.claim())
-  );
-});
+const DATA_CACHE='dexbinder-data-stable-v1';
+const IMAGE_CACHE='dexbinder-images-stable-v1';
 
-const DATA_CACHE='dexbinder-data-v092a';
-const IMAGE_CACHE='dexbinder-images-v092a';
+async function migrateCacheFamily(prefix,targetName){
+  const names=await caches.keys();
+  const sourceNames=names.filter(n=>n.startsWith(prefix)&&n!==targetName);
+  if(!sourceNames.length)return;
+  const target=await caches.open(targetName);
+  for(const name of sourceNames){
+    const source=await caches.open(name);
+    const requests=await source.keys();
+    for(const req of requests){
+      if(await target.match(req))continue;
+      const res=await source.match(req);
+      if(res)await target.put(req,res);
+    }
+  }
+}
+
+self.addEventListener('activate',event=>{
+  event.waitUntil((async()=>{
+    await migrateCacheFamily('dexbinder-data-',DATA_CACHE);
+    await migrateCacheFamily('dexbinder-images-',IMAGE_CACHE);
+    const keep=new Set([CACHE,DATA_CACHE,IMAGE_CACHE]);
+    const keys=await caches.keys();
+    await Promise.all(keys.filter(k=>k.startsWith('dexbinder-')&&!keep.has(k)).map(k=>caches.delete(k)));
+    await self.clients.claim();
+  })());
+});
 
 async function trimCache(name,max){
   const cache=await caches.open(name),keys=await cache.keys();
