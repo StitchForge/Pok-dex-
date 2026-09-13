@@ -634,6 +634,25 @@ html{-webkit-text-size-adjust:100%}
 .cabinetDetailRow b{display:block;font-size:.62rem}.cabinetDetailRow small{display:block;font-size:.49rem;color:var(--muted);margin-top:2px}
 @media(max-width:430px){.achievementCabinet{grid-template-columns:1fr}.tierTrack{grid-template-columns:repeat(2,1fr)}}
 
+
+/* v0.9.4b — tier colour states + unified Add Cards */
+.cabinetCard.tier-bronze{background:#f6ece3;border-color:#d8b596}
+.cabinetCard.tier-silver{background:#f0f2f3;border-color:#c5cbd0}
+.cabinetCard.tier-gold{background:#fbf3d9;border-color:#dec87d}
+.cabinetCard.tier-diamond{background:#eef2f8;border-color:#bdcce0}
+.cabinetCard.tier-bronze .tierPill,.tierStep.done.tier-bronze{background:#ead1bc;border-color:#d0a27c}
+.cabinetCard.tier-silver .tierPill,.tierStep.done.tier-silver{background:#dde2e5;border-color:#b9c0c5}
+.cabinetCard.tier-gold .tierPill,.tierStep.done.tier-gold{background:#f2dfa2;border-color:#d4b85d}
+.cabinetCard.tier-diamond .tierPill,.tierStep.done.tier-diamond{background:#dfe8f4;border-color:#aec0d8}
+.tierStep.done{font-weight:900}
+.addCardsChoices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.addCardsChoice{border:1px solid var(--line);background:#fff;border-radius:16px;padding:15px 12px;text-align:left;min-height:112px}
+.addCardsChoice:active{transform:scale(.99)}
+.addCardsChoiceIcon{font-size:1.55rem;display:block;margin-bottom:9px}
+.addCardsChoice b{display:block;font-size:.72rem}
+.addCardsChoice small{display:block;color:var(--muted);font-size:.5rem;line-height:1.4;margin-top:4px}
+@media(max-width:380px){.addCardsChoices{grid-template-columns:1fr}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -641,15 +660,15 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4a</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4b</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
     <section class="quickSection">
       <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
       <div class="quickActions">
-        <button class="quickAction dark" id="fastAddBtn"><b>＋ Fast Add</b><small>Add cards quickly</small></button>
-        <button class="quickAction" id="scanCardBtn"><b>📷 Scan</b><small>Photo-assisted entry</small></button>
+        <button class="quickAction dark" id="addCardsBtn"><b>＋ Add Cards</b><small>Search, add or scan cards</small></button>
+        
         <button class="quickAction" id="wishlistBtn"><b>♡ Wishlist</b><small>Goals & wanted cards</small></button>
         <button class="quickAction" id="tradeHuntBtn"><b>↔ Trade &amp; Hunt</b><small>Missing cards, trade list &amp; compare</small></button>
       </div>
@@ -901,6 +920,16 @@ html{-webkit-text-size-adjust:100%}
 
   <div class="scanCandidates" id="scanCandidates">
     <div class="tradeEmpty">Take a photo or enter a card name / number.</div>
+  </div>
+</div></div>
+
+
+<div class="modal" id="addCardsModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Add Cards</h2><p>Choose how you want to identify the card. Both routes add to the same DexBinder collection.</p></div><button class="btn small close">Close</button></div>
+  <div class="addCardsChoices">
+    <button class="addCardsChoice" id="addCardsSearchBtn"><span class="addCardsChoiceIcon">🔍</span><b>Search &amp; Add</b><small>Find a card in My Sets or the full catalogue, then add copies and collector details.</small></button>
+    <button class="addCardsChoice" id="addCardsScanBtn"><span class="addCardsChoiceIcon">📷</span><b>Scan Card</b><small>Use Scan Assist to identify a card, confirm the match, then add it to your collection.</small></button>
   </div>
 </div></div>
 
@@ -3752,6 +3781,10 @@ function achievementCategories(){
  ];
 }
 
+function achievementTierClass(state){
+ return state.index>=0?`tier-${ACHIEVEMENT_TIERS[state.index].toLowerCase()}`:'tier-locked';
+}
+
 function cabinetProgressCopy(c){
  const s=c.state;
  if(s.index>=3)return 'MAX TIER';
@@ -3766,7 +3799,7 @@ function renderAchievements(){
  $('#achievementCategoryCount').textContent=`${unlocked.length} / ${cats.length}`;
  $('#achievementTopTier').textContent=highest>=0?ACHIEVEMENT_TIERS[highest]:'—';
  $('#achievementCabinet').innerHTML=cats.map(c=>`
-  <button class="cabinetCard" data-ach-category="${c.id}">
+  <button class="cabinetCard ${achievementTierClass(c.state)}" data-ach-category="${c.id}">
     <div class="cabinetVisual">
       <div class="tierRing" style="--p:${c.state.progress}"><span>${c.icon}</span></div>
       <div class="cabinetCopy"><h3>${c.title}</h3><span class="tierPill">${c.state.tier}</span><strong>${c.value.toLocaleString()} ${c.unit}</strong></div>
@@ -3806,7 +3839,7 @@ function openAchievementDetail(id){
   [{tier:'Bronze',label:'1 record',done:c.state.index>=0},{tier:'Silver',label:'2 types',done:c.state.index>=1},{tier:'Gold',label:'4 types',done:c.state.index>=2},{tier:'Diamond',label:'100 recorded',done:c.state.index>=3}];
  $('#achievementDetailBody').innerHTML=`
    <div class="cabinetDetailHero"><div class="tierRing" style="--p:${c.state.progress}"><span>${c.icon}</span></div><div class="cabinetCopy"><h3>${c.title}</h3><span class="tierPill">${c.state.tier}</span><strong>${c.value.toLocaleString()} ${c.unit}</strong><small>${cabinetProgressCopy(c)}</small></div></div>
-   <div class="tierTrack">${steps.map(x=>`<div class="tierStep ${x.done?'done':''}"><b>${x.tier}</b><small>${x.label}</small></div>`).join('')}</div>
+   <div class="tierTrack">${steps.map(x=>`<div class="tierStep ${x.done?`done tier-${x.tier.toLowerCase()}`:''}"><b>${x.tier}</b><small>${x.label}</small></div>`).join('')}</div>
    <div class="cabinetDetailList">${achievementDetailRows(c)}</div>`;
  $('#achievementDetailModal').classList.add('open');
 }
@@ -4540,7 +4573,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.4a',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.4b',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -4633,7 +4666,7 @@ $('#setLibraryHome').onclick=openLibrary;
 $('#wishlistBtn').onclick=openWishlist;
 $('#wishlistSearch').oninput=renderWishlist;
 $('#wishlistPriorityFilter').onchange=renderWishlist;
-$('#scanCardBtn').onclick=openScanCard;
+
 $('#scanTakePhoto').onclick=()=>$('#scanImageInput').click();
 $('#scanImageInput').onchange=()=>{
   const f=$('#scanImageInput').files?.[0];
@@ -4649,7 +4682,9 @@ $('#scanClear').onclick=resetScan;
 $('#scanOCRBtn').onclick=runScanOCR;
 $('#scanSearchBtn').onclick=findScanMatches;
 
-$('#fastAddBtn').onclick=openFastAdd;
+$('#addCardsBtn').onclick=()=>$('#addCardsModal').classList.add('open');
+$('#addCardsSearchBtn').onclick=()=>{$('#addCardsModal').classList.remove('open');openFastAdd()};
+$('#addCardsScanBtn').onclick=()=>{$('#addCardsModal').classList.remove('open');openScanCard()};
 
 $('#fastAddMySetsTab').onclick=()=>setFastAddScope('mine');
 $('#fastAddCatalogueTab').onclick=()=>setFastAddScope('all');
