@@ -653,6 +653,15 @@ html{-webkit-text-size-adjust:100%}
 .addCardsChoice small{display:block;color:var(--muted);font-size:.5rem;line-height:1.4;margin-top:4px}
 @media(max-width:380px){.addCardsChoices{grid-template-columns:1fr}}
 
+
+/* v0.9.4c — dimensional chase-art Active Collection cards */
+.setCard{position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(135deg,#faf7f1,#eee8df)}
+.setCard::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.90) 44%,rgba(255,255,255,.52) 70%,rgba(255,255,255,.28) 100%);z-index:-1}
+.setChaseArt{position:absolute;right:-8px;top:-24%;width:48%;height:148%;object-fit:contain;object-position:center;opacity:.31;filter:saturate(1.12) contrast(1.02);transform:rotate(5deg) scale(1.03);z-index:-2;pointer-events:none}
+.setChaseGlow{position:absolute;right:-19%;top:-45%;width:76%;height:190%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.04),rgba(255,255,255,.66) 67%,rgba(255,255,255,0) 73%);z-index:-1;pointer-events:none}
+.setCardTop,.setPct,.setCardProgress,.setCardHint{position:relative;z-index:1}
+.setCard.hasChaseArt{box-shadow:0 8px 22px rgba(35,31,25,.07)}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -660,7 +669,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4b</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4c</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -1860,6 +1869,23 @@ function renderStats(){
  if(currentSet){let [n,t]=counts(currentSet);let p=t?Math.round(n/t*100):0;$('#setOwned').textContent=`${n} / ${t}`;$('#setPct').textContent=`${p}% complete`;$('#setProgress').style.width=p+'%'}
  renderSetCards();
 }
+
+function dashboardChaseCard(sid){
+ const cards=cardsBySet[sid]||[];
+ if(!cards.length)return null;
+ const withArt=cards.filter(c=>c?.image);
+ if(!withArt.length)return null;
+ return [...withArt].sort((a,b)=>{
+   const av=String(a.localId||a.id||'').match(/\d+/g)||['0'];
+   const bv=String(b.localId||b.id||'').match(/\d+/g)||['0'];
+   return Number(bv[bv.length-1])-Number(av[av.length-1]);
+ })[0];
+}
+function dashboardChaseImage(sid){
+ const c=dashboardChaseCard(sid);
+ return c?.image?`${c.image}/high.webp`:'';
+}
+
 function renderSetCards(){
  let box=$('#setCards'); if(!box)return;
  const active=[...activeSetIds].map(id=>SETS[id]).filter(Boolean);
@@ -1872,7 +1898,9 @@ function renderSetCards(){
    let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0;
    let missing=t?Math.max(0,t-n):null;
    let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';
-   return `<article class="setCard openSet" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
+   const chaseImage=dashboardChaseImage(s.id);
+   return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
+     ${chaseImage?`<img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy"><span class="setChaseGlow"></span>`:''}
      <div class="setCardTop">
        <div class="eyebrow" style="color:#777">${s.series||'Pokémon TCG'}</div>
        <h3>${s.name}</h3>
@@ -4573,7 +4601,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.4b',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.4c',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
