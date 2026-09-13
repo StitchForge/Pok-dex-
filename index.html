@@ -401,17 +401,104 @@ html{-webkit-text-size-adjust:100%}
   .catalogueFilterRow{grid-template-columns:1fr}
 }
 
+
+/* v0.8.3 dashboard + navigation cleanup */
+.quickSection{margin:18px 0 8px}
+.quickSectionHead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 2px 9px}
+.quickSectionHead h2{margin:0;font-size:1.15rem;letter-spacing:-.035em}
+.quickSectionHead p{margin:3px 0 0;color:var(--muted);font-size:.72rem}
+.quickActions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quickAction{
+  border:1px solid var(--line);
+  background:var(--paper);
+  border-radius:16px;
+  min-height:78px;
+  padding:10px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:6px;
+  text-align:left;
+  font-weight:900;
+  color:var(--ink);
+}
+.quickAction b{font-size:.75rem;line-height:1.15}
+.quickAction small{font-size:.55rem;color:var(--muted);line-height:1.25}
+.quickAction.dark{background:#171717;color:#fff;border-color:#171717}
+.quickAction.dark small{color:#c9c5be}
+.dashboardTools{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.dashboardTools .btn{flex:1}
+.activeHead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:22px 2px 10px}
+.activeHead h2{margin:0;font-size:1.35rem;letter-spacing:-.04em}
+.activeHead p{margin:3px 0 0;color:var(--muted);font-size:.76rem}
+.activeHead .btn{flex:0 0 auto}
+
+.setCard{
+  cursor:pointer;
+  grid-template-columns:1fr auto;
+  padding:15px;
+  transition:transform .12s ease,box-shadow .12s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.setCard:active{transform:scale(.992)}
+.setCard:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.setCardTop{min-width:0}
+.setCardMeta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:5px}
+.setCardMeta span{font-size:.62rem;color:var(--muted)}
+.setCardProgress{grid-column:1/-1;height:7px;background:#e9e3da;border-radius:999px;overflow:hidden;margin-top:3px}
+.setCardProgress i{display:block;height:100%;background:#171717;border-radius:999px}
+.setCardHint{grid-column:1/-1;color:var(--muted);font-size:.58rem;margin-top:-2px}
+.setActions{display:none!important}
+
+.dataSyncGrid{display:grid;gap:9px}
+.dataSyncCard{
+  border:1px solid var(--line);
+  border-radius:15px;
+  padding:12px;
+  background:#fff;
+}
+.dataSyncCard b{display:block;font-size:.82rem}
+.dataSyncCard p{margin:4px 0 10px;color:var(--muted);font-size:.67rem;line-height:1.4}
+.dataSyncCard .btn{width:100%}
+
+.nav{grid-template-columns:repeat(3,1fr)}
+
+@media(max-width:430px){
+  .quickActions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .quickAction{min-height:84px;padding:9px 7px}
+  .quickAction b{font-size:.68rem}
+  .quickAction small{font-size:.5rem}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.2</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.3</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="fastAddBtn">＋ Fast Add</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
+    <section class="quickSection">
+      <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
+      <div class="quickActions">
+        <button class="quickAction dark" id="fastAddBtn"><b>＋ Fast Add</b><small>Add cards quickly</small></button>
+        <button class="quickAction" id="tradeBtn"><b>↔ Trade</b><small>Manage trade cards</small></button>
+        <button class="quickAction" id="globalHuntHome"><b>🎯 Global Hunt</b><small>Everything still missing</small></button>
+      </div>
+      <div class="dashboardTools">
+        <button class="btn small" id="dataSyncBtn">☁️ Data &amp; Sync</button>
+        <button class="btn small" id="setLibraryHome">＋ Manage Sets</button>
+      </div>
+    </section>
+
+    <div class="activeHead"><div><h2>Active collections</h2><p>Tap anywhere on a set to open its binder.</p></div></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -470,9 +557,26 @@ html{-webkit-text-size-adjust:100%}
 <nav class="bottom hidden" id="bottomNav"><div class="nav">
 <button data-view="binder" class="active">▦<small>Binder</small></button>
 <button data-view="missing">◌<small>Missing</small></button>
-<button data-view="hunt">◎<small>Hunt</small></button>
 <button data-view="home">⌂<small>My Dex</small></button>
 </div></nav>
+
+
+<div class="modal" id="dataSyncModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Data &amp; Sync</h2><p>Back up your collection or manage cloud sync.</p></div><button class="btn small close">Close</button></div>
+  <div class="dataSyncGrid">
+    <div class="dataSyncCard">
+      <b>Backup &amp; Restore</b>
+      <p>Download a portable DexBinder backup, copy the backup text, or restore your collection from an existing backup.</p>
+      <button class="btn" id="backupBtn">Open Backup &amp; Restore</button>
+    </div>
+    <div class="dataSyncCard">
+      <b>Cloud Sync</b>
+      <p>Manage your Supabase cloud session and sync ownership across devices.</p>
+      <button class="btn" id="cloudBtn">☁️ Open Cloud Sync</button>
+    </div>
+  </div>
+</div></div>
 
 <div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small close">Close</button></div><div class="variants" id="detailVariants"></div></div></div>
 <div class="modal" id="bulkModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Bulk edit</h2><p>Fast initial entry without fighting the binder pages.</p></div><button class="btn small close">Close</button></div><div class="chips"><button class="chip" id="allBase">Own all base</button><button class="chip" id="allReverse">Own all reverse</button><button class="chip" id="clearSet">Clear set</button></div><div class="bulk" id="bulkList"></div></div></div>
@@ -1101,6 +1205,7 @@ async function cloudSignOut(){
 
 function bindCloudControls(){
   const cloudBtn=$('#cloudBtn');
+  if(cloudBtn)cloudBtn.addEventListener('click',()=>$('#dataSyncModal')?.classList.remove('open'));
   if(cloudBtn && !cloudBtn.dataset.bound){
     cloudBtn.dataset.bound='1';
     cloudBtn.addEventListener('click',()=>{
@@ -1236,9 +1341,34 @@ function renderSetCards(){
    const b=$('#emptyLibraryBtn'); if(b)b.onclick=openLibrary;
    return;
  }
- box.innerHTML=active.map(s=>{let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0;let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';return `<article class="setCard"><div><div class="eyebrow" style="color:#777">${s.series||'Pokémon TCG'}</div><h3>${s.name}</h3><p>${n} of ${t||'—'} master-set cards${t?` · ${Math.max(0,t-n)} missing`:''}${prep}</p></div><div class="setPct">${t?p+'%':'—'}<small>complete</small></div><div class="setActions"><button class="btn dark openSet" data-set="${s.id}">Open binder</button><button class="btn huntSet" data-set="${s.id}">Hunt missing</button></div></article>`}).join('');
- $$('.openSet').forEach(b=>b.onclick=()=>openSet(b.dataset.set,'binder'));
- $$('.huntSet').forEach(b=>b.onclick=()=>openSet(b.dataset.set,'hunt'));
+ box.innerHTML=active.map(s=>{
+   let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0;
+   let missing=t?Math.max(0,t-n):null;
+   let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';
+   return `<article class="setCard openSet" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
+     <div class="setCardTop">
+       <div class="eyebrow" style="color:#777">${s.series||'Pokémon TCG'}</div>
+       <h3>${s.name}</h3>
+       <div class="setCardMeta">
+         <span>${n} / ${t||'—'} collected</span>
+         ${missing!==null?`<span>· ${missing} missing</span>`:''}
+         ${prep?`<span>${prep}</span>`:''}
+       </div>
+     </div>
+     <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
+     <div class="setCardProgress"><i style="width:${t?p:0}%"></i></div>
+     <div class="setCardHint">Tap to open binder</div>
+   </article>`;
+ }).join('');
+ $$('.openSet').forEach(card=>{
+   card.onclick=()=>openSet(card.dataset.set,'binder');
+   card.onkeydown=e=>{
+     if(e.key==='Enter'||e.key===' '){
+       e.preventDefault();
+       openSet(card.dataset.set,'binder');
+     }
+   };
+ });
 }
 async function loadSet(sid){
  if(cardsBySet[sid])return cardsBySet[sid];
@@ -1379,7 +1509,7 @@ function renderSet(){
  let cs=cardsBySet[currentSet]||[],q=$('#search').value.trim().toLowerCase();
  cs=cs.filter(c=>!q||c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase().includes(q));
 
- $('#viewTitle').textContent=view==='binder'?(binderMode==='compact'?'Binder · Compact':'Binder · Full master set'):view==='missing'?'Missing cards':'Hunt mode';
+ $('#viewTitle').textContent=view==='binder'?(binderMode==='compact'?'Binder · Compact':'Binder · Full master set'):'Missing cards';
  $('#snapshotBtn').classList.toggle('hidden',view!=='binder');
 
  const needsVariants=(binderMode==='full'||view!=='binder');
@@ -1387,7 +1517,7 @@ function renderSet(){
    $('#meta').textContent='Preparing accurate master-set variants…';
    $('#pageToolsWrap').classList.add('hidden');
    $('#content').className='';
-   $('#content').innerHTML='<div class="notice">Master-set variant metadata is still loading. Compact Binder is available now; Full Binder, Missing and Hunt will unlock automatically when the master-set data is ready.</div>';
+   $('#content').innerHTML='<div class="notice">Master-set variant metadata is still loading. Compact Binder is available now; Full Binder and Missing will unlock automatically when the master-set data is ready.</div>';
    return;
  }
 
@@ -1410,7 +1540,7 @@ function renderSet(){
    ? `${items.length} ${view==='binder'?'positions':'missing'} · All cards`
    : `${items.length} ${view==='binder'?'positions':'missing'} · Page ${page}/${totalPages}`;
 
- $('#content').className=(view==='hunt'?'hunt ':view==='missing'?'missingView ':'')+(isAll?'allView':'');
+ $('#content').className=(view==='missing'?'missingView ':'')+(isAll?'allView':'');
  $('#content').innerHTML=`<div class="grid">${slice.map(x=>cardHTML(x)).join('')}</div>`;
 
  // Page tools
@@ -1927,6 +2057,32 @@ let fastAddDraft={qty:1,tradeQty:0,type:'raw'};
 let fastAddRecent=[];
 
 
+
+
+function setFastAddScope(scope){
+  fastAddScope=scope;
+  $('#fastAddMySetsTab').classList.toggle('on',scope==='mine');
+  $('#fastAddCatalogueTab').classList.toggle('on',scope==='all');
+  $('#fastAddMySetsPanel').classList.toggle('hidden',scope!=='mine');
+  $('#fastAddCataloguePanel').classList.toggle('open',scope==='all');
+  $('#fastAddEditor').classList.remove('open');
+  fastAddSelection=null;
+
+  if(scope==='all'){
+    ensureGlobalCatalogue()
+      .then(()=>{
+        buildCatalogueFilters();
+        renderCatalogueSetResults();
+        $('#catalogueSetSearch').focus();
+      })
+      .catch(e=>{
+        $('#catalogueSetResults').innerHTML=`<div class="notice error">Could not load catalogue: ${e.message}</div>`;
+      });
+  }else{
+    ensureAllActiveSetsLoaded().then(renderFastAddResults).catch(()=>{});
+    $('#fastAddSearchInput').focus();
+  }
+}
 
 async function ensureGlobalCatalogue(){
   if(catalogueSetsReady && allSetBriefs.length)return allSetBriefs;
@@ -2962,7 +3118,7 @@ async function renderGlobalHunt(){
  const warning=skippedCrown?'<div class="notice error">One or more active sets are temporarily excluded because their master-set variant metadata did not finish loading. Retry on a stable connection rather than using an incomplete hunt list.</div>':'';
  const rows=items.length?items.map(x=>`<div class="row" data-key="${key(x.sid,x.card.id,x.variant.id)}" data-price="" data-price-loaded="0"><img class="thumb" src="${image(x.card)}"><div><h4>${x.card.name} · ${x.variant.label}</h4><p>${SETS[x.sid].name} · #${x.card.localId}</p></div><div class="rowPrice"><b class="p">…</b><small>TCGplayer reference</small></div></div>`).join(''):'<div class="notice">Nothing missing in this filter. Nice.</div>';
  $('#globalHuntList').innerHTML=warning+rows;
- items.forEach(x=>{const wanted=key(x.sid,x.card.id,x.variant.id);let row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);if(row)row.onclick=()=>openSet(x.sid,'hunt')});
+ items.forEach(x=>{const wanted=key(x.sid,x.card.id,x.variant.id);let row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);if(row)row.onclick=()=>openSet(x.sid,'missing')});
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
@@ -3025,6 +3181,9 @@ $('#csvExportBtn').onclick=exportCollectionCSV;
 
 
 
+$('#dataSyncBtn').onclick=()=>$('#dataSyncModal').classList.add('open');
+$('#setLibraryHome').onclick=openLibrary;
+$('#globalHuntHome').onclick=openGlobalHunt;
 $('#fastAddBtn').onclick=openFastAdd;
 
 $('#fastAddMySetsTab').onclick=()=>setFastAddScope('mine');
@@ -3087,7 +3246,7 @@ $('#completeTradeBtn').onclick=completeTrade;
 $('#tradeHistoryBtn').onclick=()=>{renderTradeHistory();$('#tradeHistoryModal').classList.add('open')};
 $('#tradeHistoryMainBtn').onclick=()=>{renderTradeHistory();$('#tradeHistoryModal').classList.add('open')};
 
-$('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
+$('#backupBtn').onclick=()=>{$('#dataSyncModal').classList.remove('open');$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
 $('#copyBackup').onclick=async()=>{try{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')}catch(e){toast('Copy unavailable — select the text manually')}};
 $('#downloadBackup').onclick=()=>{
   const blob=new Blob([backup()],{type:'application/json'});
@@ -3295,29 +3454,7 @@ function initDexBinder(){
     return;
   }
 
-  // Stage 2: add Global Hunt independently.
-  try{
-    if(!document.getElementById('globalHuntHome')){
-      const lib=document.createElement('button');
-      lib.id='setLibraryHome';
-      lib.className='btn';
-      lib.setAttribute('style','width:100%;margin-top:12px');
-      lib.textContent='＋ Browse Set Library';
-      lib.addEventListener('click',openLibrary);
-      const home=document.getElementById('homeScreen');
-      if(home) home.appendChild(lib);
-
-      const gh=document.createElement('button');
-      gh.id='globalHuntHome';
-      gh.className='btn dark';
-      gh.setAttribute('style','width:100%;margin-top:12px');
-      gh.textContent='🎯 Open Global Hunt';
-      gh.addEventListener('click',openGlobalHunt);
-      if(home) home.appendChild(gh);
-    }
-  }catch(e){
-    console.warn('Global Hunt home button could not initialize',e);
-  }
+  // Stage 2: dashboard quick actions are now part of the static layout.
 
   // Stage 3: legacy migration is best-effort only.
   try{ migrateV1(); }catch(e){ console.warn('Legacy migration skipped',e); }
