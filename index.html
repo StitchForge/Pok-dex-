@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.12.2 dashboard refinements */
+/* v0.13.0 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.12.2 — visual consistency pass
+   DexBinder v0.13.0 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Day & Night
+   DexBinder v0.13.0 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Day & Night polish
+   DexBinder v0.13.0 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Interactive Sky Hero
+   DexBinder v0.13.0 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Interactive Sky correction pass
+   DexBinder v0.13.0 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Theme correction + ambient page motion
+   DexBinder v0.13.0 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.2 — portrait hero polish
+   DexBinder v0.13.0 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2211,7 +2211,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Hero structural rebuild
+   DexBinder v0.13.0 — Hero structural rebuild
    ============================================================ */
 
 .heroThemeHint{display:none!important}
@@ -2449,7 +2449,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Clean-source hero rebuild
+   DexBinder v0.13.0 — Clean-source hero rebuild
    User-supplied transparent character renders + fixed portrait zones
    ============================================================ */
 
@@ -2711,7 +2711,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.2 — Hero + Umbreon contrast polish
+   DexBinder v0.13.0 — Hero + Umbreon contrast polish
    ============================================================ */
 
 /* 1) Slightly reduce hero character dominance. */
@@ -2909,7 +2909,7 @@ body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on *{
 }
 
 
-/* v0.12.2 — two-state Day / Night polish */
+/* v0.13.0 — two-state Day / Night polish */
 .sceneBird,.themeAtmosphere .bird{display:none!important}
 
 /* exact 50/50 hero */
@@ -2988,7 +2988,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 #collectionHero .skyControl{left:23%!important;right:23%!important}
 
 
-/* v0.12.2 startup hotfix */
+/* v0.13.0 startup hotfix */
 .srOnly{
   position:absolute!important;
   width:1px!important;height:1px!important;
@@ -2999,7 +2999,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 
 
 /* ============================================================
-   DexBinder v0.12.2 FINAL — Active Set hierarchy + Umbreon legibility
+   DexBinder v0.13.0 FINAL — Active Set hierarchy + Umbreon legibility
    ============================================================ */
 
 /* Completion belongs to the information stack, not over the chase artwork. */
@@ -3055,13 +3055,57 @@ body[data-theme="umbreon"] .setChaseLabel small{
   color:#e0e4f2!important;
 }
 
+
+/* ============================================================
+   DexBinder v0.13.0 — Collection Intelligence & Goals
+   ============================================================ */
+.intelligenceSheet{padding-bottom:28px!important}
+.intelligenceHero{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;
+  padding:16px;margin:4px 0 12px;border-radius:18px;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--db-purple) 22%,var(--db-panel)),color-mix(in srgb,var(--db-pink) 35%,var(--db-panel)));
+  border:1px solid var(--db-line)
+}
+.intelligenceHero>div:first-child{display:flex;flex-direction:column;gap:4px;min-width:0}
+.intelligenceEyebrow{font-size:.48rem;font-weight:950;letter-spacing:.12em;color:var(--db-muted)}
+.intelligenceHero b{font-size:1rem;line-height:1.15}
+.intelligenceHero small{font-size:.58rem;line-height:1.4;color:var(--db-muted)}
+.intelligenceScore{
+  width:62px;height:62px;border-radius:50%;display:grid;place-items:center;
+  background:var(--db-panel);border:1px solid var(--db-line);box-shadow:var(--db-shadow-soft);
+  font-size:1rem;font-weight:950;color:var(--db-text)
+}
+.intelligenceGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 14px}
+.intelligenceStat{padding:12px;border-radius:15px;background:var(--db-panel);border:1px solid var(--db-line)}
+.intelligenceStat b{display:block;font-size:1.12rem}.intelligenceStat span{display:block;font-size:.6rem;font-weight:900;margin-top:2px}
+.intelligenceStat small{display:block;color:var(--db-muted);font-size:.5rem;margin-top:3px}
+.intelligenceSectionHead{display:flex;justify-content:space-between;align-items:end;margin:14px 2px 8px}
+.intelligenceSectionHead b{display:block;font-size:.78rem}.intelligenceSectionHead small{display:block;color:var(--db-muted);font-size:.52rem;margin-top:2px}
+.momentumRail{display:flex;gap:9px;overflow-x:auto;scroll-snap-type:x mandatory;padding:1px 1px 8px;scrollbar-width:none}
+.momentumRail::-webkit-scrollbar{display:none}
+.momentumCard{
+  flex:0 0 72%;scroll-snap-align:start;text-align:left;border:1px solid var(--db-line);background:var(--db-panel);
+  color:var(--db-text);border-radius:16px;padding:12px;box-shadow:var(--db-shadow-soft)
+}
+.momentumCard>span{display:block}.momentumCard b{display:block;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.momentumCard small{display:block;color:var(--db-muted);font-size:.5rem;margin-top:3px}
+.momentumCard strong{display:block;font-size:1.1rem;margin:10px 0 5px}
+.momentumCard>i{display:block;height:7px;border-radius:999px;overflow:hidden;background:color-mix(in srgb,var(--db-line) 85%,transparent)}
+.momentumCard>i>em{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--db-purple),#e6b35b)}
+.momentumWish{margin-top:7px!important;font-weight:850}
+body[data-theme="umbreon"] .intelligenceHero small,
+body[data-theme="umbreon"] .intelligenceStat small,
+body[data-theme="umbreon"] .intelligenceSectionHead small,
+body[data-theme="umbreon"] .momentumCard small{color:#dfe3f1!important}
+@media(min-width:700px){.intelligenceGrid{grid-template-columns:repeat(4,minmax(0,1fr))}.momentumCard{flex-basis:42%}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-/* v0.12.2 — static illustrated hero + page-level interactive atmosphere */
+/* v0.13.0 — static illustrated hero + page-level interactive atmosphere */
 #collectionHero.staticSkyHero{position:relative!important;padding:0!important;overflow:hidden!important;min-height:0!important;aspect-ratio:1105/795!important;background:#10182d!important;border-radius:28px!important;box-shadow:0 18px 44px rgba(16,24,55,.18)!important}
 #collectionHero.staticSkyHero:before,#collectionHero.staticSkyHero:after{display:none!important}
 .staticHeroArtwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
@@ -3107,7 +3151,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.12.2</div>
+  <div class="version">v0.13.0</div>
 </div>
 
   <section id="homeScreen">
@@ -3129,7 +3173,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
       <div class="quickActions">
         <button class="quickAction dark" id="addCardsBtn"><b>＋ Add Cards</b><small>Search, add or scan cards</small></button>
         
-        <button class="quickAction" id="wishlistBtn"><b>♡ Wishlist</b><small>Goals & wanted cards</small></button>
+        <button class="quickAction" id="wishlistBtn"><b>♡ Collection Goals</b><small>Insights, goals & wanted cards</small></button>
         <button class="quickAction" id="tradeHuntBtn"><b>↔ Trade &amp; Hunt</b><small>Missing cards, trade list &amp; compare</small></button>
       </div>
       <div class="dashboardTools">
@@ -3354,9 +3398,17 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 
 
 
-<div class="modal" id="wishlistModal"><div class="sheet">
+<div class="modal" id="wishlistModal"><div class="sheet intelligenceSheet">
   <div class="grab"></div>
-  <div class="detailTop"><div><h2>Wishlist &amp; Goals</h2><p>Plan what you want to collect next.</p></div><button class="btn small close">Close</button></div>
+  <div class="detailTop"><div><h2>Collection Intelligence</h2><p>Know what to collect next, where you are closest, and what deserves your attention.</p></div><button class="btn small close">Close</button></div>
+  <div class="intelligenceHero">
+    <div><span class="intelligenceEyebrow">NEXT BEST MOVE</span><b id="intelligenceNextMove">Analysing your collection…</b><small id="intelligenceNextMoveMeta">Using your active sets, wishlist and goals.</small></div>
+    <div class="intelligenceScore" id="intelligenceScore">—</div>
+  </div>
+  <div class="intelligenceGrid" id="intelligenceGrid"></div>
+  <div class="intelligenceSectionHead"><div><b>Set momentum</b><small>Closest active collections first.</small></div></div>
+  <div class="momentumRail" id="momentumRail"></div>
+  <div class="intelligenceSectionHead"><div><b>Wishlist &amp; goals</b><small>Your exact wanted variants and set targets.</small></div></div>
   <div class="goalGrid" id="goalSummary"></div>
   <div class="wishlistToolbar">
     <input class="collectorInput" id="wishlistSearch" type="search" placeholder="Search wanted cards…">
@@ -4014,6 +4066,50 @@ function wishlistStats(){
  const rows=wishlistEntries(),priced=rows.map(x=>Number(x.w.targetPrice)).filter(x=>Number.isFinite(x)&&x>0);
  return {total:rows.length,high:rows.filter(x=>x.w.priority==='high').length,budget:priced.reduce((a,b)=>a+b,0)}
 }
+
+function collectionIntelligence(){
+ const active=[...activeSetIds].map(sid=>{
+   const [have,total]=counts(sid),goal=goalTarget(sid)||total||0;
+   const target=Math.max(0,goal),remaining=Math.max(0,target-have),pct=target?Math.min(100,Math.round(have/target*100)):0;
+   const wanted=wishlistEntries().filter(x=>x.sid===sid).length;
+   return {sid,have,total,target,remaining,pct,wanted,name:SETS[sid]?.name||sid};
+ }).filter(x=>x.target>0).sort((a,b)=>a.remaining-b.remaining||b.pct-a.pct);
+ const ws=wishlistStats();
+ const unfinished=active.filter(x=>x.remaining>0);
+ const closest=unfinished[0]||null;
+ const near=unfinished.filter(x=>x.pct>=75).length;
+ const complete=active.filter(x=>x.remaining===0).length;
+ const totalRemaining=unfinished.reduce((n,x)=>n+x.remaining,0);
+ const focusScore=closest?Math.max(0,Math.min(100,closest.pct)):100;
+ return {active,ws,closest,near,complete,totalRemaining,focusScore};
+}
+function renderCollectionIntelligence(){
+ const hero=$('#intelligenceNextMove'),meta=$('#intelligenceNextMoveMeta'),score=$('#intelligenceScore'),grid=$('#intelligenceGrid'),rail=$('#momentumRail');
+ if(!hero||!grid||!rail)return;
+ const d=collectionIntelligence();
+ if(d.closest){
+   hero.textContent=`Finish ${d.closest.name}`;
+   meta.textContent=`${d.closest.remaining} position${d.closest.remaining===1?'':'s'} to your current goal · ${d.closest.pct}% complete`;
+   score.textContent=`${d.closest.pct}%`;
+ }else{
+   hero.textContent=d.active.length?'Every active goal is complete':'Choose an active set to start';
+   meta.textContent=d.active.length?'Your current collection goals are all cleared.':'Manage Sets to add a collection.';
+   score.textContent=d.active.length?'✓':'—';
+ }
+ grid.innerHTML=`
+   <div class="intelligenceStat"><b>${d.ws.total}</b><span>Wanted cards</span><small>${d.ws.high} high priority</small></div>
+   <div class="intelligenceStat"><b>${d.near}</b><span>Sets in striking distance</span><small>75%+ toward goal</small></div>
+   <div class="intelligenceStat"><b>${d.totalRemaining}</b><span>Positions remaining</span><small>Across unfinished goals</small></div>
+   <div class="intelligenceStat"><b>${d.complete}</b><span>Goals completed</span><small>Active collections</small></div>`;
+ rail.innerHTML=d.active.length?d.active.map(x=>`
+   <button class="momentumCard" data-intel-set="${x.sid}" type="button">
+     <span><b>${escapeHtml(x.name)}</b><small>${x.have}/${x.target} · ${x.remaining?`${x.remaining} left`:'Goal complete'}</small></span>
+     <strong>${x.pct}%</strong>
+     <i><em style="width:${x.pct}%"></em></i>
+     ${x.wanted?`<small class="momentumWish">♡ ${x.wanted} wanted</small>`:''}
+   </button>`).join(''):'<div class="tradeEmpty">Add an active set to see collection momentum.</div>';
+ $$('[data-intel-set]').forEach(b=>b.onclick=()=>{const sid=b.dataset.intelSet;$('#wishlistModal').classList.remove('open');openSet(sid,'binder')});
+}
 function renderGoalSummary(){
  const stats=wishlistStats(),active=[...activeSetIds],goals=active.map(sid=>({sid,...goalProgress(sid)}));
  const closest=goals.filter(g=>g.target>0&&g.remaining>0).sort((a,b)=>a.remaining-b.remaining)[0];
@@ -4023,6 +4119,7 @@ function renderGoalSummary(){
  $$('[data-save-set-goal]').forEach(b=>b.onclick=()=>{const sid=b.dataset.saveSetGoal,v=$(`[data-set-goal="${sid}"]`)?.value;setGoalFor(sid,v);toast(v?'Set goal saved':'Using master-set goal');renderWishlist()});
 }
 function renderWishlist(){
+ renderCollectionIntelligence();
  renderGoalSummary();
  const q=$('#wishlistSearch').value.trim().toLowerCase(),pf=$('#wishlistPriorityFilter').value,rank={high:0,medium:1,low:2};
  let rows=wishlistEntries().filter(x=>{const hay=`${x.c?.name||''} ${SETS[x.sid]?.name||x.sid} ${x.c?.localId||''}`.toLowerCase();return (!q||hay.includes(q))&&(pf==='all'||x.w.priority===pf)});
