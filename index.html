@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.12.1 dashboard refinements */
+/* v0.12.2 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.12.1 — visual consistency pass
+   DexBinder v0.12.2 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Day & Night
+   DexBinder v0.12.2 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Day & Night polish
+   DexBinder v0.12.2 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Interactive Sky Hero
+   DexBinder v0.12.2 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Interactive Sky correction pass
+   DexBinder v0.12.2 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Theme correction + ambient page motion
+   DexBinder v0.12.2 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.1 — portrait hero polish
+   DexBinder v0.12.2 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2211,7 +2211,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Hero structural rebuild
+   DexBinder v0.12.2 — Hero structural rebuild
    ============================================================ */
 
 .heroThemeHint{display:none!important}
@@ -2449,7 +2449,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Clean-source hero rebuild
+   DexBinder v0.12.2 — Clean-source hero rebuild
    User-supplied transparent character renders + fixed portrait zones
    ============================================================ */
 
@@ -2711,7 +2711,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.1 — Hero + Umbreon contrast polish
+   DexBinder v0.12.2 — Hero + Umbreon contrast polish
    ============================================================ */
 
 /* 1) Slightly reduce hero character dominance. */
@@ -2909,7 +2909,7 @@ body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on *{
 }
 
 
-/* v0.12.1 — two-state Day / Night polish */
+/* v0.12.2 — two-state Day / Night polish */
 .sceneBird,.themeAtmosphere .bird{display:none!important}
 
 /* exact 50/50 hero */
@@ -2988,7 +2988,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 #collectionHero .skyControl{left:23%!important;right:23%!important}
 
 
-/* v0.12.1 startup hotfix */
+/* v0.12.2 startup hotfix */
 .srOnly{
   position:absolute!important;
   width:1px!important;height:1px!important;
@@ -2997,13 +2997,71 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
   white-space:nowrap!important;border:0!important;
 }
 
+
+/* ============================================================
+   DexBinder v0.12.2 FINAL — Active Set hierarchy + Umbreon legibility
+   ============================================================ */
+
+/* Completion belongs to the information stack, not over the chase artwork. */
+.setCard .setPct{
+  position:relative!important;
+  right:auto!important;
+  top:auto!important;
+  z-index:2!important;
+  display:flex!important;
+  align-items:baseline!important;
+  gap:5px!important;
+  width:max-content!important;
+  margin-top:7px!important;
+  text-align:left!important;
+  font-size:1.02rem!important;
+  line-height:1!important;
+  color:var(--db-text)!important;
+}
+.setCard .setPct small{
+  display:inline!important;
+  font-size:.52rem!important;
+  font-weight:850!important;
+  color:var(--db-muted)!important;
+  text-transform:uppercase!important;
+  letter-spacing:.045em!important;
+}
+
+/* The right side is now reserved entirely for chase artwork. */
+.setCard.hasChaseArt .setCardTop{max-width:62%!important}
+
+/* Umbreon: secondary information should remain clearly readable. */
+body[data-theme="umbreon"]{
+  --db-muted:#d7dbea!important;
+}
+body[data-theme="umbreon"] .activeHead p,
+body[data-theme="umbreon"] .setGroupTitle small,
+body[data-theme="umbreon"] .setCardMeta span,
+body[data-theme="umbreon"] .setCardHint,
+body[data-theme="umbreon"] .setPct small,
+body[data-theme="umbreon"] .dashboardAchievementHead p{
+  color:#dfe3f1!important;
+}
+body[data-theme="umbreon"] .setCardMeta span{
+  text-shadow:0 1px 8px rgba(0,0,0,.32);
+}
+body[data-theme="umbreon"] .setCardProgress{
+  background:rgba(236,240,255,.18)!important;
+}
+body[data-theme="umbreon"] .setCardProgress i{
+  background:linear-gradient(90deg,#aaa1ff,#e6b35b)!important;
+}
+body[data-theme="umbreon"] .setChaseLabel small{
+  color:#e0e4f2!important;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-/* v0.12.1 — static illustrated hero + page-level interactive atmosphere */
+/* v0.12.2 — static illustrated hero + page-level interactive atmosphere */
 #collectionHero.staticSkyHero{position:relative!important;padding:0!important;overflow:hidden!important;min-height:0!important;aspect-ratio:1105/795!important;background:#10182d!important;border-radius:28px!important;box-shadow:0 18px 44px rgba(16,24,55,.18)!important}
 #collectionHero.staticSkyHero:before,#collectionHero.staticSkyHero:after{display:none!important}
 .staticHeroArtwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
@@ -3049,7 +3107,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.12.1</div>
+  <div class="version">v0.12.2</div>
 </div>
 
   <section id="homeScreen">
@@ -4467,8 +4525,8 @@ function renderSetCards(){
            ? `<div class="setLogoWrap"><img class="setLogo" src="${logo}" data-logo-candidates="${escapeHtml(setLogoCandidates(s.id).join('|||'))}" alt="${escapeHtml(s.name)} logo" loading="lazy"></div><div class="setIdentityFallback hidden"><h3>${escapeHtml(s.name)}</h3></div>`
            : `<div class="setIdentityFallback"><h3>${escapeHtml(s.name)}</h3></div>`}
          <div class="setCardMeta"><span>${n} / ${t||'—'} collected</span>${missing!==null?`<span>· ${missing} missing</span>`:''}${prep?`<span>${prep}</span>`:''}</div>
+         <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
        </div>
-       <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
        <div class="setCardProgress"><i style="width:${t?p:0}%"></i></div>
        <div class="setCardHint">Tap to open binder</div>
        ${chaseImage?`<button class="chasePickButton" data-chase-pick="${s.id}" type="button"><small>★ Chase Pick</small><b>${escapeHtml(chase?.name||'Featured card')}</b></button>`:''}
