@@ -407,7 +407,7 @@ html{-webkit-text-size-adjust:100%}
 .quickSectionHead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 2px 9px}
 .quickSectionHead h2{margin:0;font-size:1.15rem;letter-spacing:-.035em}
 .quickSectionHead p{margin:3px 0 0;color:var(--muted);font-size:.72rem}
-.quickActions{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.quickActions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .quickAction{
   border:1px solid var(--line);
   background:var(--paper);
@@ -518,6 +518,31 @@ html{-webkit-text-size-adjust:100%}
 .wishActions{display:grid;gap:5px}.wishForm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.wishForm .full{grid-column:1/-1}.wishSummary{font-size:.58rem;color:var(--muted);line-height:1.45;margin:6px 0 10px}
 @media(max-width:430px){.goalGrid{grid-template-columns:1fr}.wishlistToolbar{grid-template-columns:1fr}.wishRow{grid-template-columns:50px minmax(0,1fr)}.wishRow img{width:50px}.wishActions{grid-column:1/-1;grid-template-columns:1fr 1fr}.wishForm{grid-template-columns:1fr}.wishForm .full{grid-column:auto}}
 
+
+/* v0.9.1 Trade & Hunt Hub */
+.tradeHuntTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:10px 0}
+.tradeHuntTabs button{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px 7px;font-size:.62rem;font-weight:850}
+.tradeHuntTabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tradeHuntStats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.tradeHuntStat{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px}
+.tradeHuntStat b{display:block;font-size:.78rem}.tradeHuntStat small{display:block;color:var(--muted);font-size:.5rem;margin-top:2px}
+.tradeHuntPanel{display:none}.tradeHuntPanel.on{display:block}
+.tradeHuntList{display:grid;gap:7px;margin-top:8px;max-height:48vh;overflow:auto}
+.tradeHuntRow{display:grid;grid-template-columns:50px minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;background:#fff;padding:7px}
+.tradeHuntRow img{width:50px;aspect-ratio:245/337;object-fit:cover;border-radius:7px;background:#eee}
+.tradeHuntRow b{display:block;font-size:.64rem}.tradeHuntRow small{display:block;color:var(--muted);font-size:.51rem;line-height:1.35}
+.tradeHuntRowActions{display:grid;gap:5px}.tradeTargetBadge{display:inline-flex;padding:2px 6px;border:1px solid var(--line);border-radius:999px;font-size:.46rem;font-weight:900;margin-top:3px;background:#eef5ef}
+.tradeHuntHeroActions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0}
+.tradeHuntEmpty{border:1px dashed var(--line);border-radius:12px;padding:14px;color:var(--muted);font-size:.6rem;text-align:center}
+@media(max-width:430px){
+ .tradeHuntTabs{grid-template-columns:1fr}
+ .tradeHuntStats{grid-template-columns:1fr 1fr}
+ .tradeHuntRow{grid-template-columns:46px minmax(0,1fr)}
+ .tradeHuntRow img{width:46px}
+ .tradeHuntRowActions{grid-column:1/-1;grid-template-columns:1fr 1fr}
+ .tradeHuntHeroActions{grid-template-columns:1fr}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -525,7 +550,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.0</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.1</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -535,8 +560,7 @@ html{-webkit-text-size-adjust:100%}
         <button class="quickAction dark" id="fastAddBtn"><b>＋ Fast Add</b><small>Add cards quickly</small></button>
         <button class="quickAction" id="scanCardBtn"><b>📷 Scan</b><small>Photo-assisted entry</small></button>
         <button class="quickAction" id="wishlistBtn"><b>♡ Wishlist</b><small>Goals & wanted cards</small></button>
-        <button class="quickAction" id="tradeBtn"><b>↔ Trade</b><small>Manage trade cards</small></button>
-        <button class="quickAction" id="globalHuntHome"><b>🎯 Global Hunt</b><small>Everything still missing</small></button>
+        <button class="quickAction" id="tradeHuntBtn"><b>↔ Trade &amp; Hunt</b><small>Missing cards, trade list &amp; compare</small></button>
       </div>
       <div class="dashboardTools">
         <button class="btn small" id="dataSyncBtn">☁️ Data &amp; Sync</button>
@@ -913,6 +937,48 @@ html{-webkit-text-size-adjust:100%}
   <div class="tradeSourceNote">Reference values are estimates only. Missing prices are excluded, and condition/language adjustments are not applied.</div>
 </div></div>
 
+
+<div class="modal" id="tradeHuntModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop">
+    <div><h2>Trade &amp; Hunt</h2><p>Turn missing cards into trade targets, and trade duplicates toward them.</p></div>
+    <button class="btn small close">Close</button>
+  </div>
+  <div class="tradeHuntTabs">
+    <button class="on" data-th-tab="hunt">🎯 Hunt</button>
+    <button data-th-tab="trade">↔ Trade List</button>
+    <button data-th-tab="compare">⚖ Compare</button>
+  </div>
+
+  <div id="tradeHuntPanel-hunt" class="tradeHuntPanel on">
+    <div class="tradeHuntStats" id="tradeHuntHuntStats"></div>
+    <div class="tradeHuntHeroActions">
+      <button class="btn dark" id="openFullHuntFromHub">Open Full Hunt</button>
+      <button class="btn" id="openWishlistFromHub">♡ Open Wishlist</button>
+    </div>
+    <div class="wishSummary">Wishlisted missing cards can be promoted to <b>Trade Targets</b>. Trade Targets can be added directly to “You Get”.</div>
+    <div class="tradeHuntList" id="tradeHuntTargetsList"></div>
+  </div>
+
+  <div id="tradeHuntPanel-trade" class="tradeHuntPanel">
+    <div class="tradeHuntStats" id="tradeHuntTradeStats"></div>
+    <div class="tradeHuntHeroActions">
+      <button class="btn dark" id="openFullTradeListFromHub">Open Full Trade List</button>
+      <button class="btn" id="clearHubTradeBasket">Clear Selected</button>
+    </div>
+    <div class="tradeHuntList" id="tradeHuntTradeList"></div>
+  </div>
+
+  <div id="tradeHuntPanel-compare" class="tradeHuntPanel">
+    <div class="tradeHuntStats" id="tradeHuntCompareStats"></div>
+    <div class="tradeHuntHeroActions">
+      <button class="btn dark" id="openTradeCompareFromHub">Open Trade Compare</button>
+      <button class="btn" id="addTargetsToCompare">Add Trade Targets to You Get</button>
+    </div>
+    <div class="tradeHuntList" id="tradeHuntComparePreview"></div>
+  </div>
+</div></div>
+
 <div class="modal" id="tradeModal"><div class="sheet">
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Trade List</h2><p>Cards you've marked as available to trade.</p></div><button class="btn small close">Close</button></div>
@@ -1160,6 +1226,18 @@ function loadSetGoals(){try{const x=JSON.parse(localStorage.getItem(SET_GOALS_KE
 function saveSetGoals(){try{localStorage.setItem(SET_GOALS_KEY,JSON.stringify(setGoals))}catch(e){}}
 let wishlist=loadWishlist(),setGoals=loadSetGoals();
 const wishKey=(sid,cid,v)=>`${sid}|${cid}|${v}`;
+
+const TRADE_TARGETS_KEY='dexbinder_v091_trade_targets';
+function loadTradeTargets(){try{const x=JSON.parse(localStorage.getItem(TRADE_TARGETS_KEY)||'[]');return new Set(Array.isArray(x)?x:[])}catch(e){return new Set()}}
+function saveTradeTargets(){try{localStorage.setItem(TRADE_TARGETS_KEY,JSON.stringify([...tradeTargets]))}catch(e){}}
+let tradeTargets=loadTradeTargets();
+const isTradeTarget=(sid,cid,v)=>tradeTargets.has(wishKey(sid,cid,v));
+function toggleTradeTarget(sid,cid,v,force){
+ const k=wishKey(sid,cid,v),next=force==null?!tradeTargets.has(k):!!force;
+ if(next)tradeTargets.add(k);else tradeTargets.delete(k);
+ saveTradeTargets();
+}
+
 const getWish=(sid,cid,v)=>wishlist[wishKey(sid,cid,v)]||null;
 const isWanted=(sid,cid,v)=>!!getWish(sid,cid,v);
 function setWanted(sid,cid,v,data={}){
@@ -1167,7 +1245,7 @@ function setWanted(sid,cid,v,data={}){
  wishlist[k]={priority:data.priority||old.priority||'medium',targetPrice:data.targetPrice??old.targetPrice??'',notes:data.notes??old.notes??'',addedAt:old.addedAt||new Date().toISOString()};
  saveWishlist();
 }
-function removeWanted(sid,cid,v){delete wishlist[wishKey(sid,cid,v)];saveWishlist()}
+function removeWanted(sid,cid,v){const k=wishKey(sid,cid,v);delete wishlist[k];tradeTargets.delete(k);saveWishlist();saveTradeTargets()}
 function wishlistEntries(){return Object.entries(wishlist).map(([k,w])=>{const [sid,cid,variantId]=k.split('|');return {k,sid,cid,variantId,w,c:(cardsBySet[sid]||[]).find(x=>x.id===cid)}})}
 function goalTarget(sid){return Number(setGoals[sid]||SETS[sid]?.masterTotal||0)}
 function goalProgress(sid){const [have]=counts(sid),target=goalTarget(sid);return {have,target,pct:target?Math.min(100,Math.round(have/target*100)):0,remaining:Math.max(0,target-have)}}
@@ -1204,7 +1282,8 @@ function renderWishlist(){
  rows.sort((a,b)=>(rank[a.w.priority]??1)-(rank[b.w.priority]??1)||String(a.c?.name||a.cid).localeCompare(String(b.c?.name||b.cid)));
  const stats=wishlistStats();
  $('#wishlistSummary').textContent=`${stats.total} wanted card${stats.total===1?'':'s'} · ${stats.high} high priority`;
- $('#wishlistList').innerHTML=rows.length?rows.map(x=>{const label=x.c?(variantsFor(x.sid,x.c).find(v=>v.id===x.variantId)?.label||x.variantId):x.variantId;return `<div class="wishRow">${x.c?`<img src="${image(x.c,'low')}" data-fallback="${assetFallback(x.c,'low')}" onerror="retryImage(this)">`:'<div></div>'}<div><b>${x.c?.name||x.cid}</b><small>${SETS[x.sid]?.name||x.sid}${x.c?` · #${x.c.localId}`:''} · ${label}</small><span class="wishPriority ${x.w.priority}">${x.w.priority.toUpperCase()}</span>${x.w.targetPrice?`<small>Target ≤ $${Number(x.w.targetPrice).toFixed(2)}</small>`:''}${x.w.notes?`<small>${escapeHtml(x.w.notes)}</small>`:''}</div><div class="wishActions"><button class="btn small" data-wish-open="${x.sid}|${x.cid}|${x.variantId}">Open</button><button class="btn small" data-wish-remove="${x.sid}|${x.cid}|${x.variantId}">Remove</button></div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
+ $('#wishlistList').innerHTML=rows.length?rows.map(x=>{const label=x.c?(variantsFor(x.sid,x.c).find(v=>v.id===x.variantId)?.label||x.variantId):x.variantId;return `<div class="wishRow">${x.c?`<img src="${image(x.c,'low')}" data-fallback="${assetFallback(x.c,'low')}" onerror="retryImage(this)">`:'<div></div>'}<div><b>${x.c?.name||x.cid}</b><small>${SETS[x.sid]?.name||x.sid}${x.c?` · #${x.c.localId}`:''} · ${label}</small><span class="wishPriority ${x.w.priority}">${x.w.priority.toUpperCase()}</span>${x.w.targetPrice?`<small>Target ≤ $${Number(x.w.targetPrice).toFixed(2)}</small>`:''}${x.w.notes?`<small>${escapeHtml(x.w.notes)}</small>`:''}</div><div class="wishActions"><button class="btn small" data-wish-open="${x.sid}|${x.cid}|${x.variantId}">Open</button><button class="btn small" data-wish-target="${x.sid}|${x.cid}|${x.variantId}">${isTradeTarget(x.sid,x.cid,x.variantId)?'Un-target':'Trade target'}</button><button class="btn small" data-wish-remove="${x.sid}|${x.cid}|${x.variantId}">Remove</button></div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
+ $$('[data-wish-target]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishTarget.split('|');toggleTradeTarget(s,c,v);renderWishlist()});
  $$('[data-wish-remove]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishRemove.split('|');removeWanted(s,c,v);renderWishlist()});
  $$('[data-wish-open]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.wishOpen.split('|');if(!activeSetIds.has(s)){activeSetIds.add(s);saveActiveSets()}if(!cardsBySet[s])await loadSet(s);currentSet=s;$('#wishlistModal').classList.remove('open');await openCard(c,v)});
 }
@@ -2089,6 +2168,88 @@ function tradeReferencePrice(c,variantId){
   if(Number.isFinite(p.lowPrice))return p.lowPrice;
   return null;
 }
+
+let tradeHuntTab='hunt';
+function setTradeHuntTab(tab){
+ tradeHuntTab=tab;
+ $$('[data-th-tab]').forEach(b=>b.classList.toggle('on',b.dataset.thTab===tab));
+ ['hunt','trade','compare'].forEach(x=>$(`#tradeHuntPanel-${x}`).classList.toggle('on',x===tab));
+ renderTradeHuntHub();
+}
+function missingVariantRows(){
+ const out=[];
+ for(const sid of activeSetIds){
+  if(!cardsBySet[sid])continue;
+  if(sid!=='sv03.5'&&!variantReadyBySet[sid])continue;
+  for(const x of masterItems(sid)){
+   const k=key(sid,x.card.id,x.variant.id);
+   if(!owned.has(k))out.push({sid,c:x.card,v:x.variant,key:k,setName:SETS[sid]?.name||sid});
+  }
+ }
+ return out;
+}
+function targetedMissingRows(){
+ const map=new Map(missingVariantRows().map(r=>[r.key,r]));
+ return [...tradeTargets].map(k=>map.get(k)).filter(Boolean);
+}
+function wantedMissingRows(){
+ const wishes=new Set(Object.keys(wishlist));
+ return missingVariantRows().filter(r=>wishes.has(r.key));
+}
+function renderTradeHuntHunt(){
+ const missing=missingVariantRows(),wanted=wantedMissingRows(),targets=targetedMissingRows();
+ $('#tradeHuntHuntStats').innerHTML=`<div class="tradeHuntStat"><b>${missing.length}</b><small>Missing positions</small></div><div class="tradeHuntStat"><b>${wanted.length}</b><small>Wishlisted missing</small></div><div class="tradeHuntStat"><b>${targets.length}</b><small>Trade targets</small></div>`;
+ const rank={high:0,medium:1,low:2};
+ const candidates=[...wanted].sort((a,b)=>{
+  const at=isTradeTarget(a.sid,a.c.id,a.v.id)?0:1,bt=isTradeTarget(b.sid,b.c.id,b.v.id)?0:1;
+  const ap=rank[getWish(a.sid,a.c.id,a.v.id)?.priority||'medium']??1,bp=rank[getWish(b.sid,b.c.id,b.v.id)?.priority||'medium']??1;
+  return at-bt||ap-bp||a.setName.localeCompare(b.setName)||huntNumberValue(a.c.localId)-huntNumberValue(b.c.localId);
+ }).slice(0,20);
+ $('#tradeHuntTargetsList').innerHTML=candidates.length?candidates.map(r=>{
+  const target=isTradeTarget(r.sid,r.c.id,r.v.id),w=getWish(r.sid,r.c.id,r.v.id);
+  return `<div class="tradeHuntRow"><img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)"><div><b>${r.c.name} · ${r.v.label}</b><small>${r.setName} · #${r.c.localId}${w?.targetPrice?` · target ≤ $${Number(w.targetPrice).toFixed(2)}`:''}</small>${target?'<span class="tradeTargetBadge">TRADE TARGET</span>':''}</div><div class="tradeHuntRowActions"><button class="btn small" data-th-target="${r.key}">${target?'Remove target':'Make target'}</button><button class="btn small" data-th-get="${r.key}">＋ You Get</button></div></div>`;
+ }).join(''):'<div class="tradeHuntEmpty">No wishlisted missing cards yet. Add cards to Wishlist, then promote the ones you want to pursue through trades.</div>';
+
+ $$('[data-th-target]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.thTarget.split('|');toggleTradeTarget(s,c,v);renderTradeHuntHunt();renderTradeHuntCompare()});
+ $$('[data-th-get]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.thGet.split('|'),card=(cardsBySet[s]||[]).find(x=>x.id===c);if(!card)return;try{await loadPriceFor(card)}catch(e){}const k=incomingLineKey(s,c,v),prev=incomingTradeBasket.get(k)||{sid:s,cid:c,variantId:v,qty:0,manualValue:null};prev.qty=Math.min(99,(prev.qty||0)+1);incomingTradeBasket.set(k,prev);toast('Added to You Get');renderTradeHuntCompare()});
+}
+function renderTradeHuntTrade(){
+ const all=tradeEntries(),selected=all.filter(r=>tradeBasket.has(r.key)),qty=all.reduce((s,r)=>s+r.meta.tradeQuantity,0);
+ $('#tradeHuntTradeStats').innerHTML=`<div class="tradeHuntStat"><b>${all.length}</b><small>Trade groups</small></div><div class="tradeHuntStat"><b>${qty}</b><small>Cards available</small></div><div class="tradeHuntStat"><b>${selected.length}</b><small>Selected to give</small></div>`;
+ $('#tradeHuntTradeList').innerHTML=all.length?all.slice(0,20).map(r=>{
+  const selectedNow=tradeBasket.has(r.key);
+  return `<div class="tradeHuntRow"><img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)"><div><b>${r.c.name} · ${r.v.label}</b><small>${r.setName} · #${r.c.localId} · ${r.meta.tradeQuantity} available${r.unitValue!=null?` · ${formatTradeMoney(r.unitValue)} each`:''}</small></div><div class="tradeHuntRowActions"><button class="btn small" data-th-give="${r.key}">${selectedNow?'Remove':'＋ You Give'}</button></div></div>`;
+ }).join(''):'<div class="tradeHuntEmpty">Nothing is marked available to trade yet. Set a Trade Quantity on a collector lot or in Fast Add.</div>';
+ $$('[data-th-give]').forEach(b=>b.onclick=()=>{const r=all.find(x=>x.key===b.dataset.thGive);if(!r)return;if(tradeBasket.has(r.key))tradeBasket.delete(r.key);else tradeBasket.set(r.key,{qty:1,manualValue:null});renderTradeHuntTrade();renderTradeHuntCompare()});
+}
+function renderTradeHuntCompare(){
+ const ownedMap=new Map(tradeEntries().map(r=>[r.key,r]));
+ const give=[...tradeBasket.keys()].map(k=>ownedMap.get(k)).filter(Boolean).map(tradeLineFromOwned);
+ const get=incomingRows();
+ const giveValue=give.reduce((s,r)=>s+lineTotalValue(r),0),getValue=get.reduce((s,r)=>s+lineTotalValue(r),0);
+ $('#tradeHuntCompareStats').innerHTML=`<div class="tradeHuntStat"><b>${give.reduce((s,r)=>s+r.selectedQty,0)}</b><small>You Give</small></div><div class="tradeHuntStat"><b>${get.reduce((s,r)=>s+r.selectedQty,0)}</b><small>You Get</small></div><div class="tradeHuntStat"><b>${formatTradeMoney(Math.abs(giveValue-getValue))}</b><small>Reference gap</small></div>`;
+ const targetCount=targetedMissingRows().length;
+ $('#tradeHuntComparePreview').innerHTML=`<div class="goalCard"><b>${give.length} outgoing line${give.length===1?'':'s'} · ${formatTradeMoney(giveValue)}</b><small>Selected from your Trade List.</small></div><div class="goalCard"><b>${get.length} incoming line${get.length===1?'':'s'} · ${formatTradeMoney(getValue)}</b><small>${targetCount} active Trade Target${targetCount===1?'':'s'} available.</small></div>`;
+}
+function renderTradeHuntHub(){if(tradeHuntTab==='hunt')renderTradeHuntHunt();else if(tradeHuntTab==='trade')renderTradeHuntTrade();else renderTradeHuntCompare()}
+async function openTradeHuntHub(){
+ $('#tradeHuntModal').classList.add('open');
+ for(const sid of activeSetIds){
+  if(!cardsBySet[sid]){try{await loadSet(sid)}catch(e){}}
+  if(sid!=='sv03.5'&&cardsBySet[sid]&&!variantReadyBySet[sid]){try{await ensureVariantMetadata(sid)}catch(e){}}
+ }
+ renderTradeHuntHub();
+}
+function addAllTargetsToCompare(){
+ let added=0;
+ for(const r of targetedMissingRows()){
+  const k=incomingLineKey(r.sid,r.c.id,r.v.id);
+  if(!incomingTradeBasket.has(k)){incomingTradeBasket.set(k,{sid:r.sid,cid:r.c.id,variantId:r.v.id,qty:1,manualValue:null});added++}
+ }
+ toast(added?`Added ${added} trade target${added===1?'':'s'} to You Get`:'All trade targets are already in You Get');
+ renderTradeHuntCompare();
+}
+
 function tradeEntries(){
   const rows=[];
   for(const [sid,cards] of Object.entries(cardsBySet)){
@@ -3797,7 +3958,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -3858,7 +4019,7 @@ $('#csvExportBtn').onclick=exportCollectionCSV;
 
 $('#dataSyncBtn').onclick=()=>$('#dataSyncModal').classList.add('open');
 $('#setLibraryHome').onclick=openLibrary;
-$('#globalHuntHome').onclick=openGlobalHunt;
+
 
 $('#wishlistBtn').onclick=openWishlist;
 $('#wishlistSearch').oninput=renderWishlist;
@@ -3926,7 +4087,16 @@ if(collectionHero){
   };
 }
 
-$('#tradeBtn').onclick=openTradeList;
+$('#tradeHuntBtn').onclick=openTradeHuntHub;
+
+$$('[data-th-tab]').forEach(b=>b.onclick=()=>setTradeHuntTab(b.dataset.thTab));
+$('#openFullHuntFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openGlobalHunt()};
+$('#openWishlistFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openWishlist()};
+$('#openFullTradeListFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openTradeList()};
+$('#clearHubTradeBasket').onclick=()=>{tradeBasket.clear();renderTradeHuntTrade();renderTradeHuntCompare()};
+$('#openTradeCompareFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');prepareTradeCompare()};
+$('#addTargetsToCompare').onclick=addAllTargetsToCompare;
+
 $('#tradeSort').onchange=renderTradeList;
 $('#tradeSetFilter').onchange=renderTradeList;
 $$('[data-trade-filter]').forEach(b=>b.onclick=()=>{
@@ -3956,6 +4126,7 @@ function restoreBackupObject(d){
   if(Array.isArray(d.tradeHistory)){tradeHistory=d.tradeHistory;saveTradeHistory()}
   if(d.wishlist && typeof d.wishlist==='object' && !Array.isArray(d.wishlist)){wishlist=d.wishlist;saveWishlist()}
   if(d.setGoals && typeof d.setGoals==='object' && !Array.isArray(d.setGoals)){setGoals=d.setGoals;saveSetGoals()}
+  if(Array.isArray(d.tradeTargets)){tradeTargets=new Set(d.tradeTargets);saveTradeTargets()}
   save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
 }
 $('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};

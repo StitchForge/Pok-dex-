@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v090';
+const CACHE='dexbinder-shell-v091';
 const APP_SHELL=[
   './',
   './index.html',
@@ -18,7 +18,7 @@ self.addEventListener('install',event=>{
 });
 
 self.addEventListener('activate',event=>{
-  const keep=new Set([CACHE,'dexbinder-data-v090','dexbinder-images-v090']);
+  const keep=new Set([CACHE,'dexbinder-data-v091','dexbinder-images-v091']);
   event.waitUntil(
     caches.keys()
       .then(keys=>Promise.all(keys.filter(k=>k.startsWith('dexbinder-')&&!keep.has(k)).map(k=>caches.delete(k))))
@@ -26,8 +26,8 @@ self.addEventListener('activate',event=>{
   );
 });
 
-const DATA_CACHE='dexbinder-data-v090';
-const IMAGE_CACHE='dexbinder-images-v090';
+const DATA_CACHE='dexbinder-data-v091';
+const IMAGE_CACHE='dexbinder-images-v091';
 
 async function trimCache(name,max){
   const cache=await caches.open(name),keys=await cache.keys();
