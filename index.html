@@ -556,6 +556,11 @@ html{-webkit-text-size-adjust:100%}
 .tradeLaunchCard{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px}
 .tradeLaunchCard b{display:block;font-size:.68rem}.tradeLaunchCard small{display:block;color:var(--muted);font-size:.52rem;line-height:1.4;margin-top:2px}
 
+
+/* v0.9.2c Global Hunt card-detail navigation */
+.cardContextActions{display:flex;justify-content:flex-end;margin:-2px 0 10px}
+.cardContextActions.hidden{display:none}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -563,7 +568,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2b</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2c</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -762,7 +767,7 @@ html{-webkit-text-size-adjust:100%}
   </div>
 </div></div>
 
-<div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small close">Close</button></div><div class="variants" id="detailVariants"></div></div></div>
+<div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small" id="cardModalBack">Close</button></div><div class="cardContextActions hidden" id="cardContextActions"><button class="btn small" id="openCardInBinder">Open in Binder</button></div><div class="variants" id="detailVariants"></div></div></div>
 <div class="modal" id="bulkModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Bulk edit</h2><p>Fast initial entry without fighting the binder pages.</p></div><button class="btn small close">Close</button></div><div class="chips"><button class="chip" id="allBase">Own all base</button><button class="chip" id="allReverse">Own all reverse</button><button class="chip" id="clearSet">Clear set</button></div><div class="bulk" id="bulkList"></div></div></div>
 
 <div class="modal" id="pagePickerModal"><div class="sheet">
@@ -1391,7 +1396,7 @@ function renderWishlist(){
       </div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
  $$('[data-wish-target]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishTarget.split('|');toggleTradeTarget(s,c,v);renderWishlist()});
  $$('[data-wish-remove]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishRemove.split('|');removeWanted(s,c,v);renderWishlist()});
- $$('[data-wish-open]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.wishOpen.split('|');if(!activeSetIds.has(s)){activeSetIds.add(s);saveActiveSets()}if(!cardsBySet[s])await loadSet(s);currentSet=s;$('#wishlistModal').classList.remove('open');await openCard(c,v)});
+ $$('[data-wish-open]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.wishOpen.split('|');if(!activeSetIds.has(s)){activeSetIds.add(s);saveActiveSets()}if(!cardsBySet[s])await loadSet(s);currentSet=s;$('#wishlistModal').classList.remove('open');setCardDetailContext(null);await openCard(c,v)});
 }
 async function openWishlist(){$('#wishlistModal').classList.add('open');$('#wishlistList').innerHTML='<div class="tradeEmpty">Loading wishlist…</div>';await ensureWishlistSetsLoaded();renderWishlist()}
 
@@ -3222,7 +3227,7 @@ function quickAddCollectorCopy(c,v,forTrade=false){
   save();
   renderSet();
   toast(forTrade?'Trade copy added':`Added another ${c.name}`);
-  openCard(c.id,v.id);
+  setCardDetailContext(null);openCard(c.id,v.id);
 }
 
 function resetFastAddDraft(){
@@ -3729,7 +3734,7 @@ function bindCollectorPanel(c,v){
       if(notes)l.notes=notes.value.trim();
     }
   };
-  const rerender=()=>{setCollectorLots(currentSet,c.id,v.id,lots);openCard(c.id,v.id)};
+  const rerender=()=>{setCollectorLots(currentSet,c.id,v.id,lots);setCardDetailContext(null);openCard(c.id,v.id)};
   const refreshLot=l=>{
     const base=baseFor(l);
     const q=$(`#${base}-qty`),t=$(`#${base}-trade`);
@@ -3772,7 +3777,7 @@ function bindCollectorPanel(c,v){
     collectDOM();
     setCollectorLots(currentSet,c.id,v.id,lots);
     toast('Collector copies saved');
-    renderSet();openCard(c.id,v.id);
+    renderSet();setCardDetailContext(null);openCard(c.id,v.id);
   };
 }
 
@@ -3783,6 +3788,36 @@ function currentAllScrollKey(){
 function rememberAllScroll(){
   const k=currentAllScrollKey();
   if(k)allScrollMemory[k]=window.scrollY;
+}
+
+
+let cardDetailOrigin=null;
+let cardDetailOriginState=null;
+
+function setCardDetailContext(origin,state=null){
+ cardDetailOrigin=origin||null;
+ cardDetailOriginState=state||null;
+ const back=$('#cardModalBack');
+ const actions=$('#cardContextActions');
+ if(back)back.textContent=origin==='globalHunt'?'← Back':'Close';
+ if(actions)actions.classList.toggle('hidden',origin!=='globalHunt');
+}
+
+function closeCardDetail(){
+ $('#cardModal').classList.remove('open');
+ if(cardDetailOrigin==='globalHunt'){
+   const y=Number(cardDetailOriginState?.scrollY)||0;
+   requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'auto'}));
+ }
+ setCardDetailContext(null);
+}
+
+async function openHuntCard(sid,cid,variantId){
+ const huntState={scrollY:window.scrollY};
+ if(!cardsBySet[sid])await loadSetWithRetry(sid,2);
+ currentSet=sid;
+ setCardDetailContext('globalHunt',huntState);
+ await openCard(cid,variantId);
 }
 
 async function openCard(cid,forcedVariant){
@@ -4110,14 +4145,35 @@ async function renderGlobalHunt(){
  const warning=skippedCrown?'<div class="notice error">One or more active sets are temporarily excluded because their master-set variant metadata did not finish loading. Retry on a stable connection rather than using an incomplete hunt list.</div>':'';
  const rows=items.length?items.map(x=>`<div class="row" data-key="${key(x.sid,x.card.id,x.variant.id)}" data-price="" data-price-loaded="0" data-number="${x.card.localId}" data-name="${String(x.card.name||'').replace(/"/g,'&quot;')}" data-set-name="${String(SETS[x.sid].name||'').replace(/"/g,'&quot;')}"><img class="thumb" src="${image(x.card)}"><div><h4>${x.card.name} · ${x.variant.label}</h4><p>${SETS[x.sid].name} · #${x.card.localId}</p></div><div class="rowPrice"><b class="p">…</b><small>TCGplayer reference</small></div></div>`).join(''):'<div class="notice">Nothing missing in this filter. Nice.</div>';
  $('#globalHuntList').innerHTML=warning+rows;
- items.forEach(x=>{const wanted=key(x.sid,x.card.id,x.variant.id);let row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);if(row)row.onclick=()=>openSet(x.sid,'missing')});
+ items.forEach(x=>{const wanted=key(x.sid,x.card.id,x.variant.id);let row=$$('#globalHuntList .row').find(node=>node.dataset.key===wanted);if(row)row.onclick=()=>openHuntCard(x.sid,x.card.id,x.variant.id)});
  applyHuntPriceFilter();
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.2b',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.2c',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
-$$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
+
+$('#cardModalBack').onclick=closeCardDetail;
+$('#openCardInBinder').onclick=()=>{
+ const sid=currentSet,cid=selected?.id;
+ $('#cardModal').classList.remove('open');
+ setCardDetailContext(null);
+ if(sid){
+   openSet(sid,'binder').then(()=>{
+     if(cid){
+       const card=(cardsBySet[sid]||[]).find(x=>x.id===cid);
+       if(card){
+         const index=(cardsBySet[sid]||[]).findIndex(x=>x.id===cid);
+         const size=$('#pageSize').value==='all'?(cardsBySet[sid]||[]).length:Number($('#pageSize').value||9);
+         if(size>0 && $('#pageSize').value!=='all')page=Math.floor(index/size)+1;
+         renderSet();
+       }
+     }
+   });
+ }
+};
+
+$$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m){if(m.id==='cardModal')closeCardDetail();else m.classList.remove('open')}});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
 $('#libraryBack').onclick=goHome;
 $('#librarySearch').oninput=renderLibrary;
