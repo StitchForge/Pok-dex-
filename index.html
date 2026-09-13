@@ -56,11 +56,39 @@
 .netStatus.offline{background:#8a3d2f}
 .pwaInstallNote{font-size:.68rem;color:var(--muted);margin-top:10px;text-align:center}
 
+
+/* v0.6B PWA / snapshot */
+.app{padding-top:calc(16px + env(safe-area-inset-top))}
+@media(display-mode:standalone){
+  .app{padding-top:calc(18px + env(safe-area-inset-top))}
+  .pwaInstallNote{display:none!important}
+}
+body.isStandalone .pwaInstallNote{display:none!important}
+.snapshotControls{display:grid;grid-template-columns:1fr auto;gap:8px;margin:8px 0 12px}
+.snapshotNav{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;margin:10px 0}
+.snapshotNav strong{text-align:center;font-size:.82rem}
+.snapshotPreview{background:#ece6dc;border:1px solid var(--line);border-radius:18px;padding:12px}
+.snapshotHeader{display:flex;justify-content:space-between;gap:12px;align-items:flex-end;margin-bottom:10px}
+.snapshotHeader h3{margin:0;font-size:1.2rem;letter-spacing:-.04em}
+.snapshotHeader p{margin:2px 0 0;color:var(--muted);font-size:.68rem}
+.snapshotGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.snapshotCard{position:relative;aspect-ratio:245/337;background:#cbc4b9;border-radius:7px;overflow:hidden}
+.snapshotCard img{width:100%;height:100%;object-fit:cover;display:block}
+.snapshotCard.missing img{filter:grayscale(1) brightness(.55);opacity:.28}
+.snapshotCard.partial img{filter:saturate(.6) brightness(.82);opacity:.7}
+.snapshotCard .snapTag{position:absolute;left:3px;right:3px;bottom:3px;background:rgba(20,20,20,.82);color:#fff;border-radius:4px;padding:2px 4px;font-size:.46rem;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.snapshotFooter{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:.62rem;margin-top:9px}
+.snapshotActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.backupActions{display:grid;gap:8px;margin-top:10px}
+.backupExplain{background:#f2eee6;border:1px solid var(--line);border-radius:13px;padding:10px;font-size:.72rem;color:var(--muted);line-height:1.4}
+.cacheNote{font-size:.66rem;color:var(--muted);margin-top:5px}
+.offlineBadge{display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:#f2eee6;padding:5px 8px;font-size:.62rem;font-weight:850;color:var(--muted)}
+
 </style>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6A.2</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6B</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -77,7 +105,7 @@
     <div class="hero" style="margin-top:10px"><div class="heroRow"><div><div class="eyebrow" id="setSeries"></div><h1 id="setTitle"></h1><p id="setDesc"></p></div><div class="stats"><b id="setOwned">0 / 0</b><span id="setPct">0% complete</span></div></div><div class="progress"><i id="setProgress"></i></div></div>
     <div class="toolbar"><input class="search" id="search" placeholder="Search name or card #…"/><select class="select" id="pageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="all">All</option></select></div>
     <div class="chips" id="chips">
-      <button class="chip active" data-mode="compact">Compact</button><button class="chip" data-mode="full">Full binder</button><button class="chip" id="bulkBtn">Bulk edit</button>
+      <button class="chip active" data-mode="compact">Compact</button><button class="chip" data-mode="full">Full binder</button><button class="chip" id="bulkBtn">Bulk edit</button><button class="chip" id="snapshotBtn">📷 Snapshot</button>
     </div>
     <div class="sub"><strong id="viewTitle">Binder</strong><span id="meta"></span></div>
     <main id="content"></main>
@@ -136,7 +164,36 @@
   <div class="pagePickerGrid" id="pagePickerGrid"></div>
 </div></div>
 
-<div class="modal" id="backupModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Collection backup</h2><p>Copy this JSON somewhere safe, or paste it back to restore.</p></div><button class="btn small close">Close</button></div><textarea id="backupBox" style="width:100%;height:190px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace"></textarea><button class="btn dark" style="width:100%;margin-top:8px" id="copyBackup">Copy backup</button><button class="btn" style="width:100%;margin-top:7px" id="restoreBackup">Restore pasted backup</button></div></div>
+
+<div class="modal" id="snapshotModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Binder Snapshot</h2><p>Create a clean binder sheet without browser controls.</p></div><button class="btn small close">Close</button></div>
+  <div class="snapshotControls">
+    <select class="select" id="snapshotSize"><option value="9">9 cards · 3×3</option><option value="12">12 cards · 3×4</option></select>
+    <span class="offlineBadge" id="snapshotModeLabel">Compact</span>
+  </div>
+  <div class="snapshotNav"><button class="btn small" id="snapshotPrev">←</button><strong id="snapshotPageLabel">Sheet 1 / 1</strong><button class="btn small" id="snapshotNext">→</button></div>
+  <div class="snapshotPreview" id="snapshotPreview"></div>
+  <div class="snapshotActions">
+    <button class="btn dark" id="shareSnapshot">Share image</button>
+    <button class="btn" id="snapshotJump">Jump to sheet</button>
+  </div>
+  <div class="cacheNote">If iOS cannot create the image, this clean preview is intentionally screenshot-friendly.</div>
+</div></div>
+
+<div class="modal" id="backupModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Backup & transfer</h2><p>Keep a portable copy of your Dex, or move it between Safari and the installed app.</p></div><button class="btn small close">Close</button></div>
+  <div class="backupExplain"><b>Your collection is stored on this device.</b><br>Until cloud sync arrives, Safari and the Home Screen app may keep separate copies. A DexBinder backup safely transfers ownership and active-set choices between them.</div>
+  <textarea id="backupBox" style="width:100%;height:150px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace;margin-top:10px"></textarea>
+  <div class="backupActions">
+    <button class="btn dark" id="downloadBackup">Download backup file</button>
+    <button class="btn" id="copyBackup">Copy backup text</button>
+    <button class="btn" id="chooseBackup">Restore from backup file</button>
+    <button class="btn" id="restoreBackup">Restore pasted backup</button>
+  </div>
+  <input type="file" id="backupFile" accept=".json,application/json" class="hidden"/>
+</div></div>
 <div class="toast" id="toast"></div>
 <div class="netStatus" id="netStatus" role="status" aria-live="polite"></div>
 
@@ -189,6 +246,10 @@ let huntGeneration=0;
 let binderPriceGeneration=0;
 let allScrollMemory={};
 let touchStartX=0,touchStartY=0,touchStartTime=0;
+let snapshotPage=1;
+let priceFetchedAt={};
+try{priceFetchedAt=JSON.parse(localStorage.getItem('dexbinder_v06_price_timestamps')||'{}')}catch(e){priceFetchedAt={}}
+
 
 if(activeSetIds.size===0){
   activeSetIds.add('sv03.5');
@@ -217,6 +278,14 @@ function saveActiveSets(){
   try{localStorage.setItem('dexbinder_v05_active_sets',JSON.stringify([...activeSetIds]))}catch(e){console.warn('Active sets save failed',e)}
 }
 const save=()=>{try{localStorage.setItem('dexbinder_v04_owned',JSON.stringify([...owned]));}catch(e){console.warn('DexBinder storage save failed',e)}renderStats()};
+
+
+function applyPwaMode(){
+  const standalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
+  document.body.classList.toggle('isStandalone',standalone);
+}
+applyPwaMode();
+window.matchMedia('(display-mode: standalone)').addEventListener?.('change',applyPwaMode);
 
 function configurePageSizeOptions(){
   const sel=$('#pageSize'); if(!sel)return;
@@ -458,6 +527,7 @@ function renderSet(){
  cs=cs.filter(c=>!q||c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase().includes(q));
 
  $('#viewTitle').textContent=view==='binder'?(binderMode==='compact'?'Binder · Compact':'Binder · Full master set'):view==='missing'?'Missing cards':'Hunt mode';
+ $('#snapshotBtn').classList.toggle('hidden',view!=='binder');
 
  const needsVariants=(binderMode==='full'||view!=='binder');
  if(currentSet!=='sv03.5'&&needsVariants&&!variantReadyBySet[currentSet]){
@@ -541,6 +611,8 @@ async function loadPriceFor(c){
    const d=await r.json();
    detailCache[c.id]=d;
    if(d?.variants) variantCache[c.id]=d.variants;
+   priceFetchedAt[c.id]=Date.now();
+   try{localStorage.setItem('dexbinder_v06_price_timestamps',JSON.stringify(priceFetchedAt))}catch(e){}
    return d;
  }catch(e){
    console.warn('Card detail failed',c.id,e);
@@ -571,8 +643,129 @@ async function openCard(cid,forcedVariant){
  await loadPriceFor(c);
  let vs=variantsFor(currentSet,c);
  if(forcedVariant){vs=[...vs].sort((a,b)=>a.id===forcedVariant?-1:b.id===forcedVariant?1:0)}
- $('#detailVariants').innerHTML=vs.map(v=>{let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>`}).join('');
+ $('#detailVariants').innerHTML=vs.map(v=>{let on=owned.has(key(currentSet,c.id,v.id)),p=priceData(c,v.id);return `<div class="variantRow" ${forcedVariant===v.id?'style="outline:2px solid var(--yellow)"':''}><div><b>${v.label}</b><small>${p?`TCGplayer low ${p.lowPrice!=null?'$'+p.lowPrice.toFixed(2):'—'} · market ${p.marketPrice!=null?'$'+p.marketPrice.toFixed(2):'—'}${!navigator.onLine?' · cached':''}`:'Price unavailable'}</small></div><button class="toggle ${on?'on':''}" data-v="${v.id}">${on?'Owned ✓':'Mark owned'}</button></div>`}).join('');
  $$('#detailVariants .toggle').forEach(b=>b.onclick=()=>{let k=key(currentSet,c.id,b.dataset.v);owned.has(k)?owned.delete(k):owned.add(k);save();openCard(cid,forcedVariant);renderSet()})
+}
+
+
+function binderItemsForSnapshot(){
+  let cs=cardsBySet[currentSet]||[];
+  return binderMode==='full'
+    ? cs.flatMap(c=>variantsFor(currentSet,c).map(v=>({card:c,variant:v})))
+    : cs.map(c=>({card:c,variant:null}));
+}
+function snapshotState(x){
+  const c=x.card,vs=variantsFor(currentSet,c);
+  if(x.variant)return owned.has(key(currentSet,c.id,x.variant.id))?'owned':'missing';
+  const n=compactOwned(currentSet,c);
+  if(n===0)return 'missing';
+  if(n<vs.length)return 'partial';
+  return 'owned';
+}
+function snapshotLabel(x){
+  return `#${x.card.localId} · ${x.variant?x.variant.label:x.card.name}`;
+}
+function renderSnapshot(){
+  const items=binderItemsForSnapshot();
+  const size=+$('#snapshotSize').value;
+  const total=Math.max(1,Math.ceil(items.length/size));
+  snapshotPage=Math.min(Math.max(1,snapshotPage),total);
+  const slice=items.slice((snapshotPage-1)*size,snapshotPage*size);
+  const first=slice[0]?.card,last=slice[slice.length-1]?.card;
+  const [ownedNow,totalNow]=counts(currentSet);
+  $('#snapshotPageLabel').textContent=`Sheet ${snapshotPage} / ${total}`;
+  $('#snapshotPrev').disabled=snapshotPage<=1;
+  $('#snapshotNext').disabled=snapshotPage>=total;
+  $('#snapshotModeLabel').textContent=binderMode==='full'?'Full master set':'Compact binder';
+  $('#snapshotPreview').innerHTML=`
+    <div class="snapshotHeader"><div><div class="eyebrow" style="color:#777">${SETS[currentSet].series||'Pokémon TCG'}</div><h3>${SETS[currentSet].name}</h3><p>${binderMode==='full'?'Full master set':'Compact binder'} · ${ownedNow}/${totalNow} collected</p></div><b>${Math.round((totalNow?ownedNow/totalNow:0)*100)}%</b></div>
+    <div class="snapshotGrid">${slice.map(x=>`<div class="snapshotCard ${snapshotState(x)}"><img src="${image(x.card,'low')}" data-fallback="${assetFallback(x.card,'low')}" onerror="retryImage(this)"><div class="snapTag">${snapshotLabel(x)}</div></div>`).join('')}</div>
+    <div class="snapshotFooter"><span>DEXBINDER · SHEET ${snapshotPage}/${total}</span><span>${first&&last?`#${first.localId}–#${last.localId}`:''}</span></div>`;
+}
+function openSnapshot(){
+  if(!currentSet)return;
+  if(binderMode==='full' && currentSet!=='sv03.5' && !variantReadyBySet[currentSet]){
+    toast('Full master-set data is still preparing');
+    return;
+  }
+  snapshotPage=1;
+  const pv=$('#pageSize').value;
+  $('#snapshotSize').value=(pv==='12'||pv==='16')?'12':'9';
+  renderSnapshot();
+  $('#snapshotModal').classList.add('open');
+}
+async function bitmapForSnapshot(url){
+  const r=await fetch(url);
+  if(!r.ok && r.type!=='opaque')throw new Error('Image fetch failed');
+  const blob=await r.blob();
+  return await createImageBitmap(blob);
+}
+function roundedRect(ctx,x,y,w,h,r){
+  const rr=Math.min(r,w/2,h/2);
+  ctx.beginPath();ctx.moveTo(x+rr,y);ctx.arcTo(x+w,y,x+w,y+h,rr);ctx.arcTo(x+w,y+h,x,y+h,rr);ctx.arcTo(x,y+h,x,y,rr);ctx.arcTo(x,y,x+w,y,rr);ctx.closePath();
+}
+async function buildSnapshotBlob(){
+  const items=binderItemsForSnapshot();
+  const size=+$('#snapshotSize').value;
+  const slice=items.slice((snapshotPage-1)*size,snapshotPage*size);
+  const rows=Math.ceil(size/3);
+  const W=1080,outer=54,gap=18,header=185,footer=70;
+  const cardW=Math.floor((W-outer*2-gap*2)/3),cardH=Math.round(cardW*337/245);
+  const H=header+outer+rows*cardH+(rows-1)*gap+footer;
+  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#f3efe7';ctx.fillRect(0,0,W,H);
+  ctx.fillStyle='#171717';ctx.font='800 28px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';
+  ctx.fillText((SETS[currentSet].series||'POKÉMON TCG').toUpperCase(),outer,54);
+  ctx.font='900 58px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillText(SETS[currentSet].name,outer,118);
+  ctx.font='700 25px -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif';ctx.fillStyle='#756f66';
+  const [ownedNow,totalNow]=counts(currentSet);
+  ctx.fillText(`${binderMode==='full'?'FULL MASTER SET':'COMPACT BINDER'} · ${ownedNow}/${totalNow} COLLECTED`,outer,158);
+
+  for(let i=0;i<slice.length;i++){
+    const x=outer+(i%3)*(cardW+gap),y=header+Math.floor(i/3)*(cardH+gap);
+    const st=snapshotState(slice[i]);
+    ctx.save();roundedRect(ctx,x,y,cardW,cardH,14);ctx.clip();
+    ctx.fillStyle='#cbc4b9';ctx.fillRect(x,y,cardW,cardH);
+    try{
+      const bmp=await bitmapForSnapshot(image(slice[i].card,'high')||image(slice[i].card,'low'));
+      if(st==='missing'){ctx.filter='grayscale(1) brightness(.55)';ctx.globalAlpha=.30}
+      else if(st==='partial'){ctx.filter='saturate(.65) brightness(.82)';ctx.globalAlpha=.72}
+      ctx.drawImage(bmp,x,y,cardW,cardH);bmp.close?.();
+      ctx.filter='none';ctx.globalAlpha=1;
+    }catch(e){
+      ctx.fillStyle='#6f685f';ctx.font='700 24px sans-serif';ctx.textAlign='center';
+      ctx.fillText(`#${slice[i].card.localId}`,x+cardW/2,y+cardH/2-10);
+      ctx.fillText(slice[i].card.name.slice(0,18),x+cardW/2,y+cardH/2+24);
+      ctx.textAlign='left';
+    }
+    ctx.fillStyle='rgba(20,20,20,.84)';ctx.fillRect(x,y+cardH-42,cardW,42);
+    ctx.fillStyle='#fff';ctx.font='800 18px -apple-system, sans-serif';
+    ctx.fillText(snapshotLabel(slice[i]).slice(0,30),x+10,y+cardH-15);
+    ctx.restore();
+  }
+  ctx.fillStyle='#756f66';ctx.font='800 20px -apple-system, sans-serif';
+  ctx.fillText(`DEXBINDER · SHEET ${snapshotPage}/${Math.max(1,Math.ceil(items.length/size))}`,outer,H-25);
+  ctx.textAlign='right';ctx.fillText('Generated by DexBinder',W-outer,H-25);ctx.textAlign='left';
+  return await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('Could not create image')),'image/png',.95));
+}
+async function shareSnapshotImage(){
+  const btn=$('#shareSnapshot'),old=btn.textContent;btn.disabled=true;btn.textContent='Creating…';
+  try{
+    const blob=await buildSnapshotBlob();
+    const file=new File([blob],`DexBinder-${SETS[currentSet].name.replace(/\s+/g,'-')}-sheet-${snapshotPage}.png`,{type:'image/png'});
+    if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+      await navigator.share({files:[file],title:`DexBinder · ${SETS[currentSet].name}`});
+    }else{
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+      setTimeout(()=>URL.revokeObjectURL(url),30000);
+      toast('Snapshot image created');
+    }
+  }catch(e){
+    console.warn('Snapshot export failed',e);
+    toast('Image export unavailable — screenshot the clean sheet');
+  }finally{btn.disabled=false;btn.textContent=old}
 }
 
 function openPagePicker(){
@@ -675,7 +868,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6A.2',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6B',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -714,7 +907,36 @@ $('#bulkBtn').onclick=async()=>{
 $('#allBase').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>owned.add(key(currentSet,c.id,'base')));save();renderBulk();renderSet()};
 $('#allReverse').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>variantsFor(currentSet,c).filter(v=>v.id==='reverse').forEach(v=>owned.add(key(currentSet,c.id,v.id))));save();renderBulk();renderSet()};
 $('#clearSet').onclick=()=>{[...owned].filter(k=>k.startsWith(currentSet+'|')).forEach(k=>owned.delete(k));save();renderBulk();renderSet()};
-$('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};$('#copyBackup').onclick=async()=>{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')};$('#restoreBackup').onclick=()=>{try{let d=JSON.parse($('#backupBox').value);owned=new Set(d.owned||[]);if(Array.isArray(d.activeSets)){activeSetIds=new Set(d.activeSets);saveActiveSets()}save();renderSetCards();$('#backupModal').classList.remove('open');toast('Collection restored')}catch(e){toast('That backup could not be read')}};
+$('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
+$('#copyBackup').onclick=async()=>{try{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')}catch(e){toast('Copy unavailable — select the text manually')}};
+$('#downloadBackup').onclick=()=>{
+  const blob=new Blob([backup()],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download=`DexBinder-backup-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),30000);
+};
+function restoreBackupObject(d){
+  if(!d || !Array.isArray(d.owned))throw new Error('Invalid backup');
+  owned=new Set(d.owned||[]);
+  if(Array.isArray(d.activeSets)){activeSetIds=new Set(d.activeSets);saveActiveSets()}
+  save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
+}
+$('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};
+$('#chooseBackup').onclick=()=>$('#backupFile').click();
+$('#backupFile').onchange=async()=>{
+  const f=$('#backupFile').files?.[0];if(!f)return;
+  try{restoreBackupObject(JSON.parse(await f.text()))}catch(e){toast('That backup file could not be read')}
+  $('#backupFile').value='';
+};
+$('#snapshotBtn').onclick=openSnapshot;
+$('#snapshotSize').onchange=()=>{snapshotPage=1;renderSnapshot()};
+$('#snapshotPrev').onclick=()=>{if(snapshotPage>1){snapshotPage--;renderSnapshot()}};
+$('#snapshotNext').onclick=()=>{snapshotPage++;renderSnapshot()};
+$('#snapshotJump').onclick=()=>{
+  const items=binderItemsForSnapshot(),size=+$('#snapshotSize').value,total=Math.max(1,Math.ceil(items.length/size));
+  const n=Number(prompt(`Jump to sheet (1–${total})`,String(snapshotPage)));
+  if(Number.isFinite(n)&&n>=1&&n<=total){snapshotPage=Math.floor(n);renderSnapshot()}
+};
+$('#shareSnapshot').onclick=shareSnapshotImage;
 $$('#bottomNav button').forEach(b=>b.addEventListener('click',()=>{const v=b.dataset.view;if(v==='home'){goHome();return;}if(!currentSet){goHome();return;}rememberAllScroll();view=v;page=1;setNav();renderSet();}));
 let huntSearchTimer=null;
 $('#huntSearch').oninput=()=>{clearTimeout(huntSearchTimer);huntSearchTimer=setTimeout(renderGlobalHunt,180)};
@@ -825,7 +1047,7 @@ function bindSwipeNavigation(){
 function showNetworkStatus(force=false){
   const el=$('#netStatus'); if(!el)return;
   const online=navigator.onLine;
-  el.textContent=online?'Back online':'Offline · saved collection still available';
+  el.textContent=online?'Back online':'Offline · using saved collection & cached card data';
   el.classList.toggle('offline',!online);
   el.classList.add('show');
   clearTimeout(showNetworkStatus._t);
