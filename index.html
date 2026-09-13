@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.12.0 dashboard refinements */
+/* v0.12.1 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.12.0 — visual consistency pass
+   DexBinder v0.12.1 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Day & Night
+   DexBinder v0.12.1 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Day & Night polish
+   DexBinder v0.12.1 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Interactive Sky Hero
+   DexBinder v0.12.1 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Interactive Sky correction pass
+   DexBinder v0.12.1 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Theme correction + ambient page motion
+   DexBinder v0.12.1 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.0 — portrait hero polish
+   DexBinder v0.12.1 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2211,7 +2211,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Hero structural rebuild
+   DexBinder v0.12.1 — Hero structural rebuild
    ============================================================ */
 
 .heroThemeHint{display:none!important}
@@ -2449,7 +2449,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Clean-source hero rebuild
+   DexBinder v0.12.1 — Clean-source hero rebuild
    User-supplied transparent character renders + fixed portrait zones
    ============================================================ */
 
@@ -2711,7 +2711,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.12.0 — Hero + Umbreon contrast polish
+   DexBinder v0.12.1 — Hero + Umbreon contrast polish
    ============================================================ */
 
 /* 1) Slightly reduce hero character dominance. */
@@ -2909,7 +2909,7 @@ body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on *{
 }
 
 
-/* v0.12.0 — two-state Day / Night polish */
+/* v0.12.1 — two-state Day / Night polish */
 .sceneBird,.themeAtmosphere .bird{display:none!important}
 
 /* exact 50/50 hero */
@@ -2987,13 +2987,23 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 .skyModeLabel{display:none!important}
 #collectionHero .skyControl{left:23%!important;right:23%!important}
 
+
+/* v0.12.1 startup hotfix */
+.srOnly{
+  position:absolute!important;
+  width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;
+  overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important;
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-/* v0.12.0 — static illustrated hero + page-level interactive atmosphere */
+/* v0.12.1 — static illustrated hero + page-level interactive atmosphere */
 #collectionHero.staticSkyHero{position:relative!important;padding:0!important;overflow:hidden!important;min-height:0!important;aspect-ratio:1105/795!important;background:#10182d!important;border-radius:28px!important;box-shadow:0 18px 44px rgba(16,24,55,.18)!important}
 #collectionHero.staticSkyHero:before,#collectionHero.staticSkyHero:after{display:none!important}
 .staticHeroArtwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
@@ -3039,7 +3049,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.12.0</div>
+  <div class="version">v0.12.1</div>
 </div>
 
   <section id="homeScreen">
@@ -3050,7 +3060,12 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
         aria-valuemin="0" aria-valuemax="1" aria-valuenow="0" aria-valuetext="Espeon day">
         <span class="staticThemeThumb" aria-hidden="true"><span class="thumbSun">☀</span><span class="thumbMoon">☾</span></span>
       </div>
-    </div>
+    
+      <div class="srOnly" aria-live="polite">
+        <span id="globalOwned">0 / 0</span>
+        <span id="globalPct">0% collected</span>
+        <span class="progress"><i id="globalProgress"></i></span>
+      </div></div>
     <section class="quickSection">
       <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
       <div class="quickActions">
@@ -4257,9 +4272,33 @@ function counts(sid){
 }
 function renderStats(){
   try{renderDashboardAchievementStrand()}catch(e){}
- let gn=0,gt=0; [...activeSetIds].forEach(s=>{if(!SETS[s])return;let [n,t]=counts(s);gn+=n;gt+=t}); $('#globalOwned').textContent=`${gn} / ${gt}`; let gp=gt?Math.round(gn/gt*100):0;$('#globalPct').textContent=`${gp}% collected`;$('#globalProgress').style.width=gp+'%';
- if(currentSet){let [n,t]=counts(currentSet);let p=t?Math.round(n/t*100):0;$('#setOwned').textContent=`${n} / ${t}`;$('#setPct').textContent=`${p}% complete`;$('#setProgress').style.width=p+'%'}
- renderSetCards();
+  let gn=0,gt=0;
+  [...activeSetIds].forEach(s=>{
+    if(!SETS[s])return;
+    let [n,t]=counts(s);
+    gn+=n;gt+=t;
+  });
+  const globalOwnedEl=$('#globalOwned');
+  const globalPctEl=$('#globalPct');
+  const globalProgressEl=$('#globalProgress');
+  const gp=gt?Math.round(gn/gt*100):0;
+  if(globalOwnedEl)globalOwnedEl.textContent=`${gn} / ${gt}`;
+  if(globalPctEl)globalPctEl.textContent=`${gp}% collected`;
+  if(globalProgressEl)globalProgressEl.style.width=gp+'%';
+
+  if(currentSet){
+    let [n,t]=counts(currentSet);
+    let p=t?Math.round(n/t*100):0;
+    const setOwnedEl=$('#setOwned');
+    const setPctEl=$('#setPct');
+    const setProgressEl=$('#setProgress');
+    if(setOwnedEl)setOwnedEl.textContent=`${n} / ${t}`;
+    if(setPctEl)setPctEl.textContent=`${p}% complete`;
+    if(setProgressEl)setProgressEl.style.width=p+'%';
+  }
+
+  // Active Sets must render even when optional dashboard stat overlays are absent.
+  renderSetCards();
 }
 
 
