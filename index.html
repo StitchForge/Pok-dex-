@@ -320,13 +320,94 @@ html{-webkit-text-size-adjust:100%}
 .catalogueSelectedHead b{font-size:.75rem}
 .catalogueHint{font-size:.56rem;color:var(--muted);line-height:1.4;margin-top:6px}
 
+
+/* v0.8.2 Catalogue Navigation */
+.catalogueFilters{
+  display:grid;
+  gap:8px;
+  margin:8px 0 10px;
+}
+.catalogueEraScroller{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:2px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.catalogueEraScroller::-webkit-scrollbar{display:none}
+.catalogueEraChip{
+  flex:0 0 auto;
+  border:1px solid var(--line);
+  background:#f7f3ec;
+  border-radius:999px;
+  padding:7px 10px;
+  font-size:.58rem;
+  font-weight:850;
+  white-space:nowrap;
+}
+.catalogueEraChip.on{
+  background:#171717;
+  color:#fff;
+}
+.catalogueFilterRow{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+.catalogueFilterRow select{
+  width:100%;
+  min-width:0;
+}
+.catalogueGroup{
+  display:grid;
+  gap:7px;
+  margin-top:10px;
+}
+.catalogueGroupTitle{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 2px;
+}
+.catalogueGroupTitle b{
+  font-size:.68rem;
+}
+.catalogueGroupTitle span{
+  font-size:.52rem;
+  color:var(--muted);
+}
+.catalogueEraHeading{
+  margin-top:12px;
+  font-size:.8rem;
+  font-weight:950;
+}
+.catalogueYearHeading{
+  margin-top:8px;
+  font-size:.62rem;
+  font-weight:900;
+  color:var(--muted);
+}
+.catalogueEmpty{
+  border:1px dashed var(--line);
+  border-radius:12px;
+  padding:12px;
+  color:var(--muted);
+  font-size:.6rem;
+  text-align:center;
+}
+@media(max-width:390px){
+  .catalogueFilterRow{grid-template-columns:1fr}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.2</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -429,6 +510,21 @@ html{-webkit-text-size-adjust:100%}
       <input class="collectorInput" id="catalogueSetSearch" type="search" placeholder="Search every TCGdex set…">
       <button class="btn small" id="catalogueSetClear">Clear</button>
     </div>
+
+    <div class="catalogueFilters" id="catalogueFilters">
+      <div class="catalogueEraScroller" id="catalogueEraChips"></div>
+      <div class="catalogueFilterRow">
+        <select class="collectorSelect" id="catalogueYearFilter">
+          <option value="">All years</option>
+        </select>
+        <select class="collectorSelect" id="catalogueSort">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="az">A–Z</option>
+        </select>
+      </div>
+    </div>
+
     <div class="catalogueSetResults" id="catalogueSetResults"></div>
 
     <div class="hidden" id="catalogueCardPanel">
@@ -1824,8 +1920,12 @@ let fastAddSelection=null;
 let fastAddScope='mine';
 let catalogueSelectedSet=null;
 let catalogueSetsReady=false;
+let catalogueEraFilter='';
+let catalogueYearFilter='';
+let catalogueSortMode='newest';
 let fastAddDraft={qty:1,tradeQty:0,type:'raw'};
 let fastAddRecent=[];
+
 
 
 async function ensureGlobalCatalogue(){
@@ -1834,34 +1934,179 @@ async function ensureGlobalCatalogue(){
   if(!r.ok)throw new Error(`Catalogue HTTP ${r.status}`);
   allSetBriefs=await r.json();
   catalogueSetsReady=true;
+  buildCatalogueFilters();
   return allSetBriefs;
 }
-function setFastAddScope(scope){
-  fastAddScope=scope;
-  $('#fastAddMySetsTab').classList.toggle('on',scope==='mine');
-  $('#fastAddCatalogueTab').classList.toggle('on',scope==='all');
-  $('#fastAddMySetsPanel').classList.toggle('hidden',scope!=='mine');
-  $('#fastAddCataloguePanel').classList.toggle('open',scope==='all');
-  $('#fastAddEditor').classList.remove('open');
-  fastAddSelection=null;
-  if(scope==='all'){
-    ensureGlobalCatalogue().then(()=>{renderCatalogueSetResults();$('#catalogueSetSearch').focus()})
-      .catch(e=>{$('#catalogueSetResults').innerHTML=`<div class="notice error">Could not load catalogue: ${e.message}</div>`});
-  }else $('#fastAddSearchInput').focus();
+function catalogueEraName(set){
+  const raw=
+    set?.serie?.name||
+    set?.series?.name||
+    set?.serie||
+    set?.series||
+    '';
+  if(raw && typeof raw==='string') return raw;
+
+  const name=String(set?.name||'');
+  const id=String(set?.id||'').toLowerCase();
+
+  if(id.startsWith('sv')||/scarlet|violet|paldea|paradox|obsidian|temporal|twilight|stellar|surging|prismatic|journey|destined|shrouded/i.test(name)) return 'Scarlet & Violet';
+  if(id.startsWith('swsh')||/sword|shield|crown zenith|astral radiance|lost origin|silver tempest|brilliant stars|fusion strike|evolving skies|chilling reign|battle styles|vivid voltage|darkness ablaze|rebel clash/i.test(name)) return 'Sword & Shield';
+  if(id.startsWith('sm')||/sun|moon|cosmic eclipse|unified minds|unbroken bonds|team up|lost thunder|celestial storm|forbidden light|ultra prism|burning shadows|guardians rising/i.test(name)) return 'Sun & Moon';
+  if(/^xy/i.test(id)||/\bxy\b|evolutions|steam siege|fates collide|breakpoint|breakthrough|ancient origins|roaring skies|primal clash|phantom forces|furious fists|flashfire/i.test(name)) return 'XY';
+  if(/^bw/i.test(id)||/black|white|plasma|legendary treasures|boundaries crossed|dragons exalted|dark explorers|next destinies|noble victories|emerging powers/i.test(name)) return 'Black & White';
+  if(/^hgss/i.test(id)||/heartgold|soulsilver|call of legends|undaunted|unleashed|triumphant/i.test(name)) return 'HeartGold & SoulSilver';
+  if(/^pl/i.test(id)||/platinum|arceus|supreme victors|rising rivals/i.test(name)) return 'Platinum';
+  if(/^dp/i.test(id)||/diamond|pearl|stormfront|legends awakened|majestic dawn|great encounters|secret wonders|mysterious treasures/i.test(name)) return 'Diamond & Pearl';
+  if(/ex |ex$|delta species|holon|crystal guardians|dragon frontiers|power keepers|deoxys|emerald|unseen forces|legend maker/i.test(name)) return 'EX';
+  if(/neo |gym |team rocket|base set|jungle|fossil|legendary collection|expedition|aquapolis|skyridge/i.test(name)) return 'Classic';
+  return 'Other';
+}
+function catalogueReleaseDate(set){
+  const raw=set?.releaseDate||set?.release_date||set?.releasedAt||set?.date||'';
+  if(!raw)return '';
+  const d=new Date(raw);
+  return Number.isNaN(d.getTime())?'':d.toISOString().slice(0,10);
+}
+function catalogueYear(set){
+  const d=catalogueReleaseDate(set);
+  if(d)return d.slice(0,4);
+
+  const name=String(set?.name||'');
+  const m=name.match(/\b(19|20)\d{2}\b/);
+  return m?m[0]:'';
+}
+function catalogueEraRank(name){
+  const order=[
+    'Scarlet & Violet',
+    'Sword & Shield',
+    'Sun & Moon',
+    'XY',
+    'Black & White',
+    'HeartGold & SoulSilver',
+    'Platinum',
+    'Diamond & Pearl',
+    'EX',
+    'Classic',
+    'Other'
+  ];
+  const i=order.indexOf(name);
+  return i===-1?999:i;
+}
+function buildCatalogueFilters(){
+  const eras=[...new Set((allSetBriefs||[]).map(catalogueEraName))].sort((a,b)=>{
+    const r=catalogueEraRank(a)-catalogueEraRank(b);
+    return r||a.localeCompare(b);
+  });
+
+  $('#catalogueEraChips').innerHTML=[
+    `<button class="catalogueEraChip ${catalogueEraFilter===''?'on':''}" data-era="">All eras</button>`,
+    ...eras.map(e=>`<button class="catalogueEraChip ${catalogueEraFilter===e?'on':''}" data-era="${e.replace(/"/g,'&quot;')}">${e}</button>`)
+  ].join('');
+
+  $$('[data-era]').forEach(b=>b.onclick=()=>{
+    catalogueEraFilter=b.dataset.era||'';
+    buildCatalogueFilters();
+    renderCatalogueSetResults();
+  });
+
+  const years=[...new Set((allSetBriefs||[]).map(catalogueYear).filter(Boolean))].sort((a,b)=>Number(b)-Number(a));
+  const current=$('#catalogueYearFilter')?.value||catalogueYearFilter||'';
+  $('#catalogueYearFilter').innerHTML='<option value="">All years</option>'+years.map(y=>`<option value="${y}">${y}</option>`).join('');
+  $('#catalogueYearFilter').value=years.includes(current)?current:'';
+  catalogueYearFilter=$('#catalogueYearFilter').value;
+}
+function filteredCatalogueSets(){
+  const q=$('#catalogueSetSearch').value.trim().toLowerCase();
+  return (allSetBriefs||[]).filter(x=>{
+    if(q && !String(x.name||'').toLowerCase().includes(q) && !String(x.id||'').toLowerCase().includes(q))return false;
+    if(catalogueEraFilter && catalogueEraName(x)!==catalogueEraFilter)return false;
+    if(catalogueYearFilter && catalogueYear(x)!==catalogueYearFilter)return false;
+    return true;
+  }).sort((a,b)=>{
+    if(catalogueSortMode==='az') return String(a.name||a.id).localeCompare(String(b.name||b.id));
+
+    const da=catalogueReleaseDate(a);
+    const db=catalogueReleaseDate(b);
+    const ya=catalogueYear(a);
+    const yb=catalogueYear(b);
+
+    let cmp=0;
+    if(da&&db)cmp=da.localeCompare(db);
+    else if(ya&&yb)cmp=ya.localeCompare(yb);
+    else if(da||ya)cmp=1;
+    else if(db||yb)cmp=-1;
+
+    if(catalogueSortMode==='newest')cmp*=-1;
+    if(cmp!==0)return cmp;
+
+    const eraCmp=catalogueEraRank(catalogueEraName(a))-catalogueEraRank(catalogueEraName(b));
+    if(eraCmp!==0)return eraCmp;
+    return String(a.name||a.id).localeCompare(String(b.name||b.id));
+  });
+}
+function catalogueSetCardHTML(x){
+  const yr=catalogueYear(x);
+  const era=catalogueEraName(x);
+  return `
+    <div class="catalogueSetCard">
+      <div>
+        <b>${x.name||x.id}</b>
+        <small>${yr?yr+' · ':''}${era} · ${x.cardCount?.total||'—'} cards${activeSetIds.has(x.id)?' · In My Dex':''}</small>
+      </div>
+      <button class="btn small ${activeSetIds.has(x.id)?'':'dark'}" data-catalogue-set="${x.id}">
+        ${activeSetIds.has(x.id)?'Browse':'Choose'}
+      </button>
+    </div>`;
 }
 function renderCatalogueSetResults(){
-  const q=$('#catalogueSetSearch').value.trim().toLowerCase();
-  const rows=(allSetBriefs||[]).filter(x=>{
-    if(!q)return true;
-    return String(x.name||'').toLowerCase().includes(q)||String(x.id||'').toLowerCase().includes(q);
-  }).slice(0,80);
-  $('#catalogueSetResults').innerHTML=rows.length?rows.map(x=>`
-    <div class="catalogueSetCard">
-      <div><b>${x.name||x.id}</b><small>${x.id} · ${x.cardCount?.total||'—'} cards${activeSetIds.has(x.id)?' · In My Dex':''}</small></div>
-      <button class="btn small ${activeSetIds.has(x.id)?'':'dark'}" data-catalogue-set="${x.id}">${activeSetIds.has(x.id)?'Browse':'Choose'}</button>
-    </div>`).join(''):'<div class="tradeEmpty">No matching sets.</div>';
+  const rows=filteredCatalogueSets();
+
+  if(!rows.length){
+    $('#catalogueSetResults').innerHTML='<div class="catalogueEmpty">No sets match these filters.</div>';
+    return;
+  }
+
+  if(catalogueSortMode==='az'){
+    $('#catalogueSetResults').innerHTML=rows.slice(0,200).map(catalogueSetCardHTML).join('');
+  }else{
+    const grouped=new Map();
+
+    for(const set of rows){
+      const era=catalogueEraName(set);
+      const year=catalogueYear(set)||'Unknown year';
+      if(!grouped.has(era))grouped.set(era,new Map());
+      if(!grouped.get(era).has(year))grouped.get(era).set(year,[]);
+      grouped.get(era).get(year).push(set);
+    }
+
+    const eraEntries=[...grouped.entries()].sort((a,b)=>{
+      const ar=catalogueEraRank(a[0]), br=catalogueEraRank(b[0]);
+      return ar-br||a[0].localeCompare(b[0]);
+    });
+
+    if(catalogueSortMode==='oldest')eraEntries.reverse();
+
+    $('#catalogueSetResults').innerHTML=eraEntries.map(([era,years])=>{
+      let yearEntries=[...years.entries()].sort((a,b)=>{
+        if(a[0]==='Unknown year')return 1;
+        if(b[0]==='Unknown year')return -1;
+        return Number(b[0])-Number(a[0]);
+      });
+      if(catalogueSortMode==='oldest')yearEntries=yearEntries.reverse();
+
+      return `<div class="catalogueGroup">
+        <div class="catalogueEraHeading">${era}</div>
+        ${yearEntries.map(([year,sets])=>`
+          <div class="catalogueYearHeading">${year}</div>
+          ${sets.map(catalogueSetCardHTML).join('')}
+        `).join('')}
+      </div>`;
+    }).join('');
+  }
+
   $$('[data-catalogue-set]').forEach(b=>b.onclick=()=>selectCatalogueSet(b.dataset.catalogueSet));
 }
+
 async function selectCatalogueSet(sid){
   const brief=(allSetBriefs||[]).find(x=>x.id===sid);
   if(!brief)return;
@@ -1895,6 +2140,7 @@ function changeCatalogueSet(){
   $('#catalogueSetSearchWrap').classList.remove('hidden');
   $('#catalogueSetResults').classList.remove('hidden');
   $('#catalogueCardSearch').value='';
+  buildCatalogueFilters();
   renderCatalogueSetResults();
   $('#catalogueSetSearch').focus();
 }
@@ -2784,6 +3030,16 @@ $('#fastAddBtn').onclick=openFastAdd;
 $('#fastAddMySetsTab').onclick=()=>setFastAddScope('mine');
 $('#fastAddCatalogueTab').onclick=()=>setFastAddScope('all');
 $('#catalogueSetSearch').oninput=renderCatalogueSetResults;
+
+$('#catalogueYearFilter').onchange=()=>{
+  catalogueYearFilter=$('#catalogueYearFilter').value;
+  renderCatalogueSetResults();
+};
+$('#catalogueSort').onchange=()=>{
+  catalogueSortMode=$('#catalogueSort').value;
+  renderCatalogueSetResults();
+};
+
 $('#catalogueSetClear').onclick=()=>{$('#catalogueSetSearch').value='';renderCatalogueSetResults();$('#catalogueSetSearch').focus()};
 $('#catalogueCardSearch').oninput=renderCatalogueCards;
 $('#catalogueCardClear').onclick=()=>{$('#catalogueCardSearch').value='';renderCatalogueCards();$('#catalogueCardSearch').focus()};
