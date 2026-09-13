@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.11.3 dashboard refinements */
+/* v0.11.5 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.11.3 — visual consistency pass
+   DexBinder v0.11.5 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.11.3 — Day & Night
+   DexBinder v0.11.5 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.11.3 — Day & Night polish
+   DexBinder v0.11.5 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.11.3 — Interactive Sky Hero
+   DexBinder v0.11.5 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.11.3 — Interactive Sky correction pass
+   DexBinder v0.11.5 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.11.3 — Theme correction + ambient page motion
+   DexBinder v0.11.5 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.11.3 — portrait hero polish
+   DexBinder v0.11.5 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2209,6 +2209,506 @@ body[data-theme="umbreon"] .setGroup{
   .heroUmbreon{height:43%!important;right:0!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.5 — Hero structural rebuild
+   ============================================================ */
+
+.heroThemeHint{display:none!important}
+
+/* The hero is now divided into intentional zones:
+   top copy/stats, lower characters, slider, progress. */
+#collectionHero.interactiveSkyHero{
+  position:relative!important;
+  min-height:390px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:28px!important;
+  isolation:isolate!important;
+}
+
+.heroTopRow{
+  position:absolute;
+  z-index:8;
+  top:22px;
+  left:22px;
+  right:22px;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:18px;
+  align-items:start;
+}
+
+.heroCopy{
+  max-width:540px;
+  justify-self:center;
+  text-align:center;
+  padding-left:96px;
+}
+.heroCopy .eyebrow{
+  color:rgba(255,255,255,.84)!important;
+  margin-bottom:8px!important;
+}
+.heroCopy h1{
+  color:#fff!important;
+  margin:0!important;
+  font-size:clamp(2rem,6vw,3.25rem)!important;
+  line-height:.98!important;
+  letter-spacing:-.055em!important;
+  text-shadow:0 2px 18px rgba(7,12,34,.28);
+}
+.heroCopy p{
+  color:rgba(255,255,255,.92)!important;
+  margin:10px auto 0!important;
+  max-width:440px!important;
+  line-height:1.28!important;
+  font-size:.86rem!important;
+  text-shadow:0 2px 14px rgba(7,12,34,.22);
+}
+.heroToolsLink{
+  margin-top:12px!important;
+  background:rgba(17,22,48,.32)!important;
+  border:1px solid rgba(255,255,255,.36)!important;
+  color:#fff!important;
+  backdrop-filter:blur(10px);
+  border-radius:999px!important;
+  padding:8px 13px!important;
+  font-size:.58rem!important;
+  font-weight:900!important;
+}
+.heroStats{
+  position:relative!important;
+  top:auto!important;right:auto!important;
+  width:150px!important;
+  max-width:none!important;
+  padding-top:2px;
+  text-align:right!important;
+}
+.heroStats b{
+  color:#fff!important;
+  font-size:1.42rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  text-shadow:0 2px 16px rgba(5,10,30,.32)
+}
+.heroStats span{
+  display:block!important;
+  color:#d3c9ff!important;
+  font-size:.68rem!important;
+  margin-top:4px!important;
+  white-space:nowrap!important;
+}
+
+/* Characters frame the composition instead of floating under the copy. */
+.heroPokemon{
+  position:absolute!important;
+  z-index:4!important;
+  bottom:52px!important;
+  width:auto!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:transparent!important;
+  pointer-events:none!important;
+  filter:drop-shadow(0 12px 18px rgba(5,8,24,.26))!important;
+}
+.heroEspeon{
+  left:18px!important;
+  height:53%!important;
+}
+.heroUmbreon{
+  right:18px!important;
+  height:56%!important;
+}
+
+/* Clear slider lane between the characters. */
+.skyControl{
+  position:absolute!important;
+  z-index:10!important;
+  left:20%!important;
+  right:20%!important;
+  bottom:43px!important;
+  height:60px!important;
+  touch-action:none!important;
+}
+.skyTrack{
+  position:absolute!important;
+  left:0!important;
+  right:0!important;
+  top:28px!important;
+  height:4px!important;
+  border-radius:999px!important;
+  background:linear-gradient(90deg,rgba(255,212,104,.92),rgba(235,230,255,.82))!important;
+  box-shadow:0 1px 12px rgba(4,9,28,.20)!important;
+}
+.skyEndpoint{
+  position:absolute;
+  top:13px;
+  font-size:24px;
+  filter:drop-shadow(0 2px 7px rgba(0,0,0,.20));
+  pointer-events:none
+}
+.skyEndpoint.left{left:-40px}
+.skyEndpoint.right{right:-40px}
+.skyOrb{
+  top:3px!important;
+  width:52px!important;
+  height:52px!important;
+  margin-left:-26px!important;
+  border:4px solid rgba(255,255,255,.88)!important;
+  box-shadow:0 7px 22px rgba(5,9,28,.24),0 0 18px rgba(255,232,169,.18)!important;
+}
+.skyModeLabel{display:none!important}
+
+.heroProgress{
+  position:absolute!important;
+  z-index:8!important;
+  left:24px!important;
+  right:24px!important;
+  bottom:14px!important;
+  height:6px!important;
+  margin:0!important;
+  background:rgba(255,255,255,.18)!important;
+}
+.heroProgress i{background:linear-gradient(90deg,#ffd36f,#b9a7ff)!important}
+
+/* Wider screens feel like the polished mockup. */
+@media(min-width:701px){
+  #collectionHero.interactiveSkyHero{min-height:360px!important}
+  .heroCopy{padding-left:78px}
+  .heroEspeon{height:57%!important;left:28px!important}
+  .heroUmbreon{height:60%!important;right:28px!important}
+  .skyControl{left:22%!important;right:22%!important}
+}
+
+/* Portrait phone layout: no headline/stats collision. */
+@media(max-width:700px) and (orientation:portrait){
+  #collectionHero.interactiveSkyHero{min-height:430px!important}
+  .heroTopRow{
+    top:18px!important;
+    left:16px!important;
+    right:16px!important;
+    grid-template-columns:1fr!important;
+    gap:6px!important;
+  }
+  .heroCopy{
+    width:100%!important;
+    max-width:none!important;
+    padding:0 18px!important;
+    justify-self:stretch!important;
+  }
+  .heroCopy h1{
+    font-size:clamp(2rem,8vw,2.7rem)!important;
+    max-width:78%!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+  .heroCopy p{
+    max-width:72%!important;
+    font-size:.76rem!important;
+  }
+  .heroStats{
+    position:absolute!important;
+    top:0!important;
+    right:0!important;
+    width:auto!important;
+    z-index:12!important;
+  }
+  .heroStats b{font-size:1.18rem!important}
+  .heroStats span{font-size:.58rem!important}
+  .heroToolsLink{margin-top:10px!important}
+  .heroPokemon{bottom:54px!important}
+  .heroEspeon{height:45%!important;left:8px!important}
+  .heroUmbreon{height:48%!important;right:8px!important}
+  .skyControl{left:22%!important;right:22%!important;bottom:46px!important}
+}
+
+/* Narrow iPhone portrait. */
+@media(max-width:430px) and (orientation:portrait){
+  #collectionHero.interactiveSkyHero{min-height:420px!important}
+  .heroTopRow{top:16px!important;left:14px!important;right:14px!important}
+  .heroCopy{padding:0 12px!important}
+  .heroCopy .eyebrow{font-size:.56rem!important}
+  .heroCopy h1{font-size:1.95rem!important;max-width:76%!important}
+  .heroCopy p{font-size:.70rem!important;max-width:68%!important}
+  .heroStats b{font-size:1.02rem!important}
+  .heroStats span{font-size:.52rem!important}
+  .heroPokemon{bottom:52px!important}
+  .heroEspeon{height:41%!important;left:2px!important}
+  .heroUmbreon{height:44%!important;right:2px!important}
+  .skyControl{left:24%!important;right:24%!important}
+  .skyEndpoint.left{left:-32px}
+  .skyEndpoint.right{right:-32px}
+}
+
+/* Keep the page atmosphere from v0.11.3 visible. */
+.themeAtmosphere{display:block!important}
+
+/* Header is intentionally clean: brand + version only. */
+.top{justify-content:space-between!important}
+
+
+/* ============================================================
+   DexBinder v0.11.5 — Clean-source hero rebuild
+   User-supplied transparent character renders + fixed portrait zones
+   ============================================================ */
+
+.heroThemeHint,.dragSkyLabel,.headerHint{display:none!important}
+
+/* One contained scene, with content and controls in non-overlapping zones. */
+#collectionHero.interactiveSkyHero{
+  --hero-copy-top:24px;
+  --hero-slider-bottom:40px;
+  position:relative!important;
+  min-height:410px!important;
+  padding:0!important;
+  overflow:hidden!important;
+  border-radius:28px!important;
+  isolation:isolate!important;
+  background:#16264a!important;
+  color:#fff!important;
+}
+
+/* Continuous dawn -> twilight -> night background. */
+#collectionHero .skyScene{position:absolute!important;inset:0!important;z-index:0!important;overflow:hidden!important}
+#collectionHero .dayLayer{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 25% 68%,rgba(255,239,155,.98) 0 7%,rgba(255,218,149,.28) 8% 18%,transparent 30%),
+    linear-gradient(90deg,#f5b6c7 0%,#f7c6b1 29%,rgba(187,179,222,.72) 49%,rgba(63,77,143,.12) 68%,transparent 78%)!important
+}
+#collectionHero .twilightLayer{
+  opacity:1!important;
+  background:linear-gradient(90deg,transparent 27%,rgba(158,116,177,.28) 43%,rgba(69,70,137,.38) 60%,transparent 79%)!important
+}
+#collectionHero .nightLayer{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 82% 22%,rgba(234,238,255,.98) 0 5%,rgba(143,157,225,.18) 6% 16%,transparent 27%),
+    linear-gradient(90deg,transparent 34%,rgba(18,42,88,.60) 55%,#071632 100%)!important
+}
+#collectionHero .sunGlow{
+  left:18%!important;top:auto!important;bottom:22%!important;
+  width:92px!important;height:92px!important;opacity:.88!important
+}
+#collectionHero .mountainLayer,#collectionHero .treeLine{z-index:1!important}
+
+/* Genuine transparent source renders: no masks, clipping, or background extraction. */
+#collectionHero .heroPokemon{
+  position:absolute!important;
+  z-index:4!important;
+  bottom:48px!important;
+  width:auto!important;
+  max-width:none!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:transparent!important;
+  pointer-events:none!important;
+  user-select:none!important;
+  filter:drop-shadow(0 10px 15px rgba(5,8,24,.25))!important;
+}
+#collectionHero .heroEspeon{
+  left:18px!important;
+  height:48%!important;
+  opacity:calc(.58 + var(--day-p) * .42)!important;
+}
+#collectionHero .heroUmbreon{
+  right:18px!important;
+  height:50%!important;
+  opacity:calc(.58 + var(--night-p) * .42)!important;
+}
+#collectionHero[data-sky-theme="system"] .heroPokemon{opacity:.76!important}
+
+/* Protected copy zone. */
+#collectionHero .heroTopRow{
+  position:absolute!important;
+  z-index:9!important;
+  top:var(--hero-copy-top)!important;
+  left:18px!important;
+  right:18px!important;
+  display:block!important;
+  pointer-events:none!important;
+}
+#collectionHero .heroCopy{
+  width:min(68%,470px)!important;
+  max-width:none!important;
+  margin:0 auto!important;
+  padding:0!important;
+  text-align:center!important;
+  pointer-events:none!important;
+}
+#collectionHero .heroCopy .eyebrow{
+  color:rgba(255,255,255,.84)!important;
+  font-size:.58rem!important;
+  letter-spacing:.16em!important;
+  margin:0 0 7px!important
+}
+#collectionHero .heroCopy h1{
+  color:#fff!important;
+  max-width:none!important;
+  margin:0!important;
+  padding:0!important;
+  font-size:clamp(2rem,7.2vw,3rem)!important;
+  line-height:1!important;
+  letter-spacing:-.055em!important;
+  text-shadow:0 2px 16px rgba(6,10,31,.32)!important
+}
+#collectionHero .heroCopy p{
+  color:rgba(255,255,255,.93)!important;
+  max-width:390px!important;
+  margin:9px auto 0!important;
+  font-size:.78rem!important;
+  line-height:1.25!important;
+  text-shadow:0 2px 13px rgba(6,10,31,.26)!important
+}
+#collectionHero .heroToolsLink{
+  pointer-events:auto!important;
+  margin-top:11px!important;
+  padding:8px 13px!important;
+  border-radius:999px!important;
+  border:1px solid rgba(255,255,255,.40)!important;
+  background:rgba(17,22,48,.30)!important;
+  color:#fff!important;
+  backdrop-filter:blur(9px)!important;
+  font-size:.58rem!important;
+  font-weight:900!important
+}
+
+/* Stats are a separate top-right island; copy reserves enough room on narrow phones. */
+#collectionHero .heroStats{
+  position:absolute!important;
+  z-index:11!important;
+  top:0!important;
+  right:0!important;
+  width:auto!important;
+  max-width:none!important;
+  text-align:right!important;
+  pointer-events:none!important
+}
+#collectionHero .heroStats b{
+  display:block!important;
+  color:#fff!important;
+  font-size:1.20rem!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  text-shadow:0 2px 14px rgba(5,9,27,.34)!important
+}
+#collectionHero .heroStats span{
+  display:block!important;
+  color:#cbbcff!important;
+  margin-top:4px!important;
+  font-size:.58rem!important;
+  font-weight:900!important;
+  white-space:nowrap!important
+}
+
+/* Dedicated slider lane between the two characters. */
+#collectionHero .skyControl{
+  position:absolute!important;
+  z-index:12!important;
+  left:24%!important;
+  right:24%!important;
+  bottom:var(--hero-slider-bottom)!important;
+  height:60px!important;
+  touch-action:none!important;
+  cursor:ew-resize!important
+}
+#collectionHero .skyTrack{
+  position:absolute!important;
+  left:0!important;right:0!important;top:28px!important;
+  height:4px!important;border-radius:999px!important;
+  background:linear-gradient(90deg,rgba(255,210,94,.96),rgba(245,241,255,.88),rgba(199,211,255,.92))!important;
+  box-shadow:0 1px 9px rgba(5,10,30,.24)!important
+}
+#collectionHero .skyTrack:before,#collectionHero .skyTrack:after{content:none!important}
+#collectionHero .skyEndpoint{
+  display:block!important;
+  position:absolute!important;
+  top:12px!important;
+  font-size:24px!important;
+  line-height:1!important;
+  filter:drop-shadow(0 2px 6px rgba(0,0,0,.22))!important;
+  pointer-events:none!important
+}
+#collectionHero .skyEndpoint.left{left:-39px!important}
+#collectionHero .skyEndpoint.right{right:-39px!important}
+#collectionHero .skyOrb{
+  position:absolute!important;
+  left:var(--sky-x)!important;
+  top:2px!important;
+  width:52px!important;height:52px!important;
+  margin-left:-26px!important;
+  border-radius:50%!important;
+  border:4px solid rgba(255,255,255,.92)!important;
+  background:linear-gradient(90deg,#ffd568 0%,#ffd568 48%,#e1e6ff 52%,#e1e6ff 100%)!important;
+  box-shadow:0 7px 22px rgba(5,9,28,.26)!important;
+  transition:left 480ms cubic-bezier(.22,.8,.24,1),transform 220ms ease!important
+}
+#collectionHero.skyDragging .skyOrb{transition:none!important;transform:scale(1.06)!important}
+#collectionHero .orbSun{opacity:var(--day-p)!important}
+#collectionHero .orbMoon{opacity:var(--night-p)!important}
+
+/* Collection progress gets its own bottom edge. */
+#collectionHero .heroProgress{
+  position:absolute!important;
+  z-index:10!important;
+  left:22px!important;right:22px!important;bottom:14px!important;
+  height:6px!important;margin:0!important;
+  background:rgba(255,255,255,.18)!important
+}
+
+/* Portrait iPhone: reserve the right edge for stats and the lower corners for characters. */
+@media(max-width:700px) and (orientation:portrait){
+  #collectionHero.interactiveSkyHero{
+    min-height:420px!important;
+    --hero-copy-top:22px;
+    --hero-slider-bottom:42px;
+  }
+  #collectionHero .heroCopy{
+    width:72%!important;
+    padding-top:0!important
+  }
+  #collectionHero .heroCopy h1{
+    font-size:clamp(1.9rem,7.8vw,2.45rem)!important
+  }
+  #collectionHero .heroCopy p{
+    width:76%!important;
+    font-size:.70rem!important
+  }
+  #collectionHero .heroStats{
+    top:0!important;right:0!important
+  }
+  #collectionHero .heroStats b{font-size:1.05rem!important}
+  #collectionHero .heroStats span{font-size:.51rem!important}
+  #collectionHero .heroEspeon{left:7px!important;height:43%!important}
+  #collectionHero .heroUmbreon{right:7px!important;height:45%!important}
+  #collectionHero .skyControl{left:25%!important;right:25%!important}
+}
+@media(max-width:430px) and (orientation:portrait){
+  #collectionHero.interactiveSkyHero{min-height:410px!important}
+  #collectionHero .heroTopRow{left:14px!important;right:14px!important}
+  #collectionHero .heroCopy{
+    width:70%!important;
+    transform:translateY(34px)!important
+  }
+  #collectionHero .heroCopy .eyebrow{font-size:.50rem!important}
+  #collectionHero .heroCopy h1{font-size:1.82rem!important}
+  #collectionHero .heroCopy p{width:82%!important;font-size:.65rem!important}
+  #collectionHero .heroStats b{font-size:.96rem!important}
+  #collectionHero .heroStats span{font-size:.48rem!important}
+  #collectionHero .heroEspeon{left:2px!important;height:40%!important}
+  #collectionHero .heroUmbreon{right:2px!important;height:42%!important}
+  #collectionHero .skyControl{left:27%!important;right:27%!important}
+  #collectionHero .skyEndpoint.left{left:-34px!important}
+  #collectionHero .skyEndpoint.right{right:-34px!important}
+}
+
+/* Keep animated selected-theme atmosphere across the rest of the page. */
+.themeAtmosphere{display:block!important}
+@media(prefers-reduced-motion:reduce){
+  #collectionHero .sceneCloud,#collectionHero .sceneBird,#collectionHero .heroStar,#collectionHero .heroMeteor{animation:none!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -2234,8 +2734,7 @@ body[data-theme="umbreon"] .setGroup{
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="heroThemeHint" aria-hidden="true">Drag the sky</div>
-  <div class="version">v0.11.3</div>
+  <div class="version">v0.11.5</div>
 </div>
 
   <section id="homeScreen">
@@ -2263,10 +2762,10 @@ body[data-theme="umbreon"] .setGroup{
         <img class="heroPokemon heroUmbreon" src="./assets/hero-umbreon.png" alt="" aria-hidden="true">
       </div>
 
-      <div class="heroContent">
-        <div class="heroGreeting">
+      <div class="heroTopRow">
+        <div class="heroCopy">
           <div class="eyebrow">Your collection</div>
-          <h1 id="dashboardGreeting">Good morning!</h1>
+          <h1 id="dashboardGreeting">Good afternoon!</h1>
           <p>Ready to catch up on your collection?</p>
           <button class="heroToolsLink" id="heroCollectorToolsBtn" type="button">Collection tools →</button>
         </div>
@@ -2280,9 +2779,8 @@ body[data-theme="umbreon"] .setGroup{
         aria-label="Theme: drag from Espeon day to Umbreon night"
         aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="System twilight">
         <span class="skyTrack"></span>
-        <span class="skyModeLabel left">☀️ Espeon</span>
-        <span class="skyModeLabel mid">Twilight</span>
-        <span class="skyModeLabel right">Umbreon 🌙</span>
+        <span class="skyEndpoint left">☀️</span>
+        <span class="skyEndpoint right">🌙</span>
         <span class="skyOrb" id="skyOrb" aria-hidden="true">
           <span class="orbSun">☀</span><span class="orbMoon">☾</span>
         </span>
@@ -6401,7 +6899,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.11.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.5',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
