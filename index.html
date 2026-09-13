@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.10.4 dashboard refinements */
+/* v0.10.5 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.10.4 — visual consistency pass
+   DexBinder v0.10.5 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.10.4 — Day & Night
+   DexBinder v0.10.5 — Day & Night
    ============================================================ */
 
 :root{
@@ -1382,6 +1382,160 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
   .celestialOrb,.sunFace,.moonFace,.themeAtmosphere,.themeAtmosphere *{transition:none!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.10.5 — Day & Night polish
+   ============================================================ */
+
+/* The horizon is intentionally level. */
+.celestialHorizon{transform:none!important;top:20px!important}
+
+/* During a live drag the orb must stay attached to the pointer. */
+.celestialSwitch.dragging .celestialOrb{
+  transition:none!important;
+  will-change:left,transform
+}
+.themeSwitch.celestialSwitch{touch-action:none!important}
+
+/* Give daytime visibly dimensional, moving atmosphere rather than a flat fill. */
+body[data-theme="espeon"] .themeAtmosphere{
+  background:
+    radial-gradient(circle at 82% 10%,rgba(255,223,151,.34),transparent 24%),
+    radial-gradient(circle at 14% 42%,rgba(188,211,255,.34),transparent 34%),
+    linear-gradient(155deg,#e8efff 0%,#f3eaff 46%,#faedf5 100%)!important;
+  background-size:140% 140%,150% 150%,100% 100%;
+  animation:daySkyDrift 18s ease-in-out infinite alternate
+}
+body[data-theme="espeon"] .cloud{animation:cloudDrift 26s linear infinite;opacity:.34!important}
+body[data-theme="espeon"] .cloudB{animation-duration:34s;animation-delay:-12s}
+body[data-theme="espeon"] .cloudC{animation-duration:41s;animation-delay:-23s}
+.dayRay{
+  position:absolute;border-radius:50%;opacity:0;filter:blur(18px);pointer-events:none;
+  background:radial-gradient(circle,rgba(255,230,172,.26),transparent 68%)
+}
+body[data-theme="espeon"] .dayRay{opacity:1;animation:dayRayFloat 13s ease-in-out infinite alternate}
+.dayRayA{width:360px;height:360px;right:-130px;top:4%}
+.dayRayB{width:290px;height:290px;left:-120px;top:48%;animation-delay:-6s!important}
+
+/* Night gets quiet twinkle plus infrequent shooting stars. */
+body[data-theme="umbreon"] .star{animation:starPulse 4.8s ease-in-out infinite}
+body[data-theme="umbreon"] .star2,
+body[data-theme="umbreon"] .star6,
+body[data-theme="umbreon"] .star10{animation-delay:-1.6s}
+body[data-theme="umbreon"] .star3,
+body[data-theme="umbreon"] .star8,
+body[data-theme="umbreon"] .star11{animation-delay:-3.1s}
+.shootingStar{
+  position:absolute;width:95px;height:1px;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(235,235,255,.92));
+  transform:rotate(-24deg);filter:drop-shadow(0 0 4px rgba(188,184,255,.7))
+}
+.shootingStar:after{
+  content:"";position:absolute;right:-2px;top:-2px;width:5px;height:5px;border-radius:50%;
+  background:#fff
+}
+body[data-theme="umbreon"] .shootingStarA{
+  top:18%;left:78%;animation:shootingStar 11s ease-in-out infinite 2s
+}
+body[data-theme="umbreon"] .shootingStarB{
+  top:57%;left:66%;animation:shootingStar 17s ease-in-out infinite 8s
+}
+
+/* Twilight breathes very slowly between dusk tones. */
+body[data-theme="system"] .themeAtmosphere{animation:twilightBreath 16s ease-in-out infinite alternate}
+
+/* Strong explicit contrast for the exact light surfaces used in sheets.
+   This intentionally overrides inherited Umbreon theme colors. */
+body[data-theme="umbreon"] .sheet .metricCard,
+body[data-theme="umbreon"] .sheet .goalCard,
+body[data-theme="umbreon"] .sheet .tradeHuntStat,
+body[data-theme="umbreon"] .sheet .tradeStat,
+body[data-theme="umbreon"] .sheet .wishSummaryCard,
+body[data-theme="umbreon"] .sheet .collectorToolCard,
+body[data-theme="umbreon"] .sheet .toolCard,
+body[data-theme="umbreon"] .sheet .panel.white,
+body[data-theme="umbreon"] .sheet .btn:not(.dark),
+body[data-theme="umbreon"] .sheet [style*="background:#fff"],
+body[data-theme="umbreon"] .sheet [style*="background: #fff"]{
+  color:#17203a!important
+}
+body[data-theme="umbreon"] .sheet .metricCard *,
+body[data-theme="umbreon"] .sheet .goalCard *,
+body[data-theme="umbreon"] .sheet .tradeHuntStat *,
+body[data-theme="umbreon"] .sheet .tradeStat *,
+body[data-theme="umbreon"] .sheet .wishSummaryCard *,
+body[data-theme="umbreon"] .sheet .collectorToolCard *,
+body[data-theme="umbreon"] .sheet .toolCard *,
+body[data-theme="umbreon"] .sheet .panel.white *{
+  color:#17203a!important
+}
+body[data-theme="umbreon"] .sheet .metricCard small,
+body[data-theme="umbreon"] .sheet .goalCard small,
+body[data-theme="umbreon"] .sheet .tradeHuntStat small,
+body[data-theme="umbreon"] .sheet .tradeStat small,
+body[data-theme="umbreon"] .sheet .wishSummaryCard small,
+body[data-theme="umbreon"] .sheet .collectorToolCard p,
+body[data-theme="umbreon"] .sheet .toolCard p{
+  color:#6c675f!important
+}
+
+/* Common sheet tiles in this build use .card/.miniCard too. If their computed
+   surface is the light collector-paper treatment, keep typography dark. */
+body[data-theme="umbreon"] .sheet .card,
+body[data-theme="umbreon"] .sheet .miniCard{
+  --surface-text:#17203a;
+  --surface-muted:#6c675f
+}
+body[data-theme="umbreon"] .sheet .card.lightSurface,
+body[data-theme="umbreon"] .sheet .miniCard.lightSurface{
+  color:var(--surface-text)!important
+}
+body[data-theme="umbreon"] .sheet .card.lightSurface *,
+body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!important}
+
+/* Bundled transparent set logo sizing */
+.setLogo[src*="temporal-forces-logo"],
+#setLogo[src*="temporal-forces-logo"]{
+  object-fit:contain!important;
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.12))
+}
+
+@keyframes daySkyDrift{
+  from{background-position:0% 0%,100% 40%,0 0}
+  to{background-position:18% 10%,78% 52%,0 0}
+}
+@keyframes cloudDrift{
+  0%{translate:-16vw 0}
+  50%{translate:18vw -5px}
+  100%{translate:46vw 1px}
+}
+@keyframes dayRayFloat{
+  from{transform:translate3d(-12px,-7px,0) scale(.94);opacity:.55}
+  to{transform:translate3d(20px,12px,0) scale(1.08);opacity:1}
+}
+@keyframes starPulse{
+  0%,100%{opacity:.28;transform:scale(.82)}
+  50%{opacity:.86;transform:scale(1.12)}
+}
+@keyframes shootingStar{
+  0%,82%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-24deg)}
+  84%{opacity:.9}
+  89%{opacity:0;transform:translate3d(-180px,92px,0) rotate(-24deg)}
+}
+@keyframes twilightBreath{
+  from{filter:saturate(.92) brightness(1)}
+  to{filter:saturate(1.08) brightness(.985)}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-theme="espeon"] .themeAtmosphere,
+  body[data-theme="espeon"] .cloud,
+  body[data-theme="espeon"] .dayRay,
+  body[data-theme="umbreon"] .star,
+  body[data-theme="umbreon"] .shootingStar,
+  body[data-theme="system"] .themeAtmosphere{animation:none!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -1399,6 +1553,10 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
   <span class="star star4">·</span><span class="star star5">·</span><span class="star star6">✧</span>
   <span class="star star7">·</span><span class="star star8">✦</span><span class="star star9">·</span>
   <span class="star star10">·</span><span class="star star11">✧</span><span class="star star12">·</span>
+  <span class="shootingStar shootingStarA"></span>
+  <span class="shootingStar shootingStarB"></span>
+  <span class="dayRay dayRayA"></span>
+  <span class="dayRay dayRayB"></span>
 </div>
 <div class="app">
   <div class="top">
@@ -1412,7 +1570,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
     <button type="button" data-db-theme="system" aria-label="System theme"><span>System</span></button>
     <button type="button" data-db-theme="espeon" aria-label="Espeon light theme"><span>Espeon</span></button>
   </div>
-  <div class="version">v0.10.4</div>
+  <div class="version">v0.10.5</div>
 </div>
 
   <section id="homeScreen">
@@ -2686,7 +2844,7 @@ function eraFallbackRank(era){return ({'Mega Evolution':700,'Scarlet & Violet':6
 function setReleaseTime(s){const d=Date.parse(s?.releaseDate||'');return Number.isFinite(d)?d:0}
 function normalizeSetLogo(raw){if(!raw)return '';if(typeof raw==='object')raw=raw.url||raw.image||raw.path||'';raw=String(raw||'');if(!raw)return '';return /\.(png|webp|jpg|jpeg|svg)(\?|$)/i.test(raw)?raw:raw+'.webp'}
 const SET_LOGO_OVERRIDES={
- 'Temporal Forces':['https://assets.tcgdex.net/en/sv/sv05/logo.webp','https://assets.tcgdex.net/en/sv/sv05/logo.png','https://assets.tcgdex.net/en/sv/sv05/logo']
+ 'Temporal Forces':['./assets/temporal-forces-logo.png','https://assets.tcgdex.net/en/sv/sv05/logo.webp','https://assets.tcgdex.net/en/sv/sv05/logo.png']
 };
 function setLogoCandidates(sid){
  const s=SETS[sid],out=[];
@@ -5528,7 +5686,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.10.4',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.10.5',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
@@ -5981,6 +6139,7 @@ function applyDexBinderTheme(theme,{persist=true}={}){
  const allowed=new Set(DB_THEME_ORDER);
  const next=allowed.has(theme)?theme:'system';
  document.body.dataset.theme=next;
+ requestAnimationFrame(()=>refreshSurfaceContrast(document));
  if(persist){try{localStorage.setItem(DB_THEME_KEY,next)}catch(e){}}
  $$('[data-db-theme]').forEach(b=>b.classList.toggle('on',b.dataset.dbTheme===next));
  const control=$('#celestialSwitch');
@@ -5999,15 +6158,17 @@ function bindCelestialDrag(){
  const snapTheme=pct=>pct<34?'umbreon':pct>66?'espeon':'system';
 
  control.addEventListener('pointerdown',e=>{
-   if(e.target.closest('button'))return;
    dragging=true;startX=lastX=e.clientX;
    control.classList.add('dragging');
    control.setPointerCapture?.(e.pointerId);
    control.style.setProperty('--drag-pct',pctForX(e.clientX)+'%');
+   e.preventDefault();
  });
  control.addEventListener('pointermove',e=>{
-   if(!dragging)return;lastX=e.clientX;
+   if(!dragging)return;
+   lastX=e.clientX;
    control.style.setProperty('--drag-pct',pctForX(e.clientX)+'%');
+   e.preventDefault();
  });
  const end=e=>{
    if(!dragging)return;
@@ -6015,25 +6176,14 @@ function bindCelestialDrag(){
    const pct=pctForX(lastX);
    applyDexBinderTheme(snapTheme(pct));
    control.releasePointerCapture?.(e.pointerId);
+   e.preventDefault();
  };
  control.addEventListener('pointerup',end);
  control.addEventListener('pointercancel',end);
-
- // A horizontal swipe anywhere on the control advances one snapped state.
- let touchStart=null;
- control.addEventListener('touchstart',e=>{touchStart=e.touches?.[0]?.clientX??null},{passive:true});
- control.addEventListener('touchend',e=>{
-   if(touchStart==null)return;
-   const endX=e.changedTouches?.[0]?.clientX??touchStart,delta=endX-touchStart;
-   touchStart=null;if(Math.abs(delta)<24)return;
-   const current=getDexBinderTheme(),idx=DB_THEME_ORDER.indexOf(current);
-   const next=delta>0?Math.min(2,idx+1):Math.max(0,idx-1);
-   applyDexBinderTheme(DB_THEME_ORDER[next]);
- },{passive:true});
 }
 function bindDexBinderTheme(){
  applyDexBinderTheme(getDexBinderTheme(),{persist:false});
- $$('[data-db-theme]').forEach(b=>b.onclick=()=>applyDexBinderTheme(b.dataset.dbTheme));
+ $$('[data-db-theme]').forEach(b=>b.onclick=e=>{if(!$('#celestialSwitch')?.classList.contains('dragging'))applyDexBinderTheme(b.dataset.dbTheme)});
  bindCelestialDrag();
  const mq=window.matchMedia?.('(prefers-color-scheme: dark)');
  mq?.addEventListener?.('change',()=>{if(getDexBinderTheme()==='system')applyDexBinderTheme('system',{persist:false})});
@@ -6080,6 +6230,30 @@ if(document.readyState==='loading'){
 }else{
   initDexBinder();
 }
+
+function dbRgbLuminance(rgb){
+ const m=String(rgb||'').match(/rgba?\((\d+)[,\s]+(\d+)[,\s]+(\d+)/i);
+ if(!m)return null;
+ const vals=[+m[1],+m[2],+m[3]].map(v=>{
+   v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);
+ });
+ return .2126*vals[0]+.7152*vals[1]+.0722*vals[2];
+}
+function refreshSurfaceContrast(root=document){
+ if(document.body.dataset.theme!=='umbreon')return;
+ const nodes=root.querySelectorAll?.('.sheet .card,.sheet .miniCard,.sheet .metricCard,.sheet .goalCard,.sheet .tradeHuntStat,.sheet .tradeStat,.sheet button,.sheet .panel')||[];
+ nodes.forEach(el=>{
+   const cs=getComputedStyle(el),lum=dbRgbLuminance(cs.backgroundColor);
+   if(lum!==null&&lum>.72)el.classList.add('lightSurface');
+   else el.classList.remove('lightSurface');
+ });
+}
+const dbContrastObserver=new MutationObserver(muts=>{
+ if(document.body.dataset.theme!=='umbreon')return;
+ requestAnimationFrame(()=>refreshSurfaceContrast(document));
+});
+dbContrastObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
+
 </script>
 </body>
 </html>
