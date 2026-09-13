@@ -662,6 +662,156 @@ html{-webkit-text-size-adjust:100%}
 .setCardTop,.setPct,.setCardProgress,.setCardHint{position:relative;z-index:1}
 .setCard.hasChaseArt{box-shadow:0 8px 22px rgba(35,31,25,.07)}
 
+
+/* === DexBinder v0.10.0 responsive redesign === */
+:root{
+  --db-bg:#f6f4fb;
+  --db-panel:#ffffff;
+  --db-panel-2:#f3f0fb;
+  --db-text:#17203a;
+  --db-muted:#70768a;
+  --db-line:rgba(47,54,87,.12);
+  --db-purple:#7568d8;
+  --db-pink:#f1c8dc;
+  --db-blue:#bfd8f7;
+  --db-mint:#ccecdf;
+  --db-shadow:0 14px 36px rgba(62,54,93,.11);
+  --db-shadow-soft:0 8px 22px rgba(62,54,93,.08);
+}
+body[data-theme="umbreon"]{
+  --db-bg:#0d111a;
+  --db-panel:#171c28;
+  --db-panel-2:#1d2331;
+  --db-text:#f5f6fb;
+  --db-muted:#abb1c4;
+  --db-line:rgba(238,240,255,.10);
+  --db-purple:#9e95ff;
+  --db-pink:#38233b;
+  --db-blue:#1b2940;
+  --db-mint:#17302d;
+  --db-shadow:0 18px 42px rgba(0,0,0,.36);
+  --db-shadow-soft:0 10px 24px rgba(0,0,0,.24);
+}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"]{
+    --db-bg:#0d111a;
+    --db-panel:#171c28;
+    --db-panel-2:#1d2331;
+    --db-text:#f5f6fb;
+    --db-muted:#abb1c4;
+    --db-line:rgba(238,240,255,.10);
+    --db-purple:#9e95ff;
+    --db-pink:#38233b;
+    --db-blue:#1b2940;
+    --db-mint:#17302d;
+    --db-shadow:0 18px 42px rgba(0,0,0,.36);
+    --db-shadow-soft:0 10px 24px rgba(0,0,0,.24);
+  }
+}
+
+body{background:
+  radial-gradient(circle at 8% -8%,color-mix(in srgb,var(--db-purple) 12%,transparent),transparent 29%),
+  radial-gradient(circle at 100% 0%,color-mix(in srgb,var(--db-pink) 16%,transparent),transparent 27%),
+  var(--db-bg)!important;color:var(--db-text)!important;transition:.2s}
+.app{max-width:1180px!important}
+.top{
+  position:sticky;top:0;z-index:30;
+  margin:-16px -14px 14px!important;padding:14px 14px 10px!important;
+  background:color-mix(in srgb,var(--db-bg) 82%,transparent)!important;
+  backdrop-filter:blur(18px);border-bottom:1px solid var(--db-line)
+}
+.brand,.version,h1,h2,h3,strong,b{color:var(--db-text)}
+.version{color:var(--db-muted)!important}
+.themeSwitch{display:flex;gap:4px;margin-left:auto;margin-right:6px;padding:3px;border:1px solid var(--db-line);border-radius:999px;background:color-mix(in srgb,var(--db-panel) 82%,transparent)}
+.themeSwitch button{border:0;background:transparent;color:var(--db-muted);border-radius:999px;padding:6px 8px;font-size:.54rem;font-weight:900}
+.themeSwitch button.on{background:var(--db-panel);color:var(--db-text);box-shadow:0 3px 10px rgba(0,0,0,.08)}
+
+/* Hero */
+#collectionHero.hero{
+  position:relative;overflow:hidden;
+  color:var(--db-text)!important;
+  background:
+    linear-gradient(125deg,
+      color-mix(in srgb,var(--db-blue) 78%,var(--db-panel)),
+      color-mix(in srgb,var(--db-pink) 72%,var(--db-panel)) 52%,
+      color-mix(in srgb,var(--db-purple) 20%,var(--db-panel)))!important;
+  border:1px solid var(--db-line)!important;
+  border-radius:24px!important;box-shadow:var(--db-shadow)!important;
+  min-height:154px;padding:22px!important
+}
+#collectionHero.hero:after{
+  content:"";position:absolute;width:230px;height:230px;border-radius:50%;
+  right:-70px;top:-120px;background:radial-gradient(circle,color-mix(in srgb,var(--db-purple) 25%,transparent),transparent 68%)
+}
+#collectionHero .eyebrow,#collectionHero p{color:var(--db-muted)!important}
+#collectionHero .stats span{color:var(--db-purple)!important}
+#collectionHero .progress{background:color-mix(in srgb,var(--db-line) 70%,transparent)!important}
+#collectionHero .progress i{background:linear-gradient(90deg,var(--db-purple),#e6b35b)!important}
+
+/* Quick actions */
+.quickSectionHead h2,.quickSectionHead p{display:none}
+.quickActions{grid-template-columns:1.2fr 1fr 1fr!important;gap:10px!important;margin-top:12px}
+.quickAction{
+  min-height:104px!important;border-radius:20px!important;padding:15px!important;
+  display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:flex-end!important;
+  border:1px solid var(--db-line)!important;box-shadow:var(--db-shadow-soft)!important
+}
+.quickAction b{font-size:.82rem!important}.quickAction small{font-size:.54rem!important}
+#addCardsBtn{background:linear-gradient(135deg,#6878f3,#4f5fd6)!important;color:white!important}
+#addCardsBtn b,#addCardsBtn small{color:white!important}
+#wishlistBtn{background:linear-gradient(135deg,color-mix(in srgb,var(--db-pink) 90%,var(--db-panel)),var(--db-panel))!important}
+#tradeHuntBtn{background:linear-gradient(135deg,color-mix(in srgb,var(--db-mint) 92%,var(--db-panel)),var(--db-panel))!important}
+.dashboardTools{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:8px!important}
+.dashboardTools .btn{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important;border-radius:14px!important;box-shadow:var(--db-shadow-soft)!important}
+
+/* Milestone */
+.dashboardMilestone{background:color-mix(in srgb,var(--db-panel) 90%,transparent)!important;border-color:var(--db-line)!important;border-radius:18px!important;box-shadow:var(--db-shadow-soft)!important}
+
+/* Active sets */
+.activeHead{margin-top:24px!important}.activeHead h2{font-size:1.22rem!important}.activeHead p{color:var(--db-muted)!important}
+.sets{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.setCard{
+  min-height:215px!important;border-radius:22px!important;padding:16px!important;
+  background:linear-gradient(135deg,var(--db-panel),var(--db-panel-2))!important;
+  border-color:var(--db-line)!important;box-shadow:var(--db-shadow-soft)!important
+}
+.setCard::before{background:linear-gradient(92deg,color-mix(in srgb,var(--db-panel) 98%,transparent) 0%,color-mix(in srgb,var(--db-panel) 88%,transparent) 42%,color-mix(in srgb,var(--db-panel) 45%,transparent) 72%,transparent 100%)!important}
+.setChaseArt{width:58%!important;right:-3%!important;top:-22%!important;height:148%!important;opacity:.43!important;filter:saturate(1.2) contrast(1.04)!important}
+.setCardTop{max-width:68%}.setCard h3{font-size:1.2rem!important}.setCardMeta,.setCardHint{color:var(--db-muted)!important}
+.setCardProgress{height:8px!important;background:color-mix(in srgb,var(--db-line) 75%,transparent)!important}
+.setCardProgress i{background:linear-gradient(90deg,var(--db-purple),#e6b35b)!important}
+
+/* Achievements */
+.achievementCabinet{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important}
+.cabinetCard{min-height:185px;border-radius:18px!important;box-shadow:var(--db-shadow-soft)!important;border-color:var(--db-line)!important}
+.cabinetCard.tier-locked{background:var(--db-panel)!important}
+.cabinetCard.tier-bronze{background:color-mix(in srgb,#c98557 18%,var(--db-panel))!important}
+.cabinetCard.tier-silver{background:color-mix(in srgb,#8ea0b8 18%,var(--db-panel))!important}
+.cabinetCard.tier-gold{background:color-mix(in srgb,#e3b73e 22%,var(--db-panel))!important}
+.cabinetCard.tier-diamond{background:color-mix(in srgb,#7aa8e8 20%,var(--db-panel))!important}
+
+/* Shared surfaces */
+.modal .sheet,.sheet,.panel,.row,.card,.variantRow,.bulkRow{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+.modal{backdrop-filter:blur(8px)}
+.btn:not(.dark),.search,.select,input,textarea,select,.chip{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+.btn.dark,.chip.active,.chip.on{background:var(--db-text)!important;color:var(--db-bg)!important;border-color:var(--db-text)!important}
+.bottom{background:color-mix(in srgb,var(--db-bg) 91%,transparent)!important;border-color:var(--db-line)!important}
+.nav button{color:var(--db-muted)!important}.nav button.active{background:var(--db-text)!important;color:var(--db-bg)!important}
+
+/* Mobile */
+@media(max-width:700px){
+  .themeSwitch button{font-size:.48rem;padding:6px 7px}
+  .quickActions{grid-template-columns:1fr 1fr!important;grid-template-areas:"add add" "wish trade"!important}
+  #addCardsBtn{grid-area:add;min-height:96px!important}
+  #wishlistBtn{grid-area:wish}#tradeHuntBtn{grid-area:trade}
+  .quickAction{min-height:84px!important}
+  .sets{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;gap:10px!important;margin-left:-14px;margin-right:-14px;padding:0 14px 10px!important;scrollbar-width:none}
+  .sets::-webkit-scrollbar{display:none}.setCard{flex:0 0 87%!important;scroll-snap-align:center;min-height:220px!important}
+  .achievementCabinet{display:flex!important;overflow-x:auto!important;scroll-snap-type:x mandatory;margin-left:-14px;margin-right:-14px;padding:0 14px 8px!important;scrollbar-width:none}
+  .achievementCabinet::-webkit-scrollbar{display:none}.cabinetCard{flex:0 0 72%!important;scroll-snap-align:start}
+}
+@media(max-width:390px){.dashboardTools{grid-template-columns:1fr!important}.setCard{flex-basis:90%!important}.cabinetCard{flex-basis:80%!important}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -669,10 +819,18 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4c</div></div>
+  <div class="top">
+  <div class="brand"><div class="ball"></div>DexBinder</div>
+  <div class="themeSwitch" aria-label="Appearance">
+    <button type="button" data-db-theme="system">System</button>
+    <button type="button" data-db-theme="espeon">☀️ Espeon</button>
+    <button type="button" data-db-theme="umbreon">🌙 Umbreon</button>
+  </div>
+  <div class="version">v0.10.0</div>
+</div>
 
   <section id="homeScreen">
-    <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
+    <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1 id="dashboardGreeting">Good evening!</h1><p>Your collection. Your journey. Keep collecting — great things take time. ✨</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
     <section class="quickSection">
       <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
       <div class="quickActions">
@@ -692,7 +850,7 @@ html{-webkit-text-size-adjust:100%}
       <div class="dashboardMilestoneBody" id="dashboardMilestoneBody"><span class="achievementIcon">🏅</span><div><b>Building your collection…</b><small>Achievements will appear here as your Dex grows.</small></div></div>
     </section>
 
-    <div class="activeHead"><div><h2>Active collections</h2><p>Tap anywhere on a set to open its binder.</p></div></div>
+    <div class="activeHead"><div><h2>My Active Sets</h2><p>Swipe through your collections and tap a set to open its binder.</p></div></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -4601,7 +4759,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.4c',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.10.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -5040,7 +5198,31 @@ function showBootError(stage,e){
     box.innerHTML=`<div class="notice error"><b>DexBinder hit a startup error.</b><br><span>${stage}: ${msg}</span><br><br><button class="btn small" onclick="location.reload()">Retry</button></div>`;
   }
 }
+
+const DB_THEME_KEY='dexbinder_v10_theme';
+function getDexBinderTheme(){
+ try{return localStorage.getItem(DB_THEME_KEY)||'system'}catch(e){return 'system'}
+}
+function applyDexBinderTheme(theme){
+ const allowed=new Set(['system','espeon','umbreon']);
+ const next=allowed.has(theme)?theme:'system';
+ document.body.dataset.theme=next;
+ try{localStorage.setItem(DB_THEME_KEY,next)}catch(e){}
+ $$('[data-db-theme]').forEach(b=>b.classList.toggle('on',b.dataset.dbTheme===next));
+}
+function bindDexBinderTheme(){
+ applyDexBinderTheme(getDexBinderTheme());
+ $$('[data-db-theme]').forEach(b=>b.onclick=()=>applyDexBinderTheme(b.dataset.dbTheme));
+}
+function renderDashboardGreeting(){
+ const el=$('#dashboardGreeting');if(!el)return;
+ const h=new Date().getHours();
+ el.textContent=h<12?'Good morning!':h<18?'Good afternoon!':'Good evening!';
+}
+
 function initDexBinder(){
+  bindDexBinderTheme();
+  renderDashboardGreeting();
   registerDexBinderServiceWorker();
   // Stage 1: render the core UI first. Optional migration/cache work must never block it.
   try{
