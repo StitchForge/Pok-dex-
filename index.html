@@ -179,17 +179,43 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .historyItem b{font-size:.72rem}.historyItem small{display:block;color:var(--muted);font-size:.58rem;margin-top:3px;line-height:1.4}
 .historyValues{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:.65rem;font-weight:900}
 
+
+/* v0.7.3 Collector Tools & Polish */
+.collectorHubGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0}
+.collectorHubCard{border:1px solid var(--line);background:#fffdf9;border-radius:14px;padding:11px;text-align:left}
+.collectorHubCard b{display:block;font-size:.77rem}.collectorHubCard small{display:block;color:var(--muted);font-size:.57rem;margin-top:3px;line-height:1.35}
+.metricGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.metricCard{border:1px solid var(--line);background:#f7f3ec;border-radius:13px;padding:10px}
+.metricCard strong{display:block;font-size:1.05rem;line-height:1.05}.metricCard small{display:block;color:var(--muted);font-size:.56rem;margin-top:4px;text-transform:uppercase;letter-spacing:.04em;font-weight:850}
+.searchResults{display:grid;gap:8px;margin-top:10px;max-height:56vh;overflow:auto}
+.searchResult{display:grid;grid-template-columns:54px 1fr auto;gap:9px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:13px;padding:8px}
+.searchResult img{width:54px;aspect-ratio:245/337;object-fit:cover;border-radius:7px}
+.searchResult b{display:block;font-size:.72rem}.searchResult small{display:block;color:var(--muted);font-size:.55rem;line-height:1.35;margin-top:2px}
+.searchResult .btn{white-space:nowrap}
+.duplicatesList{display:grid;gap:8px;margin-top:10px;max-height:56vh;overflow:auto}
+.duplicateItem{display:grid;grid-template-columns:54px 1fr;gap:9px;border:1px solid var(--line);background:#fff;border-radius:13px;padding:8px}
+.duplicateItem img{width:54px;aspect-ratio:245/337;object-fit:cover;border-radius:7px}
+.duplicateItem b{display:block;font-size:.72rem}.duplicateItem small{display:block;color:var(--muted);font-size:.55rem;line-height:1.35;margin-top:2px}
+.duplicateActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:7px}
+.valueBreakdown{display:grid;gap:7px;margin-top:10px}
+.valueRow{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);padding:7px 0;font-size:.68rem}
+.valueRow:last-child{border-bottom:0}
+.csvNote{font-size:.58rem;color:var(--muted);line-height:1.4;margin-top:8px}
+.historyActions{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.historyDelete{font-size:.56rem}
+.dataHealthBox{border:1px solid var(--line);background:#f7f3ec;border-radius:13px;padding:10px;margin-top:10px;font-size:.62rem;line-height:1.45;color:var(--muted)}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.2a</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="collectorToolsBtn">Collector Tools</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -263,6 +289,66 @@ body.isStandalone .pwaInstallNote{display:none!important}
 
 
 
+
+
+<div class="modal" id="collectorToolsModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Collector Tools</h2><p>Your collection beyond master-set completion.</p></div><button class="btn small close">Close</button></div>
+
+  <div class="metricGrid">
+    <div class="metricCard"><strong id="metricMasterProgress">—</strong><small>Master positions owned</small></div>
+    <div class="metricCard"><strong id="metricPhysicalCards">—</strong><small>Physical cards owned</small></div>
+    <div class="metricCard"><strong id="metricDuplicates">—</strong><small>Duplicate copies</small></div>
+    <div class="metricCard"><strong id="metricTradeCards">—</strong><small>Cards available to trade</small></div>
+    <div class="metricCard"><strong id="metricCompletedSets">—</strong><small>Completed sets</small></div>
+    <div class="metricCard"><strong id="metricCompletedTrades">—</strong><small>Completed trades</small></div>
+  </div>
+
+  <div class="collectorHubGrid">
+    <button class="collectorHubCard" id="globalSearchBtn"><b>Global Card Search</b><small>Search across all active sets.</small></button>
+    <button class="collectorHubCard" id="duplicatesBtn"><b>Duplicates</b><small>Find extra copies and move them into your trade binder.</small></button>
+    <button class="collectorHubCard" id="collectionValueBtn"><b>Collection Value</b><small>Estimated collection, duplicate and trade reference values.</small></button>
+    <button class="collectorHubCard" id="csvExportBtn"><b>Export CSV</b><small>Download a human-readable collection spreadsheet.</small></button>
+  </div>
+
+  <div class="dataHealthBox" id="dataHealthBox">Checking collector data…</div>
+  <div class="csvNote">Master-set completion counts collectible positions. Physical card count includes duplicate copies, so these numbers are intentionally different.</div>
+</div></div>
+
+<div class="modal" id="globalSearchModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Global Card Search</h2><p>Search your active sets by Pokémon/card name or number.</p></div><button class="btn small close">Close</button></div>
+  <input class="collectorInput" id="globalCardSearchInput" type="search" placeholder="Search e.g. Pikachu or 025…">
+  <div class="searchResults" id="globalCardSearchResults"></div>
+</div></div>
+
+<div class="modal" id="duplicatesModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Duplicates</h2><p>Physical copies beyond the first owned copy of a variant.</p></div><button class="btn small close">Close</button></div>
+  <div class="tradeToolbar">
+    <select class="select" id="duplicateSort">
+      <option value="quantity">Most duplicates</option>
+      <option value="value">Highest duplicate value</option>
+      <option value="set">Set</option>
+      <option value="name">Card name</option>
+    </select>
+    <select class="select" id="duplicateSetFilter"><option value="all">All sets</option></select>
+  </div>
+  <div class="duplicatesList" id="duplicatesList"></div>
+</div></div>
+
+<div class="modal" id="collectionValueModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Collection Value</h2><p>TCGplayer-derived reference values for your physical cards.</p></div><button class="btn small close">Close</button></div>
+  <div class="metricGrid">
+    <div class="metricCard"><strong id="collectionValueTotal">$0.00</strong><small>Estimated collection</small></div>
+    <div class="metricCard"><strong id="duplicatesValueTotal">$0.00</strong><small>Estimated duplicates</small></div>
+    <div class="metricCard"><strong id="tradeValueTotal">$0.00</strong><small>Trade binder</small></div>
+    <div class="metricCard"><strong id="recordedSpendTotal">$0.00</strong><small>Recorded purchase spend</small></div>
+  </div>
+  <div class="valueBreakdown" id="collectionValueBreakdown"></div>
+  <div class="tradeSourceNote">Reference values are estimates only. Missing prices are excluded, and condition/language adjustments are not applied.</div>
+</div></div>
 
 <div class="modal" id="tradeModal"><div class="sheet">
   <div class="grab"></div>
@@ -471,6 +557,7 @@ let incomingTradeBasket=new Map();
 const TRADE_HISTORY_KEY='dexbinder_v072_trade_history';
 let tradeHistory=[];
 try{tradeHistory=JSON.parse(localStorage.getItem(TRADE_HISTORY_KEY)||'[]')||[]}catch(e){tradeHistory=[]}
+setTimeout(()=>{try{migrateCollectorDataV073()}catch(e){}},0);
 let tradeFilter='all';
 
 try{collectorMeta=JSON.parse(localStorage.getItem(COLLECTOR_META_KEY)||'{}')||{}}catch(e){collectorMeta={}}
@@ -1352,10 +1439,26 @@ function updateTradeHistorySummary(){
 
 function renderTradeHistory(){
   updateTradeHistorySummary();
-  $('#tradeHistoryList').innerHTML=tradeHistory.length?tradeHistory.map(t=>`
+  const root=$('#tradeHistoryList');
+  root.innerHTML=tradeHistory.length?`
+    <div class="historyActions"><button class="btn small" id="clearTradeHistoryBtn">Clear all history</button></div>
+    ${tradeHistory.map(t=>`
     <div class="historyItem"><b>${new Date(t.completedAt).toLocaleDateString()} · ${t.give.length} given / ${t.get.length} received</b>
     <small>${t.give.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing given'}<br>↔ ${t.get.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing received'}</small>
-    <div class="historyValues"><span>Gave ${formatTradeMoney(t.giveValue)}</span><span>Got ${formatTradeMoney(t.getValue)}</span></div></div>`).join(''):'<div class="tradeEmpty">No completed trades yet.</div>';
+    <div class="historyValues"><span>Gave ${formatTradeMoney(t.giveValue)}</span><span>Got ${formatTradeMoney(t.getValue)}</span></div>
+    <div class="historyActions"><button class="btn small historyDelete" data-delete-history="${t.id}">Delete history entry</button></div>
+    </div>`).join('')}`:'<div class="tradeEmpty">No completed trades yet.</div>';
+
+  $$('[data-delete-history]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.deleteHistory;
+    if(!confirm('Delete this trade-history entry?\n\nThis removes the log only. It will NOT reverse changes to your collection.'))return;
+    tradeHistory=tradeHistory.filter(t=>t.id!==id);saveTradeHistory();renderTradeHistory();renderCollectorTools();toast('Trade history entry deleted');
+  });
+  const clear=$('#clearTradeHistoryBtn');
+  if(clear)clear.onclick=()=>{
+    if(!confirm('Clear ALL trade history?\n\nThis removes history only. It will NOT reverse collection changes.'))return;
+    tradeHistory=[];saveTradeHistory();renderTradeHistory();renderCollectorTools();toast('Trade history cleared');
+  };
 }
 function completeTrade(){
   const ownedMap=new Map(tradeEntries().map(r=>[r.key,r]));
@@ -1403,6 +1506,218 @@ async function openTradeList(){
     await ensureTradePrices(rows);
     renderTradeList();
   }
+}
+
+
+const COLLECTOR_MIGRATION_KEY='dexbinder_v073_migrated';
+
+function migrateCollectorDataV073(){
+  let changed=0;
+  for(const [k,raw] of Object.entries(collectorMeta)){
+    if(!raw || typeof raw!=='object'){delete collectorMeta[k];changed++;continue}
+    const quantity=Math.max(1,Number(raw.quantity)||1);
+    let tq=Number(raw.tradeQuantity);
+    if(!Number.isFinite(tq))tq=raw.forTrade?quantity:0;
+    tq=Math.max(0,Math.min(quantity,tq));
+    if(raw.quantity!==quantity || raw.tradeQuantity!==tq || raw.forTrade!==(tq>0)){
+      collectorMeta[k]={...raw,quantity,tradeQuantity:tq,forTrade:tq>0};
+      changed++;
+    }
+  }
+  if(changed)saveCollectorMeta();
+  localStorage.setItem(COLLECTOR_MIGRATION_KEY,new Date().toISOString());
+  return changed;
+}
+function collectorOwnedRows(){
+  const rows=[];
+  for(const [sid,cards] of Object.entries(cardsBySet)){
+    for(const c of (cards||[])){
+      for(const v of variantsFor(sid,c)){
+        const k=key(sid,c.id,v.id);
+        if(!owned.has(k))continue;
+        const m=getCollectorMeta(sid,c.id,v.id);
+        const unit=tradeReferencePrice(c,v.id);
+        rows.push({
+          sid,c,v,key:k,meta:m,setName:SETS[sid]?.name||sid,
+          unitValue:unit,
+          totalValue:unit==null?null:unit*m.quantity,
+          duplicateQty:Math.max(0,m.quantity-1),
+          duplicateValue:unit==null?null:unit*Math.max(0,m.quantity-1)
+        });
+      }
+    }
+  }
+  return rows;
+}
+function collectionStats(){
+  const rows=collectorOwnedRows();
+  const masterOwned=rows.length;
+  const masterTotal=activeSetIds.reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
+  const physical=rows.reduce((s,r)=>s+r.meta.quantity,0);
+  const duplicates=rows.reduce((s,r)=>s+r.duplicateQty,0);
+  const tradeQty=rows.reduce((s,r)=>s+r.meta.tradeQuantity,0);
+  const completedSets=activeSetIds.filter(sid=>{
+    const set=SETS[sid];if(!set)return false;
+    const count=rows.filter(r=>r.sid===sid).length;
+    return count>=set.masterTotal;
+  }).length;
+  const collectionValue=rows.reduce((s,r)=>s+(r.totalValue||0),0);
+  const duplicateValue=rows.reduce((s,r)=>s+(r.duplicateValue||0),0);
+  const tradeValue=rows.reduce((s,r)=>s+(r.unitValue==null?0:r.unitValue*r.meta.tradeQuantity),0);
+  const recordedSpend=rows.reduce((s,r)=>{
+    const p=Number(r.meta.purchasePrice);
+    return s+(Number.isFinite(p)&&p>=0?p*r.meta.quantity:0);
+  },0);
+  return {rows,masterOwned,masterTotal,physical,duplicates,tradeQty,completedSets,collectionValue,duplicateValue,tradeValue,recordedSpend};
+}
+async function ensureAllActiveSetsLoaded(){
+  for(const sid of activeSetIds){
+    if(!cardsBySet[sid]){
+      try{await loadSet(sid)}catch(e){}
+    }
+  }
+}
+async function ensurePricesForRows(rows){
+  const seen=new Set();
+  for(const r of rows){
+    if(r.unitValue!=null || seen.has(r.c.id))continue;
+    seen.add(r.c.id);
+    try{await loadPriceFor(r.c)}catch(e){}
+  }
+}
+function renderCollectorTools(){
+  const s=collectionStats();
+  $('#metricMasterProgress').textContent=`${s.masterOwned}/${s.masterTotal}`;
+  $('#metricPhysicalCards').textContent=s.physical;
+  $('#metricDuplicates').textContent=s.duplicates;
+  $('#metricTradeCards').textContent=s.tradeQty;
+  $('#metricCompletedSets').textContent=s.completedSets;
+  $('#metricCompletedTrades').textContent=tradeHistory.length;
+  const migrated=localStorage.getItem(COLLECTOR_MIGRATION_KEY);
+  $('#dataHealthBox').textContent=`Collector data checked · ${Object.keys(collectorMeta).length} metadata record${Object.keys(collectorMeta).length===1?'':'s'} · trade quantities validated${migrated?' · migration complete':''}.`;
+}
+async function openCollectorTools(){
+  $('#collectorToolsModal').classList.add('open');
+  await ensureAllActiveSetsLoaded();
+  migrateCollectorDataV073();
+  renderCollectorTools();
+}
+function globalSearchRows(q){
+  q=q.trim().toLowerCase();
+  if(q.length<2)return [];
+  const rows=[];
+  for(const sid of activeSetIds){
+    for(const c of (cardsBySet[sid]||[])){
+      const matches=c.name.toLowerCase().includes(q)||String(c.localId).toLowerCase()===q||String(c.id).toLowerCase().includes(q);
+      if(!matches)continue;
+      for(const v of variantsFor(sid,c)){
+        const k=key(sid,c.id,v.id),isOwned=owned.has(k),m=isOwned?getCollectorMeta(sid,c.id,v.id):null;
+        rows.push({sid,c,v,key:k,isOwned,meta:m,setName:SETS[sid]?.name||sid});
+      }
+      if(rows.length>=50)return rows;
+    }
+  }
+  return rows;
+}
+function renderGlobalSearch(){
+  const q=$('#globalCardSearchInput').value;
+  const rows=globalSearchRows(q);
+  if(q.trim().length<2){$('#globalCardSearchResults').innerHTML='<div class="tradeEmpty">Type at least 2 characters.</div>';return}
+  $('#globalCardSearchResults').innerHTML=rows.length?rows.map(r=>{
+    const ownedText=r.isOwned?`${r.meta.quantity} owned · ${r.meta.tradeQuantity} trade`:'Not owned';
+    const price=tradeReferencePrice(r.c,r.v.id);
+    return `<div class="searchResult">
+      <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)">
+      <div><b>${r.c.name}</b><small>${r.setName} · #${r.c.localId} · ${r.v.label}<br>${ownedText}${price!=null?` · ${formatTradeMoney(price)}`:''}</small></div>
+      <button class="btn small" data-search-open="${r.sid}|${r.c.id}|${r.v.id}">Open</button>
+    </div>`;
+  }).join(''):'<div class="tradeEmpty">No matching cards in your active sets.</div>';
+  $$('[data-search-open]').forEach(b=>b.onclick=async()=>{
+    const [sid,cid,variantId]=b.dataset.searchOpen.split('|');
+    $('#globalSearchModal').classList.remove('open');
+    $('#collectorToolsModal').classList.remove('open');
+    currentSet=sid;
+    await openSet(sid,'binder');
+    setTimeout(()=>openCard(cid,variantId),80);
+  });
+}
+function duplicateRows(){
+  return collectorOwnedRows().filter(r=>r.duplicateQty>0);
+}
+function renderDuplicates(){
+  let rows=duplicateRows();
+  const setFilter=$('#duplicateSetFilter').value||'all';
+  if(setFilter!=='all')rows=rows.filter(r=>r.sid===setFilter);
+  const sort=$('#duplicateSort').value||'quantity';
+  rows.sort((a,b)=>{
+    if(sort==='value')return (b.duplicateValue||0)-(a.duplicateValue||0);
+    if(sort==='set')return a.setName.localeCompare(b.setName)||Number(a.c.localId)-Number(b.c.localId);
+    if(sort==='name')return a.c.name.localeCompare(b.c.name);
+    return b.duplicateQty-a.duplicateQty;
+  });
+  const filter=$('#duplicateSetFilter'),cur=filter.value||'all';
+  const ids=[...new Set(duplicateRows().map(r=>r.sid))].sort((a,b)=>(SETS[a]?.name||a).localeCompare(SETS[b]?.name||b));
+  filter.innerHTML='<option value="all">All sets</option>'+ids.map(s=>`<option value="${s}">${SETS[s]?.name||s}</option>`).join('');
+  filter.value=ids.includes(cur)?cur:'all';
+  $('#duplicatesList').innerHTML=rows.length?rows.map(r=>`
+    <div class="duplicateItem">
+      <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)">
+      <div><b>${r.c.name}</b><small>${r.setName} · #${r.c.localId} · ${r.v.label}<br>${r.meta.quantity} owned · ${r.duplicateQty} duplicate${r.duplicateQty===1?'':'s'} · ${r.meta.tradeQuantity} trade${r.duplicateValue!=null?` · ${formatTradeMoney(r.duplicateValue)} dup value`:''}</small>
+      <div class="duplicateActions">
+        <button class="btn small" data-dup-trade="${r.key}">Trade all duplicates</button>
+        <button class="btn small" data-dup-open="${r.sid}|${r.c.id}|${r.v.id}">Edit</button>
+      </div></div>
+    </div>`).join(''):'<div class="tradeEmpty">No duplicate copies yet.</div>';
+  $$('[data-dup-trade]').forEach(b=>b.onclick=()=>{
+    const r=collectorOwnedRows().find(x=>x.key===b.dataset.dupTrade);if(!r)return;
+    setCollectorMeta(r.sid,r.c.id,r.v.id,{...r.meta,tradeQuantity:r.duplicateQty});
+    renderDuplicates();renderCollectorTools();toast('Duplicates added to trade binder');
+  });
+  $$('[data-dup-open]').forEach(b=>b.onclick=async()=>{
+    const [sid,cid,variantId]=b.dataset.dupOpen.split('|');
+    $('#duplicatesModal').classList.remove('open');$('#collectorToolsModal').classList.remove('open');
+    currentSet=sid;await openSet(sid,'binder');setTimeout(()=>openCard(cid,variantId),80);
+  });
+}
+async function renderCollectionValue(){
+  let s=collectionStats();
+  $('#collectionValueTotal').textContent='Loading…';
+  await ensurePricesForRows(s.rows);
+  s=collectionStats();
+  $('#collectionValueTotal').textContent=formatTradeMoney(s.collectionValue);
+  $('#duplicatesValueTotal').textContent=formatTradeMoney(s.duplicateValue);
+  $('#tradeValueTotal').textContent=formatTradeMoney(s.tradeValue);
+  $('#recordedSpendTotal').textContent=formatTradeMoney(s.recordedSpend);
+  const known=s.rows.filter(r=>r.unitValue!=null).length,missing=s.rows.length-known;
+  $('#collectionValueBreakdown').innerHTML=`
+    <div class="valueRow"><span>Priced owned variants</span><b>${known}</b></div>
+    <div class="valueRow"><span>Missing reference prices</span><b>${missing}</b></div>
+    <div class="valueRow"><span>Physical cards</span><b>${s.physical}</b></div>
+    <div class="valueRow"><span>Duplicate copies</span><b>${s.duplicates}</b></div>
+    <div class="valueRow"><span>Trade copies</span><b>${s.tradeQty}</b></div>`;
+}
+function csvEscape(v){
+  v=v==null?'':String(v);
+  return /[",\n]/.test(v)?`"${v.replace(/"/g,'""')}"`:v;
+}
+function exportCollectionCSV(){
+  const rows=collectorOwnedRows();
+  const headers=['Set','Card','Number','Variant','Owned Quantity','Trade Quantity','Condition','Language','Purchase Price','Purchase Date','Notes','Reference Price','Estimated Total Value'];
+  const lines=[headers.map(csvEscape).join(',')];
+  for(const r of rows){
+    lines.push([
+      r.setName,r.c.name,r.c.localId,r.v.label,r.meta.quantity,r.meta.tradeQuantity,
+      r.meta.condition||'',r.meta.language||'',r.meta.purchasePrice||'',r.meta.purchaseDate||'',
+      r.meta.notes||'',r.unitValue==null?'':r.unitValue.toFixed(2),
+      r.totalValue==null?'':r.totalValue.toFixed(2)
+    ].map(csvEscape).join(','));
+  }
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`DexBinder-collection-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('CSV export ready');
 }
 
 function cardCollectorSummary(sid,c){
@@ -1797,6 +2112,23 @@ $('#bulkBtn').onclick=async()=>{
 $('#allBase').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>owned.add(key(currentSet,c.id,'base')));save();renderBulk();renderSet()};
 $('#allReverse').onclick=()=>{(cardsBySet[currentSet]||[]).forEach(c=>variantsFor(currentSet,c).filter(v=>v.id==='reverse').forEach(v=>owned.add(key(currentSet,c.id,v.id))));save();renderBulk();renderSet()};
 $('#clearSet').onclick=()=>{[...owned].filter(k=>k.startsWith(currentSet+'|')).forEach(k=>owned.delete(k));save();renderBulk();renderSet()};
+
+
+function updatePhysicalCountLabels(){
+  const s=collectionStats();
+  const el=$('#physicalCountLabel');
+  if(el)el.textContent=`${s.physical} physical cards · ${s.duplicates} duplicates`;
+}
+
+
+$('#collectorToolsBtn').onclick=openCollectorTools;
+$('#globalSearchBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#globalSearchModal').classList.add('open');$('#globalCardSearchInput').focus();renderGlobalSearch()};
+$('#globalCardSearchInput').oninput=renderGlobalSearch;
+$('#duplicatesBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#duplicatesModal').classList.add('open');renderDuplicates()};
+$('#duplicateSort').onchange=renderDuplicates;
+$('#duplicateSetFilter').onchange=renderDuplicates;
+$('#collectionValueBtn').onclick=async()=>{$('#collectionValueModal').classList.add('open');await renderCollectionValue()};
+$('#csvExportBtn').onclick=exportCollectionCSV;
 
 $('#tradeBtn').onclick=openTradeList;
 $('#tradeSort').onchange=renderTradeList;
