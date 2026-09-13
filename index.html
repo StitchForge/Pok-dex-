@@ -99,7 +99,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.2</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.3</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -202,6 +202,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
       <button class="btn" id="cloudSignOut">Sign out</button>
     </div>
   </div>
+  <div id="cloudDiagnostic" class="hidden" style="margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff7e8;color:#6b5122;font-size:.68rem;line-height:1.4;word-break:break-word"></div>
   <div class="cacheNote" style="margin-top:10px">Offline changes remain on this device and sync when DexBinder is online again. Backup remains available as an emergency export.</div>
 </div></div>
 
@@ -414,16 +415,40 @@ function scheduleCloudSync(){
   clearTimeout(cloudSyncTimer);
   cloudSyncTimer=setTimeout(()=>pushCloud(),900);
 }
+function setCloudDiagnostic(message){
+  const box=$('#cloudDiagnostic');
+  if(!box)return;
+  if(!message){box.classList.add('hidden');box.textContent='';return}
+  box.textContent=message;
+  box.classList.remove('hidden');
+}
+
 async function cloudSignIn(){
   if(!cloudConfigured()){toast('Cloud setup is not configured yet');return}
   const email=$('#cloudEmail').value.trim();
   if(!email || !email.includes('@')){toast('Enter a valid email');return}
   const redirectTo=location.origin+location.pathname;
-  const {error}=await cloudClient.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo}});
-  if(error){console.warn(error);toast('Could not send sign-in link');return}
-  toast('Check your email for the DexBinder sign-in link');
-  $('#cloudSubtitle').textContent='Sign-in link sent · check your email';
-  $('#cloudLinkHelp')?.classList.remove('hidden');
+  const btn=$('#cloudSignIn');
+  const original=btn?.textContent||'Email me a sign-in link';
+  if(btn){btn.disabled=true;btn.textContent='Sending…'}
+  try{
+    const {data,error}=await cloudClient.auth.signInWithOtp({
+      email,
+      options:{emailRedirectTo:redirectTo}
+    });
+    if(error)throw error;
+    $('#cloudSubtitle').textContent='Sign-in link sent · check your email';
+    setCloudDiagnostic('Sign-in email requested successfully.');
+    toast('Check your email for the DexBinder sign-in link');
+  }catch(err){
+    console.warn('Cloud sign-in error',err);
+    const msg=err?.message || err?.error_description || err?.code || 'Unknown authentication error';
+    setCloudDiagnostic(`Supabase error: ${msg}`);
+    $('#cloudSubtitle').textContent='Sign-in request failed · see details below';
+    toast(msg);
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=original}
+  }
 }
 async function cloudUseMagicLink(){
   if(!cloudClient){toast('Cloud is still starting · try again');return}
@@ -458,6 +483,7 @@ function bindCloudControls(){
   if(cloudBtn && !cloudBtn.dataset.bound){
     cloudBtn.dataset.bound='1';
     cloudBtn.addEventListener('click',()=>{
+      setCloudDiagnostic('');
       updateCloudUI();
       $('#cloudModal')?.classList.add('open');
     });
