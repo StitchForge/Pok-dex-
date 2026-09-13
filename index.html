@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.10.5 dashboard refinements */
+/* v0.11.0 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.10.5 — visual consistency pass
+   DexBinder v0.11.0 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.10.5 — Day & Night
+   DexBinder v0.11.0 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.10.5 — Day & Night polish
+   DexBinder v0.11.0 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1536,6 +1536,161 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
   body[data-theme="system"] .themeAtmosphere{animation:none!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.0 — Interactive Sky Hero
+   ============================================================ */
+
+.themeAtmosphere{display:none!important}
+.heroThemeHint{
+  margin-left:auto;color:var(--db-muted);font-size:.48rem;font-weight:900;
+  letter-spacing:.06em;text-transform:uppercase;white-space:nowrap
+}
+
+/* Make room in header after removing the old segmented theme control. */
+.top{gap:8px!important}
+
+/* New interactive collection hero */
+#collectionHero.interactiveSkyHero{
+  --sky-x:50%;
+  --day-p:.5;
+  --night-p:.5;
+  --twilight-p:1;
+  position:relative!important;overflow:hidden!important;isolation:isolate;
+  min-height:260px!important;padding:0!important;
+  border-radius:28px!important;border:1px solid color-mix(in srgb,var(--db-line) 82%,transparent)!important;
+  background:#dcdff0!important;color:#fff!important;
+  box-shadow:0 20px 48px rgba(30,31,58,.16)!important;
+  touch-action:pan-y;
+}
+#collectionHero.interactiveSkyHero:after{display:none!important}
+
+.skyScene{position:absolute;inset:0;z-index:0;overflow:hidden}
+.skyLayer{position:absolute;inset:0;transition:opacity 430ms ease}
+.dayLayer{
+  opacity:var(--day-p);
+  background:
+    radial-gradient(circle at 26% 66%,rgba(255,241,172,.98) 0 6%,rgba(255,218,151,.30) 7% 17%,transparent 29%),
+    linear-gradient(180deg,#95c9ff 0%,#f0c7e6 47%,#ffd59d 77%,#cf8d79 100%)
+}
+.twilightLayer{
+  opacity:calc(var(--twilight-p)*.86);
+  background:
+    radial-gradient(circle at 52% 70%,rgba(255,189,130,.48),transparent 24%),
+    linear-gradient(180deg,rgba(128,113,184,.38),rgba(236,146,157,.23) 58%,rgba(24,38,84,.18))
+}
+.nightLayer{
+  opacity:var(--night-p);
+  background:
+    radial-gradient(circle at 80% 21%,rgba(225,231,255,.96) 0 5%,rgba(134,149,226,.22) 6% 17%,transparent 29%),
+    radial-gradient(circle at 74% 20%,rgba(83,92,190,.24),transparent 30%),
+    linear-gradient(180deg,#071128 0%,#122650 52%,#182447 100%)
+}
+.sunGlow{position:absolute;left:21%;top:54%;width:105px;height:105px;border-radius:50%;background:#fff1a7;box-shadow:0 0 50px rgba(255,212,132,.75)}
+.sceneCloud{
+  position:absolute;width:140px;height:28px;border-radius:999px;background:rgba(255,255,255,.42);
+  filter:blur(.2px);animation:heroCloud 28s linear infinite
+}
+.sceneCloud:before,.sceneCloud:after{content:"";position:absolute;border-radius:50%;background:inherit}
+.sceneCloud:before{width:50px;height:50px;left:22px;bottom:3px}.sceneCloud:after{width:68px;height:68px;right:18px;bottom:0}
+.sceneCloud1{left:-90px;top:19%;transform:scale(.62)}.sceneCloud2{left:12%;top:35%;transform:scale(.42);animation-duration:37s}.sceneCloud3{left:52%;top:14%;transform:scale(.34);animation-duration:44s}
+.sceneBird{position:absolute;color:rgba(43,55,93,.48);font:700 18px Georgia,serif;animation:birdFloat 9s ease-in-out infinite}
+.sceneBird1{left:16%;top:27%}.sceneBird2{left:34%;top:18%;font-size:13px;animation-delay:-4s}
+
+.heroStar{position:absolute;color:#fff;text-shadow:0 0 9px rgba(191,206,255,.85);animation:heroTwinkle 4.5s ease-in-out infinite}
+.hs1{left:58%;top:12%}.hs2{left:68%;top:24%}.hs3{left:79%;top:12%}.hs4{left:91%;top:28%}.hs5{left:73%;top:42%}.hs6{left:86%;top:54%}.hs7{left:61%;top:48%}.hs8{left:94%;top:9%}.hs9{left:82%;top:35%}
+.heroMeteor{position:absolute;width:90px;height:1px;background:linear-gradient(90deg,transparent,#fff);opacity:0;transform:rotate(-24deg)}
+.heroMeteorA{left:72%;top:22%;animation:heroMeteor 10s ease-in-out infinite 2s}
+.heroMeteorB{left:89%;top:43%;animation:heroMeteor 16s ease-in-out infinite 8s}
+
+.mountainLayer{position:absolute;left:-4%;right:-4%;bottom:0;clip-path:polygon(0 100%,0 67%,8% 56%,17% 72%,28% 42%,39% 70%,51% 46%,62% 68%,73% 39%,83% 64%,92% 48%,100% 68%,100% 100%)}
+.mountainBack{height:48%;background:linear-gradient(90deg,rgba(118,104,164,.75),rgba(43,64,109,.78))}
+.mountainFront{height:34%;background:linear-gradient(90deg,#473f68,#12284a 58%,#0d1b34)}
+.treeLine{position:absolute;left:0;right:0;bottom:0;height:26%;opacity:.8;background:
+  linear-gradient(135deg,transparent 47%,#171f35 48% 53%,transparent 54%) 0 0/28px 52px repeat-x,
+  linear-gradient(225deg,transparent 47%,#171f35 48% 53%,transparent 54%) 14px 5px/28px 52px repeat-x}
+
+.espeonEcho,.umbreonEcho{position:absolute;bottom:34px;width:100px;height:115px;opacity:.32;filter:blur(.1px)}
+.espeonEcho{left:24px;color:#9e6da3}.umbreonEcho{right:24px;color:#11182c}
+.espeonEcho .head,.umbreonEcho .head{position:absolute;width:58px;height:58px;border-radius:50% 50% 42% 42%;left:20px;top:35px;background:currentColor}
+.espeonEcho .ear,.umbreonEcho .ear{position:absolute;width:24px;height:62px;background:currentColor;clip-path:polygon(50% 0,100% 100%,0 82%);top:0}
+.espeonEcho .e1,.umbreonEcho .e1{left:18px;transform:rotate(-14deg)}.espeonEcho .e2,.umbreonEcho .e2{right:18px;transform:rotate(14deg)}
+.espeonEcho .tail{position:absolute;width:58px;height:12px;border-radius:999px;background:currentColor;left:57px;top:84px;transform:rotate(22deg)}
+.umbreonEcho .ring{position:absolute;border:4px solid #d8bf58;border-radius:50%;width:22px;height:22px;z-index:2}.umbreonEcho .r1{left:39px;top:49px}.umbreonEcho .r2{left:18px;top:81px}
+
+.heroContent{position:relative;z-index:3;display:flex;justify-content:space-between;gap:18px;padding:23px 24px 0;pointer-events:none}
+.heroGreeting{max-width:64%;text-shadow:0 2px 18px rgba(13,18,44,.22)}
+#collectionHero .heroGreeting .eyebrow{color:rgba(255,255,255,.82)!important}
+#collectionHero .heroGreeting h1{color:#fff!important;font-size:clamp(1.9rem,7vw,3.4rem)!important;margin:6px 0!important;line-height:.98!important}
+#collectionHero .heroGreeting p{color:rgba(255,255,255,.88)!important;font-size:.85rem!important}
+.heroStats{position:relative;z-index:4;color:#fff!important;text-shadow:0 2px 16px rgba(4,8,24,.34)}
+.heroStats b,.heroStats span{color:#fff!important}
+.heroToolsLink{
+  pointer-events:auto;margin-top:10px;border:1px solid rgba(255,255,255,.34);background:rgba(15,20,42,.18);color:#fff;
+  border-radius:999px;padding:7px 10px;font-size:.56rem;font-weight:900;backdrop-filter:blur(10px)
+}
+
+.skyControl{
+  position:absolute;z-index:7;left:12%;right:12%;bottom:32px;height:58px;
+  touch-action:none;cursor:ew-resize;outline:none
+}
+.skyTrack{position:absolute;left:0;right:0;top:26px;height:4px;border-radius:999px;background:rgba(255,255,255,.44);box-shadow:0 1px 10px rgba(6,13,35,.18)}
+.skyOrb{
+  position:absolute;left:var(--sky-x);top:2px;width:51px;height:51px;margin-left:-25.5px;border-radius:50%;
+  display:grid;place-items:center;background:linear-gradient(90deg,#e5e8ff 0 49%,#ffd879 51% 100%);
+  border:4px solid rgba(255,255,255,.86);box-shadow:0 7px 22px rgba(3,10,35,.20),0 0 23px rgba(255,223,141,.22);
+  transition:left 480ms cubic-bezier(.22,.8,.24,1),transform 240ms ease
+}
+.skyDragging .skyOrb{transition:none!important;transform:scale(1.06)}
+.orbSun,.orbMoon{position:absolute;font-size:19px;transition:opacity 220ms ease}
+.orbSun{opacity:var(--day-p)}.orbMoon{opacity:var(--night-p)}
+.skyModeLabel{position:absolute;bottom:-12px;font-size:.42rem;font-weight:900;color:rgba(255,255,255,.72);text-shadow:0 1px 9px rgba(4,8,20,.35)}
+.skyModeLabel.left{left:0}.skyModeLabel.mid{left:50%;transform:translateX(-50%)}.skyModeLabel.right{right:0}
+.heroProgress{position:absolute!important;z-index:6;left:24px;right:24px;bottom:12px;margin:0!important;height:6px!important;background:rgba(255,255,255,.22)!important}
+.heroProgress i{background:linear-gradient(90deg,#eee6ff,#ffd071)!important}
+
+.skyAnimating .skyLayer{transition:opacity 500ms ease}
+.skyDragging .skyLayer{transition:none!important}
+
+@keyframes heroCloud{from{translate:-10vw 0}to{translate:72vw 2px}}
+@keyframes birdFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes heroTwinkle{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:.92;transform:scale(1.15)}}
+@keyframes heroMeteor{0%,80%,100%{opacity:0;transform:translate(0,0) rotate(-24deg)}82%{opacity:.95}88%{opacity:0;transform:translate(-150px,78px) rotate(-24deg)}}
+
+/* Day/night position alters emphasis without replacing the continuous landscape. */
+#collectionHero[data-sky-theme="espeon"] .espeonEcho{opacity:.48}
+#collectionHero[data-sky-theme="espeon"] .umbreonEcho{opacity:.10}
+#collectionHero[data-sky-theme="umbreon"] .umbreonEcho{opacity:.55}
+#collectionHero[data-sky-theme="umbreon"] .espeonEcho{opacity:.08}
+#collectionHero[data-sky-theme="system"] .espeonEcho,
+#collectionHero[data-sky-theme="system"] .umbreonEcho{opacity:.22}
+
+/* Secondary surfaces still follow the selected app theme. */
+body[data-theme="espeon"] #collectionHero{border-color:rgba(124,101,170,.22)!important}
+body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!important}
+
+@media(max-width:700px){
+  #collectionHero.interactiveSkyHero{min-height:285px!important}
+  .heroContent{padding:20px 18px 0}
+  .heroGreeting{max-width:67%}
+  .heroStats b{font-size:1.35rem!important}
+  .skyControl{left:10%;right:10%;bottom:38px}
+  .heroProgress{left:18px;right:18px;bottom:14px}
+}
+@media(max-width:430px){
+  #collectionHero.interactiveSkyHero{min-height:300px!important}
+  #collectionHero .heroGreeting h1{font-size:1.78rem!important}
+  #collectionHero .heroGreeting p{font-size:.70rem!important}
+  .heroStats{max-width:95px}.heroStats b{font-size:1.18rem!important}
+  .espeonEcho,.umbreonEcho{transform:scale(.80);transform-origin:bottom}
+  .espeonEcho{left:5px}.umbreonEcho{right:0}
+  .skyControl{left:8%;right:8%}
+}
+@media(prefers-reduced-motion:reduce){
+  .sceneCloud,.sceneBird,.heroStar,.heroMeteor{animation:none!important}
+  .skyOrb,.skyLayer{transition:none!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -1561,20 +1716,62 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="themeSwitch celestialSwitch" id="celestialSwitch" aria-label="Appearance">
-    <div class="celestialTrack" aria-hidden="true">
-      <span class="celestialHorizon"></span>
-      <span class="celestialOrb"><span class="sunFace">☀</span><span class="moonFace">☾</span></span>
-    </div>
-    <button type="button" data-db-theme="umbreon" aria-label="Umbreon dark theme"><span>Umbreon</span></button>
-    <button type="button" data-db-theme="system" aria-label="System theme"><span>System</span></button>
-    <button type="button" data-db-theme="espeon" aria-label="Espeon light theme"><span>Espeon</span></button>
-  </div>
-  <div class="version">v0.10.5</div>
+  <div class="heroThemeHint" aria-hidden="true">Drag the sky</div>
+  <div class="version">v0.11.0</div>
 </div>
 
   <section id="homeScreen">
-    <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1 id="dashboardGreeting">Good evening!</h1><p>Your collection. Your journey. Keep collecting — great things take time. ✨</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
+    <div id="collectionHero" class="hero interactiveSkyHero" data-sky-theme="system" aria-label="Interactive collection sky">
+      <div class="skyScene" id="skyScene">
+        <div class="skyLayer dayLayer">
+          <span class="sunGlow"></span>
+          <span class="sceneCloud sceneCloud1"></span>
+          <span class="sceneCloud sceneCloud2"></span>
+          <span class="sceneCloud sceneCloud3"></span>
+          <span class="sceneBird sceneBird1">⌁</span>
+          <span class="sceneBird sceneBird2">⌁</span>
+        </div>
+        <div class="skyLayer twilightLayer"></div>
+        <div class="skyLayer nightLayer">
+          <span class="heroStar hs1">✦</span><span class="heroStar hs2">·</span><span class="heroStar hs3">✧</span>
+          <span class="heroStar hs4">·</span><span class="heroStar hs5">✦</span><span class="heroStar hs6">·</span>
+          <span class="heroStar hs7">·</span><span class="heroStar hs8">✧</span><span class="heroStar hs9">·</span>
+          <span class="heroMeteor heroMeteorA"></span><span class="heroMeteor heroMeteorB"></span>
+        </div>
+        <div class="mountainLayer mountainBack"></div>
+        <div class="mountainLayer mountainFront"></div>
+        <div class="treeLine"></div>
+        <div class="espeonEcho" aria-hidden="true"><span class="ear e1"></span><span class="ear e2"></span><span class="head"></span><span class="tail"></span></div>
+        <div class="umbreonEcho" aria-hidden="true"><span class="ear e1"></span><span class="ear e2"></span><span class="head"></span><span class="ring r1"></span><span class="ring r2"></span></div>
+      </div>
+
+      <div class="heroContent">
+        <div class="heroGreeting">
+          <div class="eyebrow">Your collection</div>
+          <h1 id="dashboardGreeting">Good morning!</h1>
+          <p>Ready to catch up on your collection?</p>
+          <button class="heroToolsLink" id="heroCollectorToolsBtn" type="button">Collection tools →</button>
+        </div>
+        <div class="stats heroStats">
+          <b id="globalOwned">0 / 702</b>
+          <span id="globalPct">0% collected</span>
+        </div>
+      </div>
+
+      <div class="skyControl" id="skyControl" role="slider" tabindex="0"
+        aria-label="Theme: drag from Umbreon night to Espeon day"
+        aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="System twilight">
+        <span class="skyTrack"></span>
+        <span class="skyModeLabel left">🌙 Umbreon</span>
+        <span class="skyModeLabel mid">Twilight</span>
+        <span class="skyModeLabel right">Espeon ☀️</span>
+        <span class="skyOrb" id="skyOrb" aria-hidden="true">
+          <span class="orbSun">☀</span><span class="orbMoon">☾</span>
+        </span>
+      </div>
+
+      <div class="progress heroProgress"><i id="globalProgress"></i></div>
+    </div>
     <section class="quickSection">
       <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
       <div class="quickActions">
@@ -5686,7 +5883,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.10.5',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
@@ -6140,6 +6337,7 @@ function applyDexBinderTheme(theme,{persist=true}={}){
  const next=allowed.has(theme)?theme:'system';
  document.body.dataset.theme=next;
  requestAnimationFrame(()=>refreshSurfaceContrast(document));
+ requestAnimationFrame(()=>syncInteractiveSkyToTheme(next));
  if(persist){try{localStorage.setItem(DB_THEME_KEY,next)}catch(e){}}
  $$('[data-db-theme]').forEach(b=>b.classList.toggle('on',b.dataset.dbTheme===next));
  const control=$('#celestialSwitch');
@@ -6148,46 +6346,85 @@ function applyDexBinderTheme(theme,{persist=true}={}){
    control.style.removeProperty('--drag-pct');
  }
 }
-function bindCelestialDrag(){
- const control=$('#celestialSwitch');if(!control)return;
- let dragging=false,startX=0,lastX=0;
- const pctForX=x=>{
-   const r=control.getBoundingClientRect();
-   return Math.max(9,Math.min(91,((x-r.left)/Math.max(1,r.width))*100));
- };
- const snapTheme=pct=>pct<34?'umbreon':pct>66?'espeon':'system';
 
- control.addEventListener('pointerdown',e=>{
-   dragging=true;startX=lastX=e.clientX;
-   control.classList.add('dragging');
-   control.setPointerCapture?.(e.pointerId);
-   control.style.setProperty('--drag-pct',pctForX(e.clientX)+'%');
-   e.preventDefault();
- });
- control.addEventListener('pointermove',e=>{
-   if(!dragging)return;
-   lastX=e.clientX;
-   control.style.setProperty('--drag-pct',pctForX(e.clientX)+'%');
-   e.preventDefault();
- });
- const end=e=>{
-   if(!dragging)return;
-   dragging=false;control.classList.remove('dragging');
-   const pct=pctForX(lastX);
-   applyDexBinderTheme(snapTheme(pct));
-   control.releasePointerCapture?.(e.pointerId);
-   e.preventDefault();
- };
- control.addEventListener('pointerup',end);
- control.addEventListener('pointercancel',end);
-}
 function bindDexBinderTheme(){
  applyDexBinderTheme(getDexBinderTheme(),{persist:false});
- $$('[data-db-theme]').forEach(b=>b.onclick=e=>{if(!$('#celestialSwitch')?.classList.contains('dragging'))applyDexBinderTheme(b.dataset.dbTheme)});
- bindCelestialDrag();
+ bindInteractiveSkyHero();
  const mq=window.matchMedia?.('(prefers-color-scheme: dark)');
  mq?.addEventListener?.('change',()=>{if(getDexBinderTheme()==='system')applyDexBinderTheme('system',{persist:false})});
 }
+
+let dbSkyDragging=false;
+let dbSkyValue=.5;
+const DB_SKY_THEME_POS={umbreon:0,system:.5,espeon:1};
+
+function skyThemeForValue(v){
+ return v<.25?'umbreon':v>.75?'espeon':'system';
+}
+function skyValueToAria(v){
+ const theme=skyThemeForValue(v);
+ return theme==='umbreon'?['0','Umbreon night']:theme==='espeon'?['2','Espeon day']:['1','System twilight'];
+}
+function setSkyVisualValue(v,{animate=false}={}){
+ const hero=$('#collectionHero'),control=$('#skyControl');if(!hero||!control)return;
+ v=Math.max(0,Math.min(1,v));dbSkyValue=v;
+ hero.style.setProperty('--sky-x',(v*100)+'%');
+ hero.style.setProperty('--night-p',String(1-v));
+ hero.style.setProperty('--day-p',String(v));
+ hero.style.setProperty('--twilight-p',String(1-Math.abs(v-.5)*2));
+ hero.classList.toggle('skyAnimating',!!animate);
+ const [now,text]=skyValueToAria(v);
+ control.setAttribute('aria-valuenow',now);control.setAttribute('aria-valuetext',text);
+}
+function syncInteractiveSkyToTheme(theme){
+ const v=DB_SKY_THEME_POS[theme]??.5;
+ if(!dbSkyDragging)setSkyVisualValue(v,{animate:true});
+ const hero=$('#collectionHero');if(hero)hero.dataset.skyTheme=theme;
+ setTimeout(()=>hero?.classList.remove('skyAnimating'),520);
+}
+function bindInteractiveSkyHero(){
+ const hero=$('#collectionHero'),control=$('#skyControl');if(!hero||!control)return;
+ syncInteractiveSkyToTheme(getDexBinderTheme());
+
+ const valueForX=x=>{
+   const r=control.getBoundingClientRect();
+   return Math.max(0,Math.min(1,(x-r.left)/Math.max(1,r.width)));
+ };
+ let pointerId=null;
+
+ control.addEventListener('pointerdown',e=>{
+   dbSkyDragging=true;pointerId=e.pointerId;
+   control.setPointerCapture?.(pointerId);
+   hero.classList.add('skyDragging');
+   setSkyVisualValue(valueForX(e.clientX));
+   e.preventDefault();
+ });
+ control.addEventListener('pointermove',e=>{
+   if(!dbSkyDragging||e.pointerId!==pointerId)return;
+   setSkyVisualValue(valueForX(e.clientX));
+   e.preventDefault();
+ });
+ const finish=e=>{
+   if(!dbSkyDragging)return;
+   dbSkyDragging=false;hero.classList.remove('skyDragging');
+   const theme=skyThemeForValue(dbSkyValue);
+   applyDexBinderTheme(theme);
+   control.releasePointerCapture?.(pointerId);
+   pointerId=null;e?.preventDefault?.();
+ };
+ control.addEventListener('pointerup',finish);
+ control.addEventListener('pointercancel',finish);
+
+ control.addEventListener('keydown',e=>{
+   if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+   const order=['umbreon','system','espeon'];let idx=order.indexOf(getDexBinderTheme());
+   if(e.key==='Home')idx=0;else if(e.key==='End')idx=2;else idx=Math.max(0,Math.min(2,idx+(e.key==='ArrowRight'?1:-1)));
+   applyDexBinderTheme(order[idx]);e.preventDefault();
+ });
+
+ $('#heroCollectorToolsBtn')?.addEventListener('click',e=>{e.stopPropagation();openCollectorTools()});
+}
+
 function renderDashboardGreeting(){
  const el=$('#dashboardGreeting');if(!el)return;
  const h=new Date().getHours();
