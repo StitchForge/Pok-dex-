@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.11.5 dashboard refinements */
+/* v0.11.6 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.11.5 — visual consistency pass
+   DexBinder v0.11.6 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Day & Night
+   DexBinder v0.11.6 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Day & Night polish
+   DexBinder v0.11.6 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Interactive Sky Hero
+   DexBinder v0.11.6 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Interactive Sky correction pass
+   DexBinder v0.11.6 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Theme correction + ambient page motion
+   DexBinder v0.11.6 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.11.5 — portrait hero polish
+   DexBinder v0.11.6 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2211,7 +2211,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Hero structural rebuild
+   DexBinder v0.11.6 — Hero structural rebuild
    ============================================================ */
 
 .heroThemeHint{display:none!important}
@@ -2449,7 +2449,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.11.5 — Clean-source hero rebuild
+   DexBinder v0.11.6 — Clean-source hero rebuild
    User-supplied transparent character renders + fixed portrait zones
    ============================================================ */
 
@@ -2709,6 +2709,205 @@ body[data-theme="umbreon"] .setGroup{
   #collectionHero .sceneCloud,#collectionHero .sceneBird,#collectionHero .heroStar,#collectionHero .heroMeteor{animation:none!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.6 — Hero + Umbreon contrast polish
+   ============================================================ */
+
+/* 1) Slightly reduce hero character dominance. */
+#collectionHero .heroEspeon{
+  height:42%!important;
+  left:18px!important;
+}
+#collectionHero .heroUmbreon{
+  height:44%!important;
+  right:18px!important;
+}
+@media(max-width:700px) and (orientation:portrait){
+  #collectionHero .heroEspeon{height:38%!important;left:7px!important}
+  #collectionHero .heroUmbreon{height:40%!important;right:7px!important}
+}
+@media(max-width:430px) and (orientation:portrait){
+  #collectionHero .heroEspeon{height:36%!important;left:4px!important}
+  #collectionHero .heroUmbreon{height:38%!important;right:4px!important}
+}
+
+/* 2) Remove the fence/cross-hatch tree line and soften the lower scenery. */
+#collectionHero .treeLine{display:none!important}
+#collectionHero .mountainFront{
+  height:25%!important;
+  opacity:.82!important;
+  clip-path:polygon(0 100%,0 72%,10% 63%,20% 76%,32% 54%,43% 73%,55% 58%,68% 76%,80% 59%,91% 72%,100% 64%,100% 100%)!important;
+  background:linear-gradient(90deg,rgba(70,61,104,.82),rgba(20,43,79,.88) 58%,rgba(10,28,53,.95))!important;
+}
+#collectionHero .mountainBack{
+  height:35%!important;
+  opacity:.58!important;
+  clip-path:polygon(0 100%,0 74%,12% 61%,24% 78%,37% 49%,49% 72%,60% 57%,72% 72%,84% 52%,94% 69%,100% 62%,100% 100%)!important
+}
+
+/* 3) Solid selected-state orb:
+      Espeon = gold sun, System = blended twilight, Umbreon = silver moon. */
+#collectionHero[data-sky-theme="espeon"] .skyOrb{
+  background:#ffd568!important;
+  border-color:rgba(255,248,218,.96)!important;
+  box-shadow:0 7px 22px rgba(5,9,28,.22),0 0 20px rgba(255,212,104,.30)!important
+}
+#collectionHero[data-sky-theme="espeon"] .orbSun{opacity:1!important}
+#collectionHero[data-sky-theme="espeon"] .orbMoon{opacity:0!important}
+
+#collectionHero[data-sky-theme="system"] .skyOrb{
+  background:linear-gradient(90deg,#ffd568 0 48%,#dfe4ff 52% 100%)!important
+}
+#collectionHero[data-sky-theme="system"] .orbSun{opacity:.55!important}
+#collectionHero[data-sky-theme="system"] .orbMoon{opacity:.55!important}
+
+#collectionHero[data-sky-theme="umbreon"] .skyOrb{
+  background:#dfe4ff!important;
+  border-color:rgba(245,247,255,.96)!important;
+  box-shadow:0 7px 22px rgba(5,9,28,.26),0 0 20px rgba(183,193,255,.26)!important
+}
+#collectionHero[data-sky-theme="umbreon"] .orbSun{opacity:0!important}
+#collectionHero[data-sky-theme="umbreon"] .orbMoon{opacity:1!important}
+
+/* Keep drag movement smooth. While dragging, allow blended state again. */
+#collectionHero.skyDragging .skyOrb{
+  background:linear-gradient(90deg,#ffd568 0 48%,#dfe4ff 52% 100%)!important
+}
+
+/* 4) Umbreon modal Close button contrast — always legible. */
+body[data-theme="umbreon"] .sheet .detailTop > .btn,
+body[data-theme="umbreon"] .sheet .close,
+body[data-theme="umbreon"] .sheet button.close,
+body[data-theme="umbreon"] .sheet #cardModalBack{
+  background:#252c3b!important;
+  color:#f7f8ff!important;
+  border-color:rgba(238,240,255,.16)!important;
+}
+body[data-theme="umbreon"] .sheet .detailTop > .btn *,
+body[data-theme="umbreon"] .sheet .close *,
+body[data-theme="umbreon"] .sheet #cardModalBack *{
+  color:#f7f8ff!important;
+}
+
+/* 5) Explicit light-surface tokens inside Umbreon sheets.
+      Stop relying on inherited theme text for cream/white cards. */
+body[data-theme="umbreon"] .sheet{
+  --light-card-bg:#fffdf8;
+  --light-card-text:#17203a;
+  --light-card-muted:#6f6a62;
+  --light-card-line:#ded7cc;
+}
+
+/* Known light cards / tiles */
+body[data-theme="umbreon"] .sheet .metricCard,
+body[data-theme="umbreon"] .sheet .goalCard,
+body[data-theme="umbreon"] .sheet .tradeStat,
+body[data-theme="umbreon"] .sheet .tradeHuntStat,
+body[data-theme="umbreon"] .sheet .tradeHuntTabs button:not(.on),
+body[data-theme="umbreon"] .sheet .dataSyncCard,
+body[data-theme="umbreon"] .sheet .searchResult,
+body[data-theme="umbreon"] .sheet .duplicateItem,
+body[data-theme="umbreon"] .sheet .wishRow,
+body[data-theme="umbreon"] .sheet .tradeItem,
+body[data-theme="umbreon"] .sheet .tradeHuntRow,
+body[data-theme="umbreon"] .sheet .scanStatus,
+body[data-theme="umbreon"] .sheet .scanCandidate,
+body[data-theme="umbreon"] .sheet .acqMetric,
+body[data-theme="umbreon"] .sheet .achievementMetric,
+body[data-theme="umbreon"] .sheet .collectorSummaryCard,
+body[data-theme="umbreon"] .sheet .collectorToolCard,
+body[data-theme="umbreon"] .sheet .toolCard,
+body[data-theme="umbreon"] .sheet .panel.white,
+body[data-theme="umbreon"] .sheet .lightSurface{
+  background:var(--light-card-bg)!important;
+  color:var(--light-card-text)!important;
+  border-color:var(--light-card-line)!important;
+}
+
+/* Strong typography override on known light cards */
+body[data-theme="umbreon"] .sheet .metricCard h1,
+body[data-theme="umbreon"] .sheet .metricCard h2,
+body[data-theme="umbreon"] .sheet .metricCard h3,
+body[data-theme="umbreon"] .sheet .metricCard b,
+body[data-theme="umbreon"] .sheet .metricCard strong,
+body[data-theme="umbreon"] .sheet .goalCard h1,
+body[data-theme="umbreon"] .sheet .goalCard h2,
+body[data-theme="umbreon"] .sheet .goalCard h3,
+body[data-theme="umbreon"] .sheet .goalCard b,
+body[data-theme="umbreon"] .sheet .goalCard strong,
+body[data-theme="umbreon"] .sheet .tradeStat b,
+body[data-theme="umbreon"] .sheet .tradeHuntStat b,
+body[data-theme="umbreon"] .sheet .dataSyncCard b,
+body[data-theme="umbreon"] .sheet .searchResult b,
+body[data-theme="umbreon"] .sheet .duplicateItem b,
+body[data-theme="umbreon"] .sheet .wishRow b,
+body[data-theme="umbreon"] .sheet .tradeItem b,
+body[data-theme="umbreon"] .sheet .tradeHuntRow b,
+body[data-theme="umbreon"] .sheet .scanCandidate b,
+body[data-theme="umbreon"] .sheet .acqMetric b,
+body[data-theme="umbreon"] .sheet .achievementMetric b,
+body[data-theme="umbreon"] .sheet .collectorSummaryCard b,
+body[data-theme="umbreon"] .sheet .collectorToolCard b,
+body[data-theme="umbreon"] .sheet .toolCard b{
+  color:var(--light-card-text)!important
+}
+
+/* Secondary text on light cards */
+body[data-theme="umbreon"] .sheet .metricCard small,
+body[data-theme="umbreon"] .sheet .goalCard small,
+body[data-theme="umbreon"] .sheet .tradeStat small,
+body[data-theme="umbreon"] .sheet .tradeHuntStat small,
+body[data-theme="umbreon"] .sheet .dataSyncCard p,
+body[data-theme="umbreon"] .sheet .searchResult small,
+body[data-theme="umbreon"] .sheet .duplicateItem small,
+body[data-theme="umbreon"] .sheet .wishRow small,
+body[data-theme="umbreon"] .sheet .tradeMeta,
+body[data-theme="umbreon"] .sheet .tradeHuntRow small,
+body[data-theme="umbreon"] .sheet .scanCandidate small,
+body[data-theme="umbreon"] .sheet .acqMetric small,
+body[data-theme="umbreon"] .sheet .achievementMetric small,
+body[data-theme="umbreon"] .sheet .collectorSummaryCard p,
+body[data-theme="umbreon"] .sheet .collectorToolCard p,
+body[data-theme="umbreon"] .sheet .toolCard p{
+  color:var(--light-card-muted)!important
+}
+
+/* Generic safety net for dynamically classified light surfaces. */
+body[data-theme="umbreon"] .sheet .lightSurface,
+body[data-theme="umbreon"] .sheet .lightSurface *{
+  color:var(--light-card-text)!important
+}
+body[data-theme="umbreon"] .sheet .lightSurface small,
+body[data-theme="umbreon"] .sheet .lightSurface p,
+body[data-theme="umbreon"] .sheet .lightSurface .muted{
+  color:var(--light-card-muted)!important
+}
+
+/* White/cream action buttons in Umbreon sheets should use dark text. */
+body[data-theme="umbreon"] .sheet .btn:not(.dark):not(.close),
+body[data-theme="umbreon"] .sheet .tradeHuntTabs button:not(.on){
+  background:var(--light-card-bg)!important;
+  color:var(--light-card-text)!important;
+  border-color:var(--light-card-line)!important
+}
+body[data-theme="umbreon"] .sheet .btn:not(.dark):not(.close) *,
+body[data-theme="umbreon"] .sheet .tradeHuntTabs button:not(.on) *{
+  color:var(--light-card-text)!important
+}
+
+/* Keep selected/dark buttons readable as light-on-dark. */
+body[data-theme="umbreon"] .sheet .btn.dark,
+body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on{
+  background:#171c28!important;
+  color:#f7f8ff!important;
+  border-color:rgba(238,240,255,.14)!important
+}
+body[data-theme="umbreon"] .sheet .btn.dark *,
+body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on *{
+  color:#f7f8ff!important
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -2734,7 +2933,7 @@ body[data-theme="umbreon"] .setGroup{
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.11.5</div>
+  <div class="version">v0.11.6</div>
 </div>
 
   <section id="homeScreen">
@@ -6899,7 +7098,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.11.5',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.6',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
