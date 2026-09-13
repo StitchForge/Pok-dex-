@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.11.0 dashboard refinements */
+/* v0.11.1 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.11.0 — visual consistency pass
+   DexBinder v0.11.1 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.11.0 — Day & Night
+   DexBinder v0.11.1 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.11.0 — Day & Night polish
+   DexBinder v0.11.1 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.11.0 — Interactive Sky Hero
+   DexBinder v0.11.1 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1691,6 +1691,220 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
   .skyOrb,.skyLayer{transition:none!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.1 — Interactive Sky correction pass
+   Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
+   ============================================================ */
+
+/* Restore full-page theme environments. */
+body{
+  min-height:100vh;
+  transition:background .45s ease,color .3s ease!important;
+}
+body[data-theme="espeon"]{
+  background:
+    radial-gradient(circle at 82% 8%,rgba(255,222,160,.28),transparent 24%),
+    radial-gradient(circle at 12% 28%,rgba(188,211,255,.26),transparent 30%),
+    linear-gradient(180deg,#f5f1fb 0%,#eef2fb 48%,#f7f3f8 100%)!important;
+}
+body[data-theme="umbreon"]{
+  background:
+    radial-gradient(circle at 78% 8%,rgba(109,91,174,.18),transparent 28%),
+    radial-gradient(circle at 12% 32%,rgba(39,61,111,.16),transparent 30%),
+    linear-gradient(180deg,#080b13 0%,#0d111b 47%,#111522 100%)!important;
+}
+body[data-theme="system"]{
+  background:
+    radial-gradient(circle at 78% 10%,rgba(220,158,177,.18),transparent 27%),
+    linear-gradient(180deg,#e4deed 0%,#e8e4ee 48%,#f1eef4 100%)!important;
+}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"]{
+    background:
+      radial-gradient(circle at 78% 10%,rgba(132,83,125,.15),transparent 27%),
+      linear-gradient(180deg,#12131d 0%,#17131d 48%,#161822 100%)!important;
+  }
+}
+
+/* Remove the old abstract character CSS entirely from view. */
+.espeonEcho,.umbreonEcho{display:none!important}
+
+/* Rebuild the hero closer to the approved illustrated concept. */
+#collectionHero.interactiveSkyHero{
+  --day-p:.5;
+  --night-p:.5;
+  --twilight-p:1;
+  min-height:260px!important;
+  background:#13213f!important;
+  border:1px solid rgba(121,113,175,.28)!important;
+  box-shadow:0 18px 46px rgba(27,31,58,.16)!important;
+}
+
+/* LEFT is warm day, RIGHT is dark night, always in one continuous scene. */
+.dayLayer{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 24% 63%,rgba(255,243,173,.98) 0 6%,rgba(255,215,143,.32) 7% 17%,transparent 28%),
+    linear-gradient(90deg,
+      rgba(246,184,199,.98) 0%,
+      rgba(249,205,172,.94) 30%,
+      rgba(183,190,234,.58) 49%,
+      rgba(34,64,118,0) 66%)!important;
+}
+.twilightLayer{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 50% 66%,rgba(239,168,151,.22),transparent 22%),
+    linear-gradient(90deg,
+      transparent 25%,
+      rgba(160,118,174,.28) 42%,
+      rgba(75,78,142,.32) 58%,
+      transparent 76%)!important;
+}
+.nightLayer{
+  opacity:1!important;
+  background:
+    radial-gradient(circle at 82% 22%,rgba(230,235,255,.98) 0 5%,rgba(130,146,222,.18) 6% 16%,transparent 27%),
+    linear-gradient(90deg,
+      rgba(15,31,70,0) 36%,
+      rgba(18,43,88,.66) 55%,
+      rgba(5,17,46,.98) 100%)!important;
+}
+
+/* Characters are now real artwork crops from the approved concept. */
+.heroPokemon{
+  position:absolute;z-index:2;bottom:0;
+  height:78%;width:auto;object-fit:contain;object-position:bottom;
+  pointer-events:none;user-select:none;
+  filter:drop-shadow(0 12px 20px rgba(5,8,24,.16));
+}
+.heroEspeon{
+  left:-9px;
+  opacity:calc(.48 + (1 - var(--night-p)) * .38);
+}
+.heroUmbreon{
+  right:-8px;
+  opacity:calc(.48 + var(--night-p) * .38);
+}
+
+/* Fade characters slightly toward twilight so the centre remains readable. */
+#collectionHero[data-sky-theme="system"] .heroPokemon{opacity:.52}
+
+/* Hero copy remains centered and readable above the scene. */
+.heroContent{
+  position:relative;z-index:5;
+  padding:22px 24px 0!important;
+}
+.heroGreeting{
+  max-width:58%!important;
+  margin-left:auto;margin-right:auto;
+  text-align:center;
+  text-shadow:0 2px 16px rgba(8,13,36,.30)
+}
+#collectionHero .heroGreeting .eyebrow{color:rgba(255,255,255,.88)!important}
+#collectionHero .heroGreeting h1{color:#fff!important}
+#collectionHero .heroGreeting p{color:rgba(255,255,255,.92)!important}
+.heroStats{
+  position:absolute!important;right:20px;top:20px!important;
+  text-align:right!important;z-index:7
+}
+.heroToolsLink{
+  margin-top:9px!important;
+  background:rgba(15,20,42,.24)!important;
+  border-color:rgba(255,255,255,.38)!important
+}
+
+/* Slider is a simple straight horizon; end symbols match each side. */
+.skyControl{
+  left:16%!important;right:16%!important;bottom:35px!important;
+  height:62px!important
+}
+.skyTrack{
+  top:28px!important;height:4px!important;
+  background:rgba(255,255,255,.58)!important;
+  box-shadow:0 1px 10px rgba(4,10,30,.22)!important
+}
+.skyTrack:before{
+  content:"☀️";
+  position:absolute;left:-34px;top:-14px;
+  font-size:21px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.16))
+}
+.skyTrack:after{
+  content:"🌙";
+  position:absolute;right:-34px;top:-14px;
+  font-size:21px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.20))
+}
+.skyModeLabel{display:none!important}
+
+/* The handle becomes sun on the left, moon on the right, half/half at twilight. */
+.skyOrb{
+  background:
+    linear-gradient(90deg,
+      #f8d476 0%,
+      #f8d476 calc((1 - var(--night-p)) * 100%),
+      #dde2ff calc((1 - var(--night-p)) * 100%),
+      #dde2ff 100%)!important;
+}
+.orbSun{opacity:calc(1 - var(--night-p))!important}
+.orbMoon{opacity:var(--night-p)!important}
+
+/* Day motion stays on the left side only. */
+.sceneCloud1,.sceneCloud2{animation:heroCloud 30s linear infinite!important}
+.sceneCloud3{opacity:.35!important}
+.sceneBird{opacity:.50!important}
+
+/* Night animation stays on the right. */
+.heroStar{opacity:.82!important}
+.heroMeteorA,.heroMeteorB{display:block!important}
+
+/* Keep scenery behind the character artwork. */
+.mountainLayer,.treeLine{z-index:1!important}
+
+/* Fix page text contrast after restoring backgrounds. */
+body[data-theme="espeon"] .activeHead h2,
+body[data-theme="espeon"] .activeHead p,
+body[data-theme="espeon"] .dashboardAchievementHead h2,
+body[data-theme="espeon"] .dashboardAchievementHead p{
+  color:#17203a!important
+}
+body[data-theme="umbreon"] .activeHead h2,
+body[data-theme="umbreon"] .dashboardAchievementHead h2{
+  color:#f5f6fb!important
+}
+body[data-theme="umbreon"] .activeHead p,
+body[data-theme="umbreon"] .dashboardAchievementHead p{
+  color:#abb1c4!important
+}
+
+/* Header sits naturally over each page environment. */
+body[data-theme="espeon"] .top{
+  background:rgba(247,244,251,.90)!important
+}
+body[data-theme="umbreon"] .top{
+  background:rgba(9,12,20,.90)!important
+}
+
+/* On mobile, preserve the characters while keeping text/slider usable. */
+@media(max-width:700px){
+  #collectionHero.interactiveSkyHero{min-height:280px!important}
+  .heroPokemon{height:67%}
+  .heroEspeon{left:-28px}
+  .heroUmbreon{right:-30px}
+  .heroGreeting{max-width:64%!important}
+  .skyControl{left:19%!important;right:19%!important}
+}
+@media(max-width:430px){
+  #collectionHero.interactiveSkyHero{min-height:294px!important}
+  .heroPokemon{height:60%}
+  .heroGreeting{max-width:68%!important}
+  #collectionHero .heroGreeting h1{font-size:1.65rem!important}
+  .heroStats{right:14px!important;top:16px!important}
+  .heroStats b{font-size:1.05rem!important}
+  .skyControl{left:21%!important;right:21%!important;bottom:38px!important}
+  .skyTrack:before{left:-30px}.skyTrack:after{right:-30px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -1717,7 +1931,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
   <div class="heroThemeHint" aria-hidden="true">Drag the sky</div>
-  <div class="version">v0.11.0</div>
+  <div class="version">v0.11.1</div>
 </div>
 
   <section id="homeScreen">
@@ -1741,8 +1955,8 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
         <div class="mountainLayer mountainBack"></div>
         <div class="mountainLayer mountainFront"></div>
         <div class="treeLine"></div>
-        <div class="espeonEcho" aria-hidden="true"><span class="ear e1"></span><span class="ear e2"></span><span class="head"></span><span class="tail"></span></div>
-        <div class="umbreonEcho" aria-hidden="true"><span class="ear e1"></span><span class="ear e2"></span><span class="head"></span><span class="ring r1"></span><span class="ring r2"></span></div>
+        <img class="heroPokemon heroEspeon" src="./assets/hero-espeon.png" alt="" aria-hidden="true">
+        <img class="heroPokemon heroUmbreon" src="./assets/hero-umbreon.png" alt="" aria-hidden="true">
       </div>
 
       <div class="heroContent">
@@ -1759,12 +1973,12 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
       </div>
 
       <div class="skyControl" id="skyControl" role="slider" tabindex="0"
-        aria-label="Theme: drag from Umbreon night to Espeon day"
+        aria-label="Theme: drag from Espeon day to Umbreon night"
         aria-valuemin="0" aria-valuemax="2" aria-valuenow="1" aria-valuetext="System twilight">
         <span class="skyTrack"></span>
-        <span class="skyModeLabel left">🌙 Umbreon</span>
+        <span class="skyModeLabel left">☀️ Espeon</span>
         <span class="skyModeLabel mid">Twilight</span>
-        <span class="skyModeLabel right">Espeon ☀️</span>
+        <span class="skyModeLabel right">Umbreon 🌙</span>
         <span class="skyOrb" id="skyOrb" aria-hidden="true">
           <span class="orbSun">☀</span><span class="orbMoon">☾</span>
         </span>
@@ -5883,7 +6097,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.11.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
@@ -6356,14 +6570,14 @@ function bindDexBinderTheme(){
 
 let dbSkyDragging=false;
 let dbSkyValue=.5;
-const DB_SKY_THEME_POS={umbreon:0,system:.5,espeon:1};
+const DB_SKY_THEME_POS={espeon:0,system:.5,umbreon:1};
 
 function skyThemeForValue(v){
- return v<.25?'umbreon':v>.75?'espeon':'system';
+ return v<.25?'espeon':v>.75?'umbreon':'system';
 }
 function skyValueToAria(v){
  const theme=skyThemeForValue(v);
- return theme==='umbreon'?['0','Umbreon night']:theme==='espeon'?['2','Espeon day']:['1','System twilight'];
+ return theme==='espeon'?['0','Espeon day']:theme==='umbreon'?['2','Umbreon night']:['1','System twilight'];
 }
 function setSkyVisualValue(v,{animate=false}={}){
  const hero=$('#collectionHero'),control=$('#skyControl');if(!hero||!control)return;
@@ -6417,7 +6631,7 @@ function bindInteractiveSkyHero(){
 
  control.addEventListener('keydown',e=>{
    if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
-   const order=['umbreon','system','espeon'];let idx=order.indexOf(getDexBinderTheme());
+   const order=['espeon','system','umbreon'];let idx=order.indexOf(getDexBinderTheme());
    if(e.key==='Home')idx=0;else if(e.key==='End')idx=2;else idx=Math.max(0,Math.min(2,idx+(e.key==='ArrowRight'?1:-1)));
    applyDexBinderTheme(order[idx]);e.preventDefault();
  });
