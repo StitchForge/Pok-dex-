@@ -88,7 +88,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6B</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6B.1</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -784,10 +784,8 @@ function openPagePicker(){
     return `<button class="pagePick ${p===page?'active':''}" data-p="${p}">${p}${range}</button>`;
   }).join('');
   $$('.pagePick').forEach(b=>b.onclick=()=>{
-    page=+b.dataset.p;
     $('#pagePickerModal').classList.remove('open');
-    renderSet();
-    window.scrollTo({top:0,behavior:'smooth'});
+    preserveBinderViewport(()=>{page=+b.dataset.p});
   });
   $('#pagePickerModal').classList.add('open');
 }
@@ -868,7 +866,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6B',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6B.1',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -891,11 +889,11 @@ window.addEventListener('resize',()=>{
   configurePageSizeOptions();
   if(old==='16' && !window.matchMedia('(min-width: 760px)').matches){$('#pageSize').value='12';page=1;renderSet()}
 });
-$('#prev').onclick=()=>{if(page>1){page--;renderSet();scrollTo({top:0,behavior:'smooth'})}};
-$('#next').onclick=()=>{const max=+$('#pageScrubber').max||1;if(page<max){page++;renderSet();scrollTo({top:0,behavior:'smooth'})}};
+$('#prev').onclick=()=>{if(page>1)preserveBinderViewport(()=>page--)};
+$('#next').onclick=()=>{const max=+$('#pageScrubber').max||1;if(page<max)preserveBinderViewport(()=>page++)};
 $('#pageJump').onclick=openPagePicker;
 $('#pageScrubber').oninput=()=>{$('#pageJump').textContent=`Page ${$('#pageScrubber').value} / ${$('#pageScrubber').max}`};
-$('#pageScrubber').onchange=()=>{page=+$('#pageScrubber').value;renderSet();scrollTo({top:0,behavior:'smooth'})};
+$('#pageScrubber').onchange=()=>preserveBinderViewport(()=>{page=+$('#pageScrubber').value});
 $$('#chips [data-mode]').forEach(b=>b.onclick=()=>{rememberAllScroll();binderMode=b.dataset.mode;$$('#chips [data-mode]').forEach(x=>x.classList.toggle('active',x===b));page=1;renderSet()});
 $('#bulkBtn').onclick=async()=>{
  if(currentSet!=='sv03.5'&&!variantReadyBySet[currentSet]){
@@ -1025,6 +1023,21 @@ function renderLibrary(){
 }
 
 
+
+function preserveBinderViewport(changePage){
+  const anchor=$('#content');
+  const before=anchor?anchor.getBoundingClientRect().top:null;
+  changePage();
+  renderSet();
+  if(before==null)return;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const after=$('#content')?.getBoundingClientRect().top;
+    if(after==null)return;
+    const delta=after-before;
+    if(Math.abs(delta)>1)window.scrollBy({top:delta,left:0,behavior:'auto'});
+  }));
+}
+
 function bindSwipeNavigation(){
   const area=$('#content'); if(!area)return;
   area.addEventListener('touchstart',e=>{
@@ -1038,8 +1051,8 @@ function bindSwipeNavigation(){
     const dx=t.clientX-touchStartX,dy=t.clientY-touchStartY,dt=Date.now()-touchStartTime;
     if(dt>700 || Math.abs(dx)<60 || Math.abs(dx)<Math.abs(dy)*1.25)return;
     const total=+$('#pageScrubber').max||1;
-    if(dx<0 && page<total){page++;renderSet();window.scrollTo({top:0,behavior:'smooth'})}
-    else if(dx>0 && page>1){page--;renderSet();window.scrollTo({top:0,behavior:'smooth'})}
+    if(dx<0 && page<total){preserveBinderViewport(()=>page++)}
+    else if(dx>0 && page>1){preserveBinderViewport(()=>page--)}
   },{passive:true});
 }
 
