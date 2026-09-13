@@ -94,14 +94,12 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .syncBadge{font-size:.6rem;font-weight:850;color:var(--muted)}
 
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-initCloud();
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6C.1</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -317,8 +315,9 @@ const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const key=(sid,cid,variant='base')=>`${sid}|${cid}|${variant}`;
 function saveActiveSets(){
   try{localStorage.setItem('dexbinder_v05_active_sets',JSON.stringify([...activeSetIds]))}catch(e){console.warn('Active sets save failed',e)}
+  if(typeof setCloudDirty==='function')setCloudDirty();
 }
-const save=()=>{try{localStorage.setItem('dexbinder_v04_owned',JSON.stringify([...owned]));}catch(e){console.warn('DexBinder storage save failed',e)}renderStats()};
+const save=()=>{try{localStorage.setItem('dexbinder_v04_owned',JSON.stringify([...owned]));}catch(e){console.warn('DexBinder storage save failed',e)}renderStats();if(typeof setCloudDirty==='function')setCloudDirty()};
 
 
 
@@ -424,6 +423,33 @@ async function cloudSignOut(){
   if(!cloudClient)return;
   await cloudClient.auth.signOut();cloudUser=null;updateCloudUI();toast('Signed out · local collection kept');
 }
+
+function bindCloudControls(){
+  const cloudBtn=$('#cloudBtn');
+  if(cloudBtn && !cloudBtn.dataset.bound){
+    cloudBtn.dataset.bound='1';
+    cloudBtn.addEventListener('click',()=>{
+      updateCloudUI();
+      $('#cloudModal')?.classList.add('open');
+    });
+  }
+  const signIn=$('#cloudSignIn');
+  if(signIn && !signIn.dataset.bound){
+    signIn.dataset.bound='1';
+    signIn.addEventListener('click',cloudSignIn);
+  }
+  const signOut=$('#cloudSignOut');
+  if(signOut && !signOut.dataset.bound){
+    signOut.dataset.bound='1';
+    signOut.addEventListener('click',cloudSignOut);
+  }
+  const syncNow=$('#cloudSyncNow');
+  if(syncNow && !syncNow.dataset.bound){
+    syncNow.dataset.bound='1';
+    syncNow.addEventListener('click',async()=>{if(await pushCloud())toast('Cloud sync complete')});
+  }
+}
+
 
 function applyPwaMode(){
   const standalone=window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true;
@@ -665,11 +691,6 @@ async function openSet(sid,target='binder'){
  setNav();
 }
 function setNav(){
-$('#cloudBtn').onclick=()=>{updateCloudUI();$('#cloudModal').classList.add('open')};
-$('#cloudSignIn').onclick=cloudSignIn;
-$('#cloudSignOut').onclick=cloudSignOut;
-$('#cloudSyncNow').onclick=async()=>{if(await pushCloud())toast('Cloud sync complete')};
-
 $$('#bottomNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
 function goHome(){rememberAllScroll();currentSet=null;$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#libraryScreen').classList.add('hidden');$('#homeScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');view='home';setNav();renderStats()}
 function renderSet(){
@@ -1017,7 +1038,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.6C',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6C.1',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -1291,6 +1312,8 @@ function initDexBinder(){
   // Stage 4: resolve supported set IDs in the background.
   resolveSupportedLibrary().then(()=>{renderSetCards();renderStats()}).catch(e=>console.warn('Set library preload skipped',e));
   try{bindSwipeNavigation()}catch(e){console.warn('Swipe navigation unavailable',e)}
+  try{bindCloudControls()}catch(e){console.warn('Cloud controls unavailable',e)}
+  initCloud().catch(e=>console.warn('Cloud initialization unavailable',e));
 
 }
 if(document.readyState==='loading'){
