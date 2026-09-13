@@ -561,6 +561,28 @@ html{-webkit-text-size-adjust:100%}
 .cardContextActions{display:flex;justify-content:flex-end;margin:-2px 0 10px}
 .cardContextActions.hidden{display:none}
 
+
+/* v0.9.3 Acquisition History */
+.acqSummary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:10px 0}
+.acqMetric{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px}
+.acqMetric b{display:block;font-size:.82rem}.acqMetric small{display:block;color:var(--muted);font-size:.5rem;margin-top:2px;line-height:1.3}
+.acqToolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:9px 0}
+.acqTimeline{display:grid;gap:8px;margin-top:10px}
+.acqMonth{display:grid;gap:7px}
+.acqMonthHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 2px}
+.acqMonthHead b{font-size:.7rem}.acqMonthHead small{font-size:.5rem;color:var(--muted)}
+.acqRow{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px}
+.acqRow img{width:52px;aspect-ratio:245/337;object-fit:cover;border-radius:7px;background:#eee}
+.acqRow b{display:block;font-size:.65rem}.acqRow small{display:block;font-size:.5rem;color:var(--muted);line-height:1.4}
+.acqBadge{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:.46rem;font-weight:900;margin-top:4px;background:#f7f3ec}
+.acqValue{text-align:right}.acqValue b{font-size:.62rem}.acqValue small{font-size:.47rem}
+@media(max-width:430px){
+ .acqSummary{grid-template-columns:1fr 1fr}
+ .acqToolbar{grid-template-columns:1fr}
+ .acqRow{grid-template-columns:46px minmax(0,1fr)}
+ .acqRow img{width:46px}.acqValue{grid-column:1/-1;text-align:left}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -568,7 +590,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2c</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.3</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -956,12 +978,27 @@ html{-webkit-text-size-adjust:100%}
       </div>
 
       <div class="collectorField">
-        <label>Purchase price / card</label>
+        <label>Acquired via</label>
+        <select class="collectorSelect" id="fastAddAcqType">
+          <option value="">Not recorded</option>
+          <option value="purchase">Purchase</option>
+          <option value="trade">Trade</option>
+          <option value="gift">Gift</option>
+          <option value="pull">Pulled</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="collectorField">
+        <label>Acquisition date</label>
+        <input class="collectorInput" id="fastAddDate" type="date">
+      </div>
+      <div class="collectorField">
+        <label>Price / card</label>
         <input class="collectorInput" id="fastAddPrice" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00">
       </div>
       <div class="collectorField">
-        <label>Purchase date</label>
-        <input class="collectorInput" id="fastAddDate" type="date">
+        <label>From / where</label>
+        <input class="collectorInput" id="fastAddAcqFrom" type="text" placeholder="Shop, seller, friend, event…">
       </div>
       <div class="collectorField full">
         <label>Notes</label>
@@ -998,11 +1035,41 @@ html{-webkit-text-size-adjust:100%}
     <button class="collectorHubCard" id="globalSearchBtn"><b>Global Card Search</b><small>Search across all active sets.</small></button>
     <button class="collectorHubCard" id="duplicatesBtn"><b>Duplicates</b><small>Find extra copies and move them into your trade binder.</small></button>
     <button class="collectorHubCard" id="collectionValueBtn"><b>Collection Value</b><small>Estimated collection, duplicate and trade reference values.</small></button>
+    <button class="collectorHubCard" id="acquisitionHistoryBtn"><b>Acquisition History</b><small>See when and how your collection grew.</small></button>
     <button class="collectorHubCard" id="csvExportBtn"><b>Export CSV</b><small>Download a human-readable collection spreadsheet.</small></button>
   </div>
 
   <div class="dataHealthBox" id="dataHealthBox">Checking collector data…</div>
   <div class="csvNote">Master-set completion counts collectible positions. Physical card count includes duplicate copies and mixed conditions/grades, so these numbers are intentionally different.</div>
+</div></div>
+
+
+<div class="modal" id="acquisitionHistoryModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Acquisition History</h2><p>Your collection timeline, built from collector copy groups.</p></div><button class="btn small close">Close</button></div>
+  <div class="acqSummary">
+    <div class="acqMetric"><b id="acqTotalCards">0</b><small>Cards with acquisition records</small></div>
+    <div class="acqMetric"><b id="acqThisMonth">0</b><small>Cards acquired this month</small></div>
+    <div class="acqMetric"><b id="acqRecordedSpend">$0.00</b><small>Recorded acquisition spend</small></div>
+  </div>
+  <div class="acqToolbar">
+    <select class="select" id="acqTypeFilter">
+      <option value="all">All acquisition types</option>
+      <option value="purchase">Purchased</option>
+      <option value="trade">Trade</option>
+      <option value="gift">Gift</option>
+      <option value="pull">Pulled</option>
+      <option value="other">Other</option>
+      <option value="unknown">Not recorded</option>
+    </select>
+    <select class="select" id="acqSort">
+      <option value="newest">Newest first</option>
+      <option value="oldest">Oldest first</option>
+      <option value="spend-desc">Highest spend</option>
+    </select>
+  </div>
+  <div class="tradeSourceNote">Older cards may have incomplete acquisition details. Add or edit them from the card's Collector copies section.</div>
+  <div class="acqTimeline" id="acqTimeline"></div>
 </div></div>
 
 <div class="modal" id="globalSearchModal"><div class="sheet">
@@ -2203,6 +2270,8 @@ function normaliseCollectorLot(lot,index=0){
     certNumber:lot?.certNumber||'',
     purchasePrice:lot?.purchasePrice??'',
     purchaseDate:lot?.purchaseDate||'',
+    acquisitionType:lot?.acquisitionType||'',
+    acquisitionFrom:lot?.acquisitionFrom||'',
     notes:lot?.notes||'',
     tradeAddedAt:tradeQuantity>0?(lot?.tradeAddedAt||new Date().toISOString()):''
   };
@@ -2221,6 +2290,8 @@ function legacyMetaToLots(raw){
     certNumber:raw.certNumber||'',
     purchasePrice:raw.purchasePrice??'',
     purchaseDate:raw.purchaseDate||'',
+    acquisitionType:raw.acquisitionType||'',
+    acquisitionFrom:raw.acquisitionFrom||'',
     notes:raw.notes||'',
     tradeAddedAt:raw.tradeAddedAt||''
   })];
@@ -2666,7 +2737,7 @@ function completeTrade(){
     const k=key(r.sid,r.c.id,r.v.id),wasOwned=owned.has(k);
     owned.add(k);
     const lots=wasOwned?getCollectorLots(r.sid,r.c.id,r.v.id):[];
-    lots.push(normaliseCollectorLot({quantity:r.selectedQty,tradeQuantity:0,type:'raw',language:'English',notes:'Received via trade'}));
+    lots.push(normaliseCollectorLot({quantity:r.selectedQty,tradeQuantity:0,type:'raw',language:'English',purchaseDate:new Date().toISOString().slice(0,10),acquisitionType:'trade',acquisitionFrom:'Trade',notes:'Received via trade'}));
     setCollectorLots(r.sid,r.c.id,r.v.id,lots);
   }
   tradeHistory.unshift({
@@ -3220,6 +3291,8 @@ function quickAddCollectorCopy(c,v,forTrade=false){
     certNumber:'',
     purchasePrice:'',
     purchaseDate:new Date().toISOString().slice(0,10),
+    acquisitionType:'other',
+    acquisitionFrom:'DexBinder quick add',
     notes:forTrade?'Added directly to trade list':'Added via +1 copy'
   });
   owned.add(key(currentSet,c.id,v.id));
@@ -3245,6 +3318,8 @@ function resetFastAddDraft(){
   $('#fastAddCert').value='';
   $('#fastAddPrice').value='';
   $('#fastAddDate').value='';
+  $('#fastAddAcqType').value='';
+  $('#fastAddAcqFrom').value='';
   $('#fastAddNotes').value='';
 }
 function renderFastAddResults(){
@@ -3317,6 +3392,8 @@ function fastAddSave(next=false){
     certNumber:fastAddDraft.type==='graded'?$('#fastAddCert').value.trim():'',
     purchasePrice:$('#fastAddPrice').value,
     purchaseDate:$('#fastAddDate').value,
+    acquisitionType:$('#fastAddAcqType').value,
+    acquisitionFrom:$('#fastAddAcqFrom').value.trim(),
     notes:$('#fastAddNotes').value.trim()
   });
   owned.add(k);
@@ -3446,6 +3523,89 @@ function localCollectorStats(){
     return n>=(SETS[sid]?.masterTotal||Infinity);
   }).length;
   return {masterOwned,masterTotal,physical,duplicates,tradeQty,completedSets};
+}
+
+
+function acquisitionTypeLabel(type){
+ return ({purchase:'Purchased',trade:'Trade',gift:'Gift',pull:'Pulled',other:'Other','':'Not recorded'})[type||'']||'Other';
+}
+function acquisitionRows(){
+ const rows=[];
+ for(const [metaK,raw] of Object.entries(collectorMeta)){
+   const parts=metaK.split('|');
+   if(parts.length<3)continue;
+   const [sid,cid,...rest]=parts,variantId=rest.join('|');
+   const c=(cardsBySet[sid]||[]).find(x=>x.id===cid);
+   if(!c)continue;
+   const v=variantsFor(sid,c).find(x=>x.id===variantId)||{id:variantId,label:variantId};
+   for(const lot of legacyMetaToLots(raw)){
+     const hasRecord=!!(lot.purchaseDate||lot.purchasePrice||lot.acquisitionType||lot.acquisitionFrom);
+     if(!hasRecord)continue;
+     const spend=Number(lot.purchasePrice);
+     rows.push({
+       sid,c,v,lot,
+       setName:SETS[sid]?.name||sid,
+       date:lot.purchaseDate||'',
+       type:lot.acquisitionType||'',
+       source:lot.acquisitionFrom||'',
+       qty:lot.quantity,
+       spend:Number.isFinite(spend)?spend*lot.quantity:0
+     });
+   }
+ }
+ return rows;
+}
+function renderAcquisitionHistory(){
+ let rows=acquisitionRows();
+ const type=$('#acqTypeFilter').value||'all';
+ const sort=$('#acqSort').value||'newest';
+ if(type!=='all')rows=rows.filter(r=>(r.type||'unknown')===type);
+ rows.sort((a,b)=>{
+   if(sort==='oldest')return (a.date||'9999').localeCompare(b.date||'9999');
+   if(sort==='spend-desc')return b.spend-a.spend || (b.date||'').localeCompare(a.date||'');
+   return (b.date||'').localeCompare(a.date||'');
+ });
+ const all=acquisitionRows();
+ const today=new Date(),monthKey=today.toISOString().slice(0,7);
+ const totalCards=all.reduce((s,r)=>s+r.qty,0);
+ const thisMonth=all.filter(r=>(r.date||'').startsWith(monthKey)).reduce((s,r)=>s+r.qty,0);
+ const spend=all.reduce((s,r)=>s+r.spend,0);
+ $('#acqTotalCards').textContent=totalCards;
+ $('#acqThisMonth').textContent=thisMonth;
+ $('#acqRecordedSpend').textContent=formatTradeMoney(spend);
+
+ if(!rows.length){
+   $('#acqTimeline').innerHTML='<div class="tradeEmpty">No acquisition records match this view yet. Add an acquisition date or source from a card’s Collector copies.</div>';
+   return;
+ }
+ const groups=new Map();
+ for(const r of rows){
+   const k=r.date?r.date.slice(0,7):'unknown';
+   if(!groups.has(k))groups.set(k,[]);
+   groups.get(k).push(r);
+ }
+ const monthLabel=k=>{
+   if(k==='unknown')return 'Date not recorded';
+   const d=new Date(`${k}-01T12:00:00`);
+   return d.toLocaleDateString(undefined,{month:'long',year:'numeric'});
+ };
+ $('#acqTimeline').innerHTML=[...groups.entries()].map(([month,items])=>{
+   const qty=items.reduce((s,r)=>s+r.qty,0),value=items.reduce((s,r)=>s+r.spend,0);
+   return `<section class="acqMonth">
+     <div class="acqMonthHead"><b>${monthLabel(month)}</b><small>${qty} card${qty===1?'':'s'}${value?` · ${formatTradeMoney(value)} recorded`:''}</small></div>
+     ${items.map(r=>`<div class="acqRow">
+       <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)">
+       <div><b>${r.qty}× ${r.c.name} · ${r.v.label}</b><small>${r.setName} · #${r.c.localId}${r.date?` · ${r.date}`:''}${r.source?`<br>From: ${escapeHtml(r.source)}`:''}</small><span class="acqBadge">${acquisitionTypeLabel(r.type)}</span></div>
+       <div class="acqValue"><b>${r.spend?formatTradeMoney(r.spend):'—'}</b><small>${r.lot.type==='graded'?`${escapeHtml(r.lot.gradingCompany)} ${escapeHtml(r.lot.grade||'')}`:(r.lot.condition||'Raw')}</small></div>
+     </div>`).join('')}
+   </section>`;
+ }).join('');
+}
+async function openAcquisitionHistory(){
+ $('#acquisitionHistoryModal').classList.add('open');
+ $('#acqTimeline').innerHTML='<div class="tradeEmpty">Loading acquisition history…</div>';
+ await ensureAllActiveSetsLoaded().catch(()=>{});
+ renderAcquisitionHistory();
 }
 
 function renderCollectorTools(){
@@ -3579,7 +3739,7 @@ function csvEscape(v){
 }
 function exportCollectionCSV(){
   const rows=collectorOwnedRows();
-  const headers=['Set','Card','Number','Variant','Group Type','Owned Quantity','Trade Quantity','Condition','Language','Grading Company','Grade','Certification Number','Purchase Price / Card','Purchase Date','Notes','Reference Price','Estimated Group Value'];
+  const headers=['Set','Card','Number','Variant','Group Type','Owned Quantity','Trade Quantity','Condition','Language','Grading Company','Grade','Certification Number','Acquired Via','Acquired From','Price / Card','Acquisition Date','Notes','Reference Price','Estimated Group Value'];
   const lines=[headers.map(csvEscape).join(',')];
   for(const r of rows){
     for(const l of r.lots){
@@ -3587,7 +3747,7 @@ function exportCollectionCSV(){
         r.setName,r.c.name,r.c.localId,r.v.label,l.type,l.quantity,l.tradeQuantity,
         l.type==='graded'?'':(l.condition||''),l.language||'',
         l.type==='graded'?(l.gradingCompany||''):'',l.type==='graded'?(l.grade||''):'',l.type==='graded'?(l.certNumber||''):'',
-        l.purchasePrice||'',l.purchaseDate||'',l.notes||'',
+        l.acquisitionType||'',l.acquisitionFrom||'',l.purchasePrice||'',l.purchaseDate||'',l.notes||'',
         r.unitValue==null?'':r.unitValue.toFixed(2),
         r.unitValue==null?'':(r.unitValue*l.quantity).toFixed(2)
       ].map(csvEscape).join(','));
@@ -3681,12 +3841,23 @@ function collectorLotHTML(c,v,l,i){
         </div>
       </div>
       <div class="collectorField">
-        <label>Purchase price / card</label>
+        <label>Acquired via</label>
+        <select class="collectorSelect" id="${base}-acqtype">
+          <option value="" ${!l.acquisitionType?'selected':''}>Not recorded</option>
+          ${[['purchase','Purchase'],['trade','Trade'],['gift','Gift'],['pull','Pulled'],['other','Other']].map(([x,label])=>`<option value="${x}" ${l.acquisitionType===x?'selected':''}>${label}</option>`).join('')}
+        </select>
+      </div>
+      <div class="collectorField">
+        <label>Acquisition date</label>
+        <input class="collectorInput" id="${base}-date" type="date" value="${escapeHtml(l.purchaseDate)}">
+      </div>
+      <div class="collectorField">
+        <label>Price / card</label>
         <input class="collectorInput" id="${base}-price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="${escapeHtml(l.purchasePrice)}">
       </div>
       <div class="collectorField">
-        <label>Purchase date</label>
-        <input class="collectorInput" id="${base}-date" type="date" value="${escapeHtml(l.purchaseDate)}">
+        <label>From / where</label>
+        <input class="collectorInput" id="${base}-acqfrom" type="text" placeholder="Shop, seller, friend, event…" value="${escapeHtml(l.acquisitionFrom||'')}">
       </div>
       <div class="collectorField full">
         <label>Notes</label>
@@ -3723,7 +3894,7 @@ function bindCollectorPanel(c,v){
   const collectDOM=()=>{
     for(const l of lots){
       const base=baseFor(l);
-      const cond=$(`#${base}-condition`),lang=$(`#${base}-language`),company=$(`#${base}-company`),grade=$(`#${base}-grade`),cert=$(`#${base}-cert`),price=$(`#${base}-price`),date=$(`#${base}-date`),notes=$(`#${base}-notes`);
+      const cond=$(`#${base}-condition`),lang=$(`#${base}-language`),company=$(`#${base}-company`),grade=$(`#${base}-grade`),cert=$(`#${base}-cert`),price=$(`#${base}-price`),date=$(`#${base}-date`),acqtype=$(`#${base}-acqtype`),acqfrom=$(`#${base}-acqfrom`),notes=$(`#${base}-notes`);
       if(cond)l.condition=cond.value;
       if(lang)l.language=lang.value;
       if(company)l.gradingCompany=company.value;
@@ -3731,6 +3902,8 @@ function bindCollectorPanel(c,v){
       if(cert)l.certNumber=cert.value.trim();
       if(price)l.purchasePrice=price.value;
       if(date)l.purchaseDate=date.value;
+      if(acqtype)l.acquisitionType=acqtype.value;
+      if(acqfrom)l.acquisitionFrom=acqfrom.value.trim();
       if(notes)l.notes=notes.value.trim();
     }
   };
@@ -4150,7 +4323,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.2c',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -4220,6 +4393,9 @@ function updatePhysicalCountLabels(){
 
 
 
+$('#acquisitionHistoryBtn').onclick=openAcquisitionHistory;
+$('#acqTypeFilter').onchange=renderAcquisitionHistory;
+$('#acqSort').onchange=renderAcquisitionHistory;
 $('#globalSearchBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#globalSearchModal').classList.add('open');$('#globalCardSearchInput').focus();renderGlobalSearch()};
 $('#globalCardSearchInput').oninput=renderGlobalSearch;
 $('#duplicatesBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#duplicatesModal').classList.add('open');renderDuplicates()};
