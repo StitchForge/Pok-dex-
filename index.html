@@ -407,7 +407,7 @@ html{-webkit-text-size-adjust:100%}
 .quickSectionHead{display:flex;justify-content:space-between;align-items:end;gap:10px;margin:0 2px 9px}
 .quickSectionHead h2{margin:0;font-size:1.15rem;letter-spacing:-.035em}
 .quickSectionHead p{margin:3px 0 0;color:var(--muted);font-size:.72rem}
-.quickActions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quickActions{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .quickAction{
   border:1px solid var(--line);
   background:var(--paper);
@@ -469,7 +469,7 @@ html{-webkit-text-size-adjust:100%}
 .nav{grid-template-columns:repeat(3,1fr)}
 
 @media(max-width:430px){
-  .quickActions{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .quickActions{grid-template-columns:repeat(2,minmax(0,1fr))}
   .quickAction{min-height:84px;padding:9px 7px}
   .quickAction b{font-size:.68rem}
   .quickAction small{font-size:.5rem}
@@ -481,13 +481,39 @@ html{-webkit-text-size-adjust:100%}
 .huntControls select{width:100%;min-width:0}
 @media(max-width:390px){.huntControls{grid-template-columns:1fr}}
 
+
+/* v0.8.8 Smart Collection Finale */
+.scanPreview{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;margin-top:10px}
+.scanPreview img{width:96px;aspect-ratio:245/337;object-fit:cover;border-radius:12px;border:1px solid var(--line);background:#f1ede6}
+.scanStatus{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;font-size:.66rem;line-height:1.45}
+.scanCandidates{display:grid;gap:8px;margin-top:10px;max-height:42vh;overflow:auto}
+.scanCandidate{display:grid;grid-template-columns:54px 1fr auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:8px;background:#fff}
+.scanCandidate img{width:54px;aspect-ratio:245/337;object-fit:cover;border-radius:7px}
+.scanCandidate b{display:block;font-size:.68rem}
+.scanCandidate small{display:block;color:var(--muted);font-size:.54rem;line-height:1.35}
+.scanManual{display:grid;grid-template-columns:1fr 120px;gap:8px;margin-top:10px}
+.scanActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.quickCopyBar{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0 0}
+.quickCopyBar .btn{width:100%}
+.priceTools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.priceSourceNote{font-size:.55rem;color:var(--muted);line-height:1.4;margin-top:5px}
+@media(max-width:390px){
+  .scanPreview{grid-template-columns:78px 1fr}
+  .scanPreview img{width:78px}
+  .scanManual{grid-template-columns:1fr}
+  .scanCandidate{grid-template-columns:48px 1fr}
+  .scanCandidate .btn{grid-column:1/-1}
+  .priceTools{grid-template-columns:1fr}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.5</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.8</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -495,6 +521,7 @@ html{-webkit-text-size-adjust:100%}
       <div class="quickSectionHead"><div><h2>Quick actions</h2><p>Jump straight into the things you use most.</p></div></div>
       <div class="quickActions">
         <button class="quickAction dark" id="fastAddBtn"><b>＋ Fast Add</b><small>Add cards quickly</small></button>
+        <button class="quickAction" id="scanCardBtn"><b>📷 Scan</b><small>Photo-assisted entry</small></button>
         <button class="quickAction" id="tradeBtn"><b>↔ Trade</b><small>Manage trade cards</small></button>
         <button class="quickAction" id="globalHuntHome"><b>🎯 Global Hunt</b><small>Everything still missing</small></button>
       </div>
@@ -566,6 +593,11 @@ html{-webkit-text-size-adjust:100%}
       </select>
     </div>
     <div class="chips"><button class="chip active" data-price="all">All prices</button><button class="chip" data-price="5">Under $5</button><button class="chip" data-price="10">Under $10</button><button class="chip" data-price="25">Under $25</button></div>
+    <div class="priceTools">
+      <button class="btn small" id="refreshHuntPrices">↻ Refresh visible prices</button>
+      <button class="btn small" id="clearPriceCache">Clear price cache</button>
+    </div>
+    <div class="priceSourceNote">Reference pricing only. Condition, language and grading premiums are not automatically applied.</div>
     <div class="notice">Prices are TCGplayer reference data supplied by TCGdex. Marketplace-to-variant matching is still being improved upstream, and prices may be cached or delayed. Verify expensive purchases before buying.</div>
     <div class="list" id="globalHuntList"></div>
   </section>
@@ -608,6 +640,37 @@ html{-webkit-text-size-adjust:100%}
 
 
 
+
+
+<div class="modal" id="scanCardModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2>Scan Card</h2><p>Photo-assisted card matching. You always confirm before anything is added.</p></div><button class="btn small close">Close</button></div>
+  <input id="scanImageInput" type="file" accept="image/*" capture="environment" class="hidden">
+
+  <div class="scanActions">
+    <button class="btn dark" id="scanTakePhoto">📷 Take / Choose Photo</button>
+    <button class="btn" id="scanClear">Clear</button>
+  </div>
+
+  <div class="scanPreview hidden" id="scanPreview">
+    <img id="scanPreviewImage" alt="Card preview">
+    <div class="scanStatus" id="scanStatus">Ready.</div>
+  </div>
+
+  <div class="scanManual">
+    <input class="collectorInput" id="scanNameHint" type="search" placeholder="Card name (optional)">
+    <input class="collectorInput" id="scanNumberHint" type="text" placeholder="Card #">
+  </div>
+
+  <div class="scanActions">
+    <button class="btn" id="scanOCRBtn">Read Photo</button>
+    <button class="btn dark" id="scanSearchBtn">Find Matches</button>
+  </div>
+
+  <div class="scanCandidates" id="scanCandidates">
+    <div class="tradeEmpty">Take a photo or enter a card name / number.</div>
+  </div>
+</div></div>
 
 <div class="modal" id="fastAddModal"><div class="sheet">
   <div class="grab"></div>
@@ -1819,6 +1882,18 @@ function priceData(c,variant){
  if(isGallery)return t.holofoil||t.holo||t.normal||null;
  return t.normal||t.holofoil||t.holo||null;
 }
+
+function priceAgeLabel(c){
+  const ts=Number(priceFetchedAt?.[c?.id]||0);
+  if(!ts)return 'Not refreshed';
+  const mins=Math.floor((Date.now()-ts)/60000);
+  if(mins<1)return 'Just refreshed';
+  if(mins<60)return `${mins}m old`;
+  const hrs=Math.floor(mins/60);
+  if(hrs<24)return `${hrs}h old`;
+  return `${Math.floor(hrs/24)}d old`;
+}
+
 function priceSourceFor(c){
  return detailCache[c?.id]?.__priceSource||'tcgdex';
 }
@@ -2268,6 +2343,9 @@ async function openTradeList(){
 
 const COLLECTOR_MIGRATION_KEY='dexbinder_v073_migrated';
 
+let scanImageFile=null;
+let scanObjectUrl=null;
+let scanOCRText='';
 let fastAddSelection=null;
 let fastAddScope='mine';
 let catalogueSelectedSet=null;
@@ -2551,6 +2629,229 @@ function renderCatalogueCards(){
     $('#fastAddMeta').textContent=`${SETS[setId]?.name||setId} · #${c.localId} · ${v.label}`;
     $('#fastAddEditor').classList.add('open');
   });
+}
+
+
+function resetScan(){
+  scanImageFile=null;
+  scanOCRText='';
+  if(scanObjectUrl){URL.revokeObjectURL(scanObjectUrl);scanObjectUrl=null}
+  $('#scanImageInput').value='';
+  $('#scanPreview').classList.add('hidden');
+  $('#scanPreviewImage').removeAttribute('src');
+  $('#scanStatus').textContent='Ready.';
+  $('#scanNameHint').value='';
+  $('#scanNumberHint').value='';
+  $('#scanCandidates').innerHTML='<div class="tradeEmpty">Take a photo or enter a card name / number.</div>';
+}
+async function openScanCard(){
+  $('#scanCardModal').classList.add('open');
+  $('#scanStatus').textContent='Preparing your active collections…';
+  await ensureAllActiveSetsLoaded().catch(()=>{});
+  $('#scanStatus').textContent='Ready. Take a photo or enter card details.';
+}
+function scanTextHints(raw){
+  const text=String(raw||'');
+  const clean=text.replace(/\s+/g,' ').trim();
+  let number='';
+  for(const p of [
+    /\b(GG\d{2})\s*\/\s*GG\d{2}\b/i,
+    /\b(\d{1,3})\s*\/\s*\d{1,3}\b/,
+    /\b(GG\d{2})\b/i
+  ]){
+    const m=clean.match(p);
+    if(m){number=m[1].toUpperCase();break}
+  }
+
+  const reject=/^(basic|stage|trainer|energy|pokemon|pokémon|illustration|rare|ability|weakness|resistance|retreat)\b/i;
+  let name='';
+  for(const line of text.split(/\n+/).map(x=>x.trim()).filter(Boolean).slice(0,12)){
+    let candidate=line.replace(/\b\d{2,3}\s*HP\b.*$/i,'')
+      .replace(/[^A-Za-zÀ-ÿ' .:-]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+    if(candidate.length<3||candidate.length>32||reject.test(candidate))continue;
+    name=candidate;
+    break;
+  }
+  return {name,number};
+}
+async function runScanOCR(){
+  if(!scanImageFile){toast('Choose a card photo first');return}
+  if(!window.Tesseract){
+    $('#scanStatus').textContent='Photo reading is unavailable right now. Enter the card name or number manually instead.';
+    return;
+  }
+  $('#scanOCRBtn').disabled=true;
+  $('#scanStatus').textContent='Reading card…';
+  try{
+    const result=await Tesseract.recognize(scanImageFile,'eng',{
+      logger:m=>{
+        if(m?.status==='recognizing text'){
+          $('#scanStatus').textContent=`Reading card… ${Math.round((m.progress||0)*100)}%`;
+        }
+      }
+    });
+    scanOCRText=result?.data?.text||'';
+    const hints=scanTextHints(scanOCRText);
+    if(hints.name && !$('#scanNameHint').value)$('#scanNameHint').value=hints.name;
+    if(hints.number && !$('#scanNumberHint').value)$('#scanNumberHint').value=hints.number;
+    $('#scanStatus').textContent=`Photo read complete.${hints.number?' Card # '+hints.number+'.':''}${hints.name?' Possible name: '+hints.name+'.':''}`;
+    await findScanMatches();
+  }catch(e){
+    console.warn('Scan OCR failed',e);
+    $('#scanStatus').textContent='I could not reliably read this photo. Try a clearer photo or enter the card name / number manually.';
+  }finally{
+    $('#scanOCRBtn').disabled=false;
+  }
+}
+function scanScoreCard(c,sid,nameHint,numberHint){
+  let score=0;
+  const cardName=String(c.name||'').toLowerCase();
+  const q=String(nameHint||'').trim().toLowerCase();
+  const num=String(numberHint||'').trim().toUpperCase();
+  const local=String(c.localId||'').toUpperCase();
+
+  if(num){
+    if(local===num)score+=120;
+    else if(local.replace(/^0+/,'')===num.replace(/^0+/,''))score+=100;
+    else if(local.includes(num)||num.includes(local))score+=35;
+  }
+  if(q){
+    if(cardName===q)score+=100;
+    else if(cardName.startsWith(q)||q.startsWith(cardName))score+=75;
+    else if(cardName.includes(q)||q.includes(cardName))score+=55;
+    else{
+      const words=q.split(/\s+/).filter(w=>w.length>2);
+      score+=words.filter(w=>cardName.includes(w)).length*15;
+    }
+  }
+  if(activeSetIds.has(sid))score+=8;
+  return score;
+}
+function scanCandidatesHTML(rows){
+  return rows.map(({sid,c,score})=>`
+    <div class="scanCandidate">
+      <img src="${image(c,'low')}" data-fallback="${assetFallback(c,'low')}" onerror="retryImage(this)">
+      <div><b>${c.name}</b><small>${SETS[sid]?.name||sid} · #${c.localId} · match ${score}</small></div>
+      <button class="btn small" data-scan-pick="${sid}|${c.id}">Choose</button>
+    </div>`).join('');
+}
+function bindScanCandidateButtons(){
+  $$('[data-scan-pick]').forEach(b=>b.onclick=()=>{
+    const [sid,cid]=b.dataset.scanPick.split('|');
+    const c=(cardsBySet[sid]||[]).find(x=>x.id===cid);
+    if(!c)return;
+
+    $('#scanCardModal').classList.remove('open');
+    $('#fastAddModal').classList.add('open');
+
+    const variants=variantsFor(sid,c);
+    const v=variants[0]||{id:'normal',label:'Normal'};
+    fastAddSelection={sid,c,v,fromCatalogue:!activeSetIds.has(sid)};
+    resetFastAddDraft();
+
+    $('#fastAddImage').src=image(c,'low');
+    $('#fastAddImage').dataset.fallback=assetFallback(c,'low');
+    $('#fastAddName').textContent=c.name;
+    $('#fastAddMeta').textContent=`${SETS[sid]?.name||sid} · #${c.localId} · ${v.label}`;
+    $('#fastAddEditor').classList.add('open');
+
+    // Show a compact variant chooser if this card has multiple physical variants.
+    $('#fastAddResults').innerHTML=variants.length>1
+      ? `<div class="notice">Choose the exact variant.</div><div class="fastAddVariants">${variants.map(vv=>`<button data-scan-variant="${vv.id}">${vv.label}</button>`).join('')}</div>`
+      : '';
+    $$('[data-scan-variant]').forEach(vb=>vb.onclick=()=>{
+      const vv=variants.find(x=>x.id===vb.dataset.scanVariant);
+      if(!vv)return;
+      fastAddSelection.v=vv;
+      $('#fastAddMeta').textContent=`${SETS[sid]?.name||sid} · #${c.localId} · ${vv.label}`;
+    });
+  });
+}
+async function findScanMatches(){
+  const nameHint=$('#scanNameHint').value.trim();
+  const numberHint=$('#scanNumberHint').value.trim();
+  if(!nameHint && !numberHint){
+    $('#scanCandidates').innerHTML='<div class="tradeEmpty">Enter a name or card number, or use Read Photo first.</div>';
+    return;
+  }
+
+  $('#scanCandidates').innerHTML='<div class="tradeEmpty">Finding likely cards…</div>';
+  await ensureAllActiveSetsLoaded().catch(()=>{});
+
+  let candidates=[];
+  for(const sid of activeSetIds){
+    for(const c of (cardsBySet[sid]||[])){
+      const score=scanScoreCard(c,sid,nameHint,numberHint);
+      if(score>0)candidates.push({sid,c,score});
+    }
+  }
+
+  // If active collections do not give enough candidates, use the global
+  // catalogue but cap network work so Scan Assist stays responsive.
+  if(candidates.filter(x=>x.score>=55).length<5){
+    await ensureGlobalCatalogue().catch(()=>[]);
+    const briefs=(allSetBriefs||[])
+      .filter(b=>!activeSetIds.has(b.id))
+      .slice(0,30);
+
+    $('#scanStatus').textContent='Checking the wider catalogue…';
+
+    for(const brief of briefs){
+      if(candidates.filter(x=>x.score>=55).length>=8)break;
+      try{
+        if(!SETS[brief.id]){
+          SETS[brief.id]={
+            id:brief.id,name:brief.name||brief.id,series:'Pokémon TCG',
+            desc:'TCGdex catalogue set',
+            baseTotal:brief.cardCount?.total||0,
+            masterTotal:brief.cardCount?.total||0,
+            variantStrategy:brief.id==='sv03.5'?'known-151':'detail'
+          };
+        }
+        if(!cardsBySet[brief.id])await loadSet(brief.id);
+        for(const c of (cardsBySet[brief.id]||[])){
+          const score=scanScoreCard(c,brief.id,nameHint,numberHint);
+          if(score>=55)candidates.push({sid:brief.id,c,score});
+        }
+      }catch(e){}
+    }
+  }
+
+  candidates.sort((a,b)=>b.score-a.score || String(a.c.name).localeCompare(String(b.c.name)));
+  candidates=candidates.slice(0,8);
+
+  $('#scanCandidates').innerHTML=candidates.length
+    ? scanCandidatesHTML(candidates)
+    : '<div class="tradeEmpty">No confident matches found. Try the exact card number or a clearer name.</div>';
+
+  $('#scanStatus').textContent=candidates.length?`Found ${candidates.length} likely match${candidates.length===1?'':'es'}.`:'No confident matches found.';
+  bindScanCandidateButtons();
+}
+
+function quickAddCollectorCopy(c,v,forTrade=false){
+  const lots=getCollectorLots(currentSet,c.id,v.id);
+  const template=lots[0]||normaliseCollectorLot({});
+  const lot=normaliseCollectorLot({
+    quantity:1,
+    tradeQuantity:forTrade?1:0,
+    type:forTrade?'raw':(template.type||'raw'),
+    condition:forTrade?'':(template.condition||''),
+    language:template.language||'English',
+    gradingCompany:forTrade?'':(template.gradingCompany||''),
+    grade:forTrade?'':(template.grade||''),
+    certNumber:'',
+    purchasePrice:'',
+    purchaseDate:new Date().toISOString().slice(0,10),
+    notes:forTrade?'Added directly to trade list':'Added via +1 copy'
+  });
+  owned.add(key(currentSet,c.id,v.id));
+  setCollectorLots(currentSet,c.id,v.id,[...lots,lot]);
+  save();
+  renderSet();
+  toast(forTrade?'Trade copy added':`Added another ${c.name}`);
+  openCard(c.id,v.id);
 }
 
 function resetFastAddDraft(){
@@ -3030,6 +3331,10 @@ function collectorPanelHTML(c,v){
     <div class="collectorBody">
       <div class="copyGroups">${lots.map((l,i)=>collectorLotHTML(c,v,l,i)).join('')}</div>
       <button class="btn addCopyGroup" type="button" data-add-lot="${v.id}">+ Add condition / graded group</button>
+      <div class="quickCopyBar">
+        <button class="btn" type="button" data-quick-copy="${v.id}">＋ Add another copy</button>
+        <button class="btn" type="button" data-quick-trade-copy="${v.id}">＋ Add trade copy</button>
+      </div>
       <button class="btn dark collectorSave" type="button" data-save-collector="${v.id}">Save collector copies</button>
       <div class="inventoryHint">Each group can have its own quantity, condition or grade, language, trade quantity and acquisition details. These details remain local + Backup/Restore protected.</div>
     </div>
@@ -3085,6 +3390,12 @@ function bindCollectorPanel(c,v){
     lots.push(normaliseCollectorLot({quantity:1,tradeQuantity:0,type:'raw',language:'English'}));
     rerender();
   };
+
+  const quickCopy=$(`[data-quick-copy="${v.id}"]`);
+  const quickTrade=$(`[data-quick-trade-copy="${v.id}"]`);
+  if(quickCopy)quickCopy.onclick=()=>quickAddCollectorCopy(c,v,false);
+  if(quickTrade)quickTrade.onclick=()=>quickAddCollectorCopy(c,v,true);
+
   const save=$(`[data-save-collector="${v.id}"]`);
   if(save)save.onclick=()=>{
     collectDOM();
@@ -3337,7 +3648,7 @@ async function hydrateHuntPrices(items,generation){
       row.dataset.priceSource=isFallback?'tcgplayer-fallback':'tcgdex';
       row.querySelector('.p').textContent=val!=null?`$${Number(val).toFixed(2)}`:'—';
       const sourceLabel=row.querySelector('.rowPrice small');
-      if(sourceLabel)sourceLabel.textContent=isFallback?'TCGplayer fallback':'TCGplayer reference';
+      if(sourceLabel)sourceLabel.textContent=`${isFallback?'TCGplayer fallback':'TCGplayer reference'} · ${priceAgeLabel(x.card)}`;
     });
     applyHuntPriceFilter();
     sortGlobalHuntRows();
@@ -3455,6 +3766,23 @@ $('#csvExportBtn').onclick=exportCollectionCSV;
 $('#dataSyncBtn').onclick=()=>$('#dataSyncModal').classList.add('open');
 $('#setLibraryHome').onclick=openLibrary;
 $('#globalHuntHome').onclick=openGlobalHunt;
+
+$('#scanCardBtn').onclick=openScanCard;
+$('#scanTakePhoto').onclick=()=>$('#scanImageInput').click();
+$('#scanImageInput').onchange=()=>{
+  const f=$('#scanImageInput').files?.[0];
+  if(!f)return;
+  scanImageFile=f;
+  if(scanObjectUrl)URL.revokeObjectURL(scanObjectUrl);
+  scanObjectUrl=URL.createObjectURL(f);
+  $('#scanPreviewImage').src=scanObjectUrl;
+  $('#scanPreview').classList.remove('hidden');
+  $('#scanStatus').textContent='Photo ready. Tap Read Photo, or enter details manually.';
+};
+$('#scanClear').onclick=resetScan;
+$('#scanOCRBtn').onclick=runScanOCR;
+$('#scanSearchBtn').onclick=findScanMatches;
+
 $('#fastAddBtn').onclick=openFastAdd;
 
 $('#fastAddMySetsTab').onclick=()=>setFastAddScope('mine');
@@ -3553,6 +3881,52 @@ $$('#bottomNav button').forEach(b=>b.addEventListener('click',()=>{const v=b.dat
 let huntSearchTimer=null;
 $('#huntSearch').oninput=()=>{clearTimeout(huntSearchTimer);huntSearchTimer=setTimeout(renderGlobalHunt,180)};
 $('#huntSet').onchange=renderGlobalHunt;
+
+async function refreshVisibleHuntPrices(){
+  const rows=[...$('#globalHuntList').querySelectorAll('.row')];
+  if(!rows.length){toast('No cards to refresh');return}
+  const btn=$('#refreshHuntPrices');
+  const old=btn.textContent;
+  btn.disabled=true;btn.textContent='Refreshing…';
+  try{
+    for(const row of rows.slice(0,80)){
+      const [sid,cid,variantId]=row.dataset.key.split('|');
+      const c=(cardsBySet[sid]||[]).find(x=>x.id===cid);
+      if(!c)continue;
+      delete detailCache[c.id];
+      delete priceFetchedAt[c.id];
+      await loadPriceFor(c);
+      const p=priceData(c,variantId);
+      const isFallback=p?.__source==='tcgplayer-fallback'||priceSourceFor(c)==='tcgplayer-fallback';
+      const val=isFallback?(p?.marketPrice??p?.lowPrice):(p?.lowPrice??p?.marketPrice);
+      row.dataset.price=val==null?'':String(val);
+      row.dataset.priceLoaded='1';
+      row.querySelector('.p').textContent=val!=null?`$${Number(val).toFixed(2)}`:'—';
+      const sourceLabel=row.querySelector('.rowPrice small');
+      if(sourceLabel)sourceLabel.textContent=`${isFallback?'TCGplayer fallback':'TCGplayer reference'} · ${priceAgeLabel(c)}`;
+    }
+    try{localStorage.setItem('dexbinder_v06_price_timestamps',JSON.stringify(priceFetchedAt))}catch(e){}
+    applyHuntPriceFilter();
+    sortGlobalHuntRows();
+    toast('Visible prices refreshed');
+  }finally{
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+function clearDexBinderPriceCache(){
+  detailCache={};
+  priceFetchedAt={};
+  ggPriceMap=null;
+  try{
+    localStorage.removeItem('dexbinder_v06_price_timestamps');
+    localStorage.removeItem(GG_PRICE_CACHE_KEY);
+  }catch(e){}
+  toast('Price cache cleared');
+  renderGlobalHunt();
+}
+$('#refreshHuntPrices').onclick=refreshVisibleHuntPrices;
+$('#clearPriceCache').onclick=clearDexBinderPriceCache;
+
 $('#huntSort').onchange=()=>{
   huntSort=$('#huntSort').value;
   sortGlobalHuntRows();
