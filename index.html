@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.11.1 dashboard refinements */
+/* v0.11.2 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.11.1 — visual consistency pass
+   DexBinder v0.11.2 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.11.1 — Day & Night
+   DexBinder v0.11.2 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.11.1 — Day & Night polish
+   DexBinder v0.11.2 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.11.1 — Interactive Sky Hero
+   DexBinder v0.11.2 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.11.1 — Interactive Sky correction pass
+   DexBinder v0.11.2 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1905,6 +1905,210 @@ body[data-theme="umbreon"] .top{
   .skyTrack:before{left:-30px}.skyTrack:after{right:-30px}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.2 — Theme correction + ambient page motion
+   ============================================================ */
+
+/* Characters are now transparent layers: no rectangular crop backgrounds. */
+.heroPokemon{
+  object-fit:contain!important;
+  background:transparent!important;
+  filter:drop-shadow(0 11px 18px rgba(6,10,28,.23))!important;
+}
+.heroEspeon{height:65%!important;left:1%!important;bottom:4px!important}
+.heroUmbreon{height:68%!important;right:1%!important;bottom:0!important}
+
+/* Correct celestial semantics:
+   LEFT Espeon/day = sun, RIGHT Umbreon/night = moon. */
+.orbSun{opacity:var(--day-p)!important}
+.orbMoon{opacity:var(--night-p)!important}
+.skyOrb{
+  background:
+    linear-gradient(90deg,
+      #f8d476 0%,
+      #f8d476 calc(var(--day-p) * 100%),
+      #dfe4ff calc(var(--day-p) * 100%),
+      #dfe4ff 100%)!important
+}
+
+/* Restore the fixed atmospheric layer behind the whole app. */
+.themeAtmosphere{
+  display:block!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:0!important;
+  overflow:hidden!important;
+  pointer-events:none!important;
+  transition:background .55s ease,opacity .55s ease!important
+}
+.app{position:relative!important;z-index:1!important}
+
+/* Espeon/day page: visible moving light, clouds and distant birds. */
+body[data-theme="espeon"] .themeAtmosphere{
+  background:
+    radial-gradient(circle at 82% 7%,rgba(255,223,158,.36),transparent 23%),
+    radial-gradient(circle at 15% 38%,rgba(183,208,255,.32),transparent 31%),
+    linear-gradient(155deg,#edf3ff 0%,#f1eaff 48%,#faeff6 100%)!important;
+  background-size:145% 145%,150% 150%,100% 100%!important;
+  animation:pageDayDrift 20s ease-in-out infinite alternate!important
+}
+body[data-theme="espeon"] .themeAtmosphere .skyGlow{
+  display:block!important;opacity:.72!important;
+  animation:pageGlowFloat 13s ease-in-out infinite alternate!important
+}
+body[data-theme="espeon"] .themeAtmosphere .cloud{
+  display:block!important;opacity:.20!important;
+  animation:pageCloudDrift 34s linear infinite!important
+}
+body[data-theme="espeon"] .themeAtmosphere .cloudB{animation-duration:43s!important;animation-delay:-11s!important}
+body[data-theme="espeon"] .themeAtmosphere .cloudC{animation-duration:51s!important;animation-delay:-26s!important}
+body[data-theme="espeon"] .themeAtmosphere .bird{
+  display:block!important;opacity:.18!important;
+  animation:pageBirdFloat 10s ease-in-out infinite!important
+}
+body[data-theme="espeon"] .themeAtmosphere .star,
+body[data-theme="espeon"] .themeAtmosphere .shootingStar{opacity:0!important}
+
+/* Umbreon/night page: stars, soft glows and occasional meteors. */
+body[data-theme="umbreon"] .themeAtmosphere{
+  background:
+    radial-gradient(circle at 80% 8%,rgba(118,97,190,.18),transparent 27%),
+    radial-gradient(circle at 14% 42%,rgba(33,58,113,.17),transparent 32%),
+    linear-gradient(160deg,#070a12 0%,#0b101b 48%,#111525 100%)!important
+}
+body[data-theme="umbreon"] .themeAtmosphere .skyGlow{
+  display:block!important;opacity:.14!important;
+  animation:pageNightGlow 15s ease-in-out infinite alternate!important
+}
+body[data-theme="umbreon"] .themeAtmosphere .cloud{display:block!important;opacity:.025!important}
+body[data-theme="umbreon"] .themeAtmosphere .bird{opacity:0!important}
+body[data-theme="umbreon"] .themeAtmosphere .star{
+  display:block!important;opacity:.58!important;
+  animation:pageStarPulse 4.8s ease-in-out infinite!important
+}
+body[data-theme="umbreon"] .themeAtmosphere .star2,
+body[data-theme="umbreon"] .themeAtmosphere .star6,
+body[data-theme="umbreon"] .themeAtmosphere .star10{animation-delay:-1.7s!important}
+body[data-theme="umbreon"] .themeAtmosphere .star3,
+body[data-theme="umbreon"] .themeAtmosphere .star8,
+body[data-theme="umbreon"] .themeAtmosphere .star11{animation-delay:-3.1s!important}
+body[data-theme="umbreon"] .themeAtmosphere .shootingStar{
+  display:block!important
+}
+body[data-theme="umbreon"] .themeAtmosphere .shootingStarA{
+  animation:pageShootingStar 13s ease-in-out infinite 3s!important
+}
+body[data-theme="umbreon"] .themeAtmosphere .shootingStarB{
+  animation:pageShootingStar 19s ease-in-out infinite 9s!important
+}
+
+/* System/twilight blends both atmospheres gently. */
+body[data-theme="system"] .themeAtmosphere{
+  background:
+    radial-gradient(circle at 76% 8%,rgba(237,173,151,.22),transparent 25%),
+    radial-gradient(circle at 16% 38%,rgba(153,151,208,.18),transparent 31%),
+    linear-gradient(155deg,#dfe4f3 0%,#eadde9 47%,#e2e5f1 100%)!important;
+  animation:pageTwilightBreath 18s ease-in-out infinite alternate!important
+}
+body[data-theme="system"] .themeAtmosphere .cloud{display:block!important;opacity:.10!important}
+body[data-theme="system"] .themeAtmosphere .bird{display:block!important;opacity:.06!important}
+body[data-theme="system"] .themeAtmosphere .star{display:block!important;opacity:.15!important}
+body[data-theme="system"] .themeAtmosphere .shootingStar{opacity:0!important}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] .themeAtmosphere{
+    background:
+      radial-gradient(circle at 76% 8%,rgba(157,95,139,.14),transparent 27%),
+      linear-gradient(155deg,#101321 0%,#181522 48%,#151824 100%)!important
+  }
+  body[data-theme="system"] .themeAtmosphere .cloud{opacity:.025!important}
+  body[data-theme="system"] .themeAtmosphere .bird{opacity:0!important}
+  body[data-theme="system"] .themeAtmosphere .star{opacity:.30!important}
+}
+
+/* Let the page environment show through instead of painting an opaque grey body. */
+body[data-theme="espeon"],
+body[data-theme="umbreon"],
+body[data-theme="system"]{background:transparent!important}
+
+/* Keep major surfaces translucent enough to feel integrated with the environment. */
+body[data-theme="espeon"] .setGroup,
+body[data-theme="espeon"] .dashboardAchievementSection,
+body[data-theme="espeon"] .quickSection{
+  background:transparent!important
+}
+body[data-theme="umbreon"] .setGroup{
+  background:rgba(23,28,40,.78)!important;
+  backdrop-filter:blur(10px)
+}
+
+/* Improve the hero composition now that character layers are transparent. */
+#collectionHero .mountainLayer{opacity:.88!important}
+#collectionHero .treeLine{opacity:.72!important}
+#collectionHero[data-sky-theme="espeon"] .heroEspeon{opacity:.97!important}
+#collectionHero[data-sky-theme="espeon"] .heroUmbreon{opacity:.34!important}
+#collectionHero[data-sky-theme="umbreon"] .heroUmbreon{opacity:.98!important}
+#collectionHero[data-sky-theme="umbreon"] .heroEspeon{opacity:.30!important}
+#collectionHero[data-sky-theme="system"] .heroPokemon{opacity:.68!important}
+
+/* Day side stars and night side clouds stay spatially appropriate. */
+#collectionHero .heroStar{transition:opacity .35s ease!important}
+#collectionHero[data-sky-theme="espeon"] .heroStar,
+#collectionHero[data-sky-theme="espeon"] .heroMeteor{opacity:.16!important}
+#collectionHero[data-sky-theme="umbreon"] .sceneCloud,
+#collectionHero[data-sky-theme="umbreon"] .sceneBird{opacity:.08!important}
+
+/* Ambient page animation */
+@keyframes pageDayDrift{
+  from{background-position:0% 0%,100% 40%,0 0}
+  to{background-position:16% 10%,76% 54%,0 0}
+}
+@keyframes pageGlowFloat{
+  from{transform:translate3d(-18px,-6px,0) scale(.96)}
+  to{transform:translate3d(22px,13px,0) scale(1.06)}
+}
+@keyframes pageCloudDrift{
+  from{translate:-18vw 0}
+  to{translate:112vw 2px}
+}
+@keyframes pageBirdFloat{
+  0%,100%{transform:translate(0,0) rotate(-8deg)}
+  50%{transform:translate(8px,-5px) rotate(-5deg)}
+}
+@keyframes pageNightGlow{
+  from{transform:translate3d(-10px,-8px,0) scale(.96)}
+  to{transform:translate3d(18px,14px,0) scale(1.06)}
+}
+@keyframes pageStarPulse{
+  0%,100%{opacity:.22;transform:scale(.82)}
+  50%{opacity:.78;transform:scale(1.15)}
+}
+@keyframes pageShootingStar{
+  0%,84%,100%{opacity:0;transform:translate3d(0,0,0) rotate(-24deg)}
+  86%{opacity:.9}
+  91%{opacity:0;transform:translate3d(-210px,110px,0) rotate(-24deg)}
+}
+@keyframes pageTwilightBreath{
+  from{filter:saturate(.94) brightness(1)}
+  to{filter:saturate(1.06) brightness(.99)}
+}
+
+/* Character sizing on smaller phones. */
+@media(max-width:700px){
+  .heroEspeon{height:61%!important;left:-2%!important}
+  .heroUmbreon{height:64%!important;right:-2%!important}
+}
+@media(max-width:430px){
+  .heroEspeon{height:56%!important;left:-4%!important}
+  .heroUmbreon{height:59%!important;right:-5%!important}
+}
+
+/* Motion accessibility remains respected. */
+@media(prefers-reduced-motion:reduce){
+  .themeAtmosphere,.themeAtmosphere *,
+  .sceneCloud,.sceneBird,.heroStar,.heroMeteor{animation:none!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -1931,7 +2135,7 @@ body[data-theme="umbreon"] .top{
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
   <div class="heroThemeHint" aria-hidden="true">Drag the sky</div>
-  <div class="version">v0.11.1</div>
+  <div class="version">v0.11.2</div>
 </div>
 
   <section id="homeScreen">
@@ -6097,7 +6301,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.11.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
@@ -6583,8 +6787,8 @@ function setSkyVisualValue(v,{animate=false}={}){
  const hero=$('#collectionHero'),control=$('#skyControl');if(!hero||!control)return;
  v=Math.max(0,Math.min(1,v));dbSkyValue=v;
  hero.style.setProperty('--sky-x',(v*100)+'%');
- hero.style.setProperty('--night-p',String(1-v));
- hero.style.setProperty('--day-p',String(v));
+ hero.style.setProperty('--night-p',String(v));
+ hero.style.setProperty('--day-p',String(1-v));
  hero.style.setProperty('--twilight-p',String(1-Math.abs(v-.5)*2));
  hero.classList.toggle('skyAnimating',!!animate);
  const [now,text]=skyValueToAria(v);
