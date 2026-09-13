@@ -543,6 +543,31 @@ html{-webkit-text-size-adjust:100%}
  .tradeHuntHeroActions{grid-template-columns:1fr}
 }
 
+
+/* v0.9.2 Full-screen Trade & Hunt + visible Wishlist targets */
+#tradeHuntScreen{padding-bottom:92px}
+.tradeHuntPageHead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-top:10px}
+.tradeHuntPageHead .hero{flex:1;margin:0}
+.tradeHuntPageTabs{position:sticky;top:0;z-index:20;background:var(--bg);padding:10px 0 8px;display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.tradeHuntPageTabs button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 8px;font-size:.64rem;font-weight:900}
+.tradeHuntPageTabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.tradeHuntPagePanel{display:none}.tradeHuntPagePanel.on{display:block}
+.tradeHuntPagePanel .tradeList,.tradeHuntPagePanel .compareList{max-height:none}
+.tradeHuntPagePanel .tradeSourceNote{margin-top:10px}
+.tradeHuntPagePanel .tradeBasketBar{position:sticky;bottom:12px;z-index:15}
+.tradeHuntFullSection{margin-top:10px}
+.tradeHuntIntro{border:1px solid var(--line);border-radius:14px;background:#fff;padding:11px;margin:8px 0 10px;font-size:.61rem;color:var(--muted);line-height:1.5}
+.wishIntentRow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tradeTargetPill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:.48rem;font-weight:900;background:#eef5ef}
+.tradeTargetPill.off{background:#fff}
+.wishTargetButton{width:100%;border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:10px;padding:9px 10px;font-size:.58rem;font-weight:900}
+.wishTargetButton.off{background:#fff;color:var(--ink)}
+.wishTargetHelp{font-size:.49rem;color:var(--muted);line-height:1.35;margin-top:4px}
+@media(max-width:430px){
+ .tradeHuntPageTabs{grid-template-columns:1fr}
+ .tradeHuntPageHead{display:block}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -550,7 +575,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.2</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -938,51 +963,36 @@ html{-webkit-text-size-adjust:100%}
 </div></div>
 
 
-<div class="modal" id="tradeHuntModal"><div class="sheet">
-  <div class="grab"></div>
-  <div class="detailTop">
-    <div><h2>Trade &amp; Hunt</h2><p>Turn missing cards into trade targets, and trade duplicates toward them.</p></div>
-    <button class="btn small close">Close</button>
-  </div>
-  <div class="tradeHuntTabs">
-    <button class="on" data-th-tab="hunt">🎯 Hunt</button>
-    <button data-th-tab="trade">↔ Trade List</button>
-    <button data-th-tab="compare">⚖ Compare</button>
+
+<section id="tradeHuntScreen" class="hidden">
+  <button class="btn small" id="tradeHuntBack">← My Dex</button>
+  <div class="tradeHuntPageHead">
+    <div class="hero">
+      <div class="eyebrow">Collector exchange</div>
+      <h1>Trade &amp; Hunt</h1>
+      <p>Plan what you need, manage what you can trade, and compare both sides in one place.</p>
+    </div>
   </div>
 
-  <div id="tradeHuntPanel-hunt" class="tradeHuntPanel on">
+  <div class="tradeHuntPageTabs">
+    <button class="on" data-th-page-tab="hunt">🎯 Hunt</button>
+    <button data-th-page-tab="trade">↔ Trade List</button>
+    <button data-th-page-tab="compare">⚖ Compare</button>
+  </div>
+
+  <div id="tradeHuntPage-hunt" class="tradeHuntPagePanel on">
     <div class="tradeHuntStats" id="tradeHuntHuntStats"></div>
+    <div class="tradeHuntIntro">Your Wishlist is your broader “I want this” list. Promote the cards you are actively willing to trade toward into <b>Trade Targets</b>.</div>
     <div class="tradeHuntHeroActions">
       <button class="btn dark" id="openFullHuntFromHub">Open Full Hunt</button>
       <button class="btn" id="openWishlistFromHub">♡ Open Wishlist</button>
     </div>
-    <div class="wishSummary">Wishlisted missing cards can be promoted to <b>Trade Targets</b>. Trade Targets can be added directly to “You Get”.</div>
     <div class="tradeHuntList" id="tradeHuntTargetsList"></div>
   </div>
 
-  <div id="tradeHuntPanel-trade" class="tradeHuntPanel">
-    <div class="tradeHuntStats" id="tradeHuntTradeStats"></div>
-    <div class="tradeHuntHeroActions">
-      <button class="btn dark" id="openFullTradeListFromHub">Open Full Trade List</button>
-      <button class="btn" id="clearHubTradeBasket">Clear Selected</button>
-    </div>
-    <div class="tradeHuntList" id="tradeHuntTradeList"></div>
-  </div>
-
-  <div id="tradeHuntPanel-compare" class="tradeHuntPanel">
-    <div class="tradeHuntStats" id="tradeHuntCompareStats"></div>
-    <div class="tradeHuntHeroActions">
-      <button class="btn dark" id="openTradeCompareFromHub">Open Trade Compare</button>
-      <button class="btn" id="addTargetsToCompare">Add Trade Targets to You Get</button>
-    </div>
-    <div class="tradeHuntList" id="tradeHuntComparePreview"></div>
-  </div>
-</div></div>
-
-<div class="modal" id="tradeModal"><div class="sheet">
-  <div class="grab"></div>
-  <div class="detailTop"><div><h2>Trade List</h2><p>Cards you've marked as available to trade.</p></div><button class="btn small close">Close</button></div>
-  <div class="tradeCompareActions" style="margin:8px 0 10px">
+  <div id="tradeHuntPage-trade" class="tradeHuntPagePanel">
+    <div class="tradeHuntFullSection">
+      <div class="tradeCompareActions" style="margin:8px 0 10px">
     <button class="btn" id="tradeHistoryMainBtn">Trade History</button>
     <div class="tradeStat"><b id="tradeHistorySummary">0 trades</b><small id="tradeHistoryValueSummary">$0 traded</small></div>
   </div>
@@ -1020,14 +1030,13 @@ html{-webkit-text-size-adjust:100%}
     <div><b id="tradeBasketTotal">$0.00</b><small id="tradeBasketMeta">0 cards in basket</small></div>
     <div style="display:flex;gap:6px"><button id="compareTradeBasket">Compare</button><button id="clearTradeBasket">Clear</button></div>
   </div>
-</div></div>
 
+    </div>
+  </div>
 
-<div class="modal" id="tradeCompareModal"><div class="sheet">
-  <div class="grab"></div>
-  <div class="detailTop"><div><h2>Compare Trade</h2><p>Build both sides, compare reference values, then complete the trade.</p></div><button class="btn small close">Close</button></div>
-
-  <div class="compareGrid">
+  <div id="tradeHuntPage-compare" class="tradeHuntPagePanel">
+    <div class="tradeHuntFullSection">
+      <div class="compareGrid">
     <div class="compareSide">
       <div class="compareHead"><b>You Give</b><strong id="giveTotal">$0.00</strong></div>
       <div class="compareList" id="giveList"></div>
@@ -1053,8 +1062,10 @@ html{-webkit-text-size-adjust:100%}
     <button class="btn dark" id="completeTradeBtn">Complete trade</button>
   </div>
   <div class="tradeSourceNote">Reference values are informational only. Use Override on any line to enter an agreed trade value without changing the card's stored market data.</div>
-</div></div>
 
+    </div>
+  </div>
+</section>
 <div class="modal" id="tradeHistoryModal"><div class="sheet">
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Trade History</h2><p>Completed trades saved on this device.</p></div><button class="btn small close">Close</button></div>
@@ -1282,7 +1293,15 @@ function renderWishlist(){
  rows.sort((a,b)=>(rank[a.w.priority]??1)-(rank[b.w.priority]??1)||String(a.c?.name||a.cid).localeCompare(String(b.c?.name||b.cid)));
  const stats=wishlistStats();
  $('#wishlistSummary').textContent=`${stats.total} wanted card${stats.total===1?'':'s'} · ${stats.high} high priority`;
- $('#wishlistList').innerHTML=rows.length?rows.map(x=>{const label=x.c?(variantsFor(x.sid,x.c).find(v=>v.id===x.variantId)?.label||x.variantId):x.variantId;return `<div class="wishRow">${x.c?`<img src="${image(x.c,'low')}" data-fallback="${assetFallback(x.c,'low')}" onerror="retryImage(this)">`:'<div></div>'}<div><b>${x.c?.name||x.cid}</b><small>${SETS[x.sid]?.name||x.sid}${x.c?` · #${x.c.localId}`:''} · ${label}</small><span class="wishPriority ${x.w.priority}">${x.w.priority.toUpperCase()}</span>${x.w.targetPrice?`<small>Target ≤ $${Number(x.w.targetPrice).toFixed(2)}</small>`:''}${x.w.notes?`<small>${escapeHtml(x.w.notes)}</small>`:''}</div><div class="wishActions"><button class="btn small" data-wish-open="${x.sid}|${x.cid}|${x.variantId}">Open</button><button class="btn small" data-wish-target="${x.sid}|${x.cid}|${x.variantId}">${isTradeTarget(x.sid,x.cid,x.variantId)?'Un-target':'Trade target'}</button><button class="btn small" data-wish-remove="${x.sid}|${x.cid}|${x.variantId}">Remove</button></div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
+ $('#wishlistList').innerHTML=rows.length?rows.map(x=>{const label=x.c?(variantsFor(x.sid,x.c).find(v=>v.id===x.variantId)?.label||x.variantId):x.variantId;return `<div class="wishRow">${x.c?`<img src="${image(x.c,'low')}" data-fallback="${assetFallback(x.c,'low')}" onerror="retryImage(this)">`:'<div></div>'}<div><b>${x.c?.name||x.cid}</b><small>${SETS[x.sid]?.name||x.sid}${x.c?` · #${x.c.localId}`:''} · ${label}</small><span class="wishPriority ${x.w.priority}">${x.w.priority.toUpperCase()}</span>${x.w.targetPrice?`<small>Target ≤ $${Number(x.w.targetPrice).toFixed(2)}</small>`:''}${x.w.notes?`<small>${escapeHtml(x.w.notes)}</small>`:''}</div><div class="wishActions">
+        <div class="wishIntentRow">
+          <span class="tradeTargetPill ${isTradeTarget(x.sid,x.cid,x.variantId)?'':'off'}">${isTradeTarget(x.sid,x.cid,x.variantId)?'✓ ACTIVE TRADE TARGET':'↔ NOT A TRADE TARGET'}</span>
+        </div>
+        <button class="wishTargetButton ${isTradeTarget(x.sid,x.cid,x.variantId)?'':'off'}" data-wish-target="${x.sid}|${x.cid}|${x.variantId}">${isTradeTarget(x.sid,x.cid,x.variantId)?'✓ Trade Target — tap to remove':'↔ Make this a Trade Target'}</button>
+        <div class="wishTargetHelp">${isTradeTarget(x.sid,x.cid,x.variantId)?'DexBinder will surface this card inside Trade & Hunt and make it easy to add to You Get.':'Use this when you are actively willing to trade toward this card.'}</div>
+        <button class="btn small" data-wish-open="${x.sid}|${x.cid}|${x.variantId}">Open card</button>
+        <button class="btn small" data-wish-remove="${x.sid}|${x.cid}|${x.variantId}">Remove from wishlist</button>
+      </div></div>`}).join(''):'<div class="tradeEmpty">No cards match this wishlist view yet.</div>';
  $$('[data-wish-target]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishTarget.split('|');toggleTradeTarget(s,c,v);renderWishlist()});
  $$('[data-wish-remove]').forEach(b=>b.onclick=()=>{const [s,c,v]=b.dataset.wishRemove.split('|');removeWanted(s,c,v);renderWishlist()});
  $$('[data-wish-open]').forEach(b=>b.onclick=async()=>{const [s,c,v]=b.dataset.wishOpen.split('|');if(!activeSetIds.has(s)){activeSetIds.add(s);saveActiveSets()}if(!cardsBySet[s])await loadSet(s);currentSet=s;$('#wishlistModal').classList.remove('open');await openCard(c,v)});
@@ -1717,7 +1736,7 @@ function migrateV1(){
  }catch(e){console.warn('v0.1 migration skipped',e)}
 }
 async function openSet(sid,target='binder'){
- currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');
+ currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#tradeHuntScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');
  let s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;$('#setDesc').textContent=s.desc;$('#content').innerHTML='<div class="notice">Loading cards…</div>';
  try{
    await loadSet(sid);
@@ -1748,7 +1767,7 @@ async function openSet(sid,target='binder'){
 }
 function setNav(){
 $$('#bottomNav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view))}
-function goHome(){rememberAllScroll();currentSet=null;$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#libraryScreen').classList.add('hidden');$('#homeScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');view='home';setNav();renderStats()}
+function goHome(){rememberAllScroll();currentSet=null;$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#libraryScreen').classList.add('hidden');$('#tradeHuntScreen').classList.add('hidden');$('#homeScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');view='home';setNav();renderStats()}
 function renderSet(){
  if(!currentSet)return;
  let cs=cardsBySet[currentSet]||[],q=$('#search').value.trim().toLowerCase();
@@ -2172,9 +2191,10 @@ function tradeReferencePrice(c,variantId){
 let tradeHuntTab='hunt';
 function setTradeHuntTab(tab){
  tradeHuntTab=tab;
- $$('[data-th-tab]').forEach(b=>b.classList.toggle('on',b.dataset.thTab===tab));
- ['hunt','trade','compare'].forEach(x=>$(`#tradeHuntPanel-${x}`).classList.toggle('on',x===tab));
+ $$('[data-th-page-tab]').forEach(b=>b.classList.toggle('on',b.dataset.thPageTab===tab));
+ ['hunt','trade','compare'].forEach(x=>$(`#tradeHuntPage-${x}`).classList.toggle('on',x===tab));
  renderTradeHuntHub();
+ window.scrollTo({top:0,behavior:'smooth'});
 }
 function missingVariantRows(){
  const out=[];
@@ -2232,13 +2252,25 @@ function renderTradeHuntCompare(){
  $('#tradeHuntComparePreview').innerHTML=`<div class="goalCard"><b>${give.length} outgoing line${give.length===1?'':'s'} · ${formatTradeMoney(giveValue)}</b><small>Selected from your Trade List.</small></div><div class="goalCard"><b>${get.length} incoming line${get.length===1?'':'s'} · ${formatTradeMoney(getValue)}</b><small>${targetCount} active Trade Target${targetCount===1?'':'s'} available.</small></div>`;
 }
 function renderTradeHuntHub(){if(tradeHuntTab==='hunt')renderTradeHuntHunt();else if(tradeHuntTab==='trade')renderTradeHuntTrade();else renderTradeHuntCompare()}
-async function openTradeHuntHub(){
- $('#tradeHuntModal').classList.add('open');
+async function openTradeHuntHub(tab='hunt'){
+ currentSet=null;view='tradehunt';
+ $('#homeScreen').classList.add('hidden');
+ $('#setScreen').classList.add('hidden');
+ $('#globalHuntScreen').classList.add('hidden');
+ $('#libraryScreen').classList.add('hidden');
+ $('#tradeHuntScreen').classList.remove('hidden');
+ $('#bottomNav').classList.add('hidden');
  for(const sid of activeSetIds){
   if(!cardsBySet[sid]){try{await loadSet(sid)}catch(e){}}
   if(sid!=='sv03.5'&&cardsBySet[sid]&&!variantReadyBySet[sid]){try{await ensureVariantMetadata(sid)}catch(e){}}
  }
+ setTradeHuntTab(tab);
+ updateTradeHistorySummary();
+ const rows=tradeEntries();
+ if(rows.some(r=>r.unitValue==null)){try{await ensureTradePrices(rows)}catch(e){}}
  renderTradeHuntHub();
+ renderTradeList();
+ renderTradeCompare();
 }
 function addAllTargetsToCompare(){
  let added=0;
@@ -2466,10 +2498,10 @@ function overrideCompareValue(token){
   map.set(k,sel);renderTradeCompare();renderTradeBasketBar();
 }
 async function prepareTradeCompare(){
-  $('#tradeCompareModal').classList.add('open');
-  $('#tradeModal').classList.remove('open');
-  for(const sid of activeSetIds){if(!cardsBySet[sid]){try{await loadSet(sid)}catch(e){}}}
-  renderTradeCompare();
+ if($('#tradeHuntScreen').classList.contains('hidden'))await openTradeHuntHub('compare');
+ else setTradeHuntTab('compare');
+ for(const sid of activeSetIds){if(!cardsBySet[sid]){try{await loadSet(sid)}catch(e){}}}
+ renderTradeCompare();
 }
 function searchIncomingCards(){
   const q=$('#incomingTradeSearch').value.trim().toLowerCase();
@@ -2576,15 +2608,18 @@ function completeTrade(){
 }
 
 async function openTradeList(){
-  $('#tradeModal').classList.add('open');
+ if($('#tradeHuntScreen').classList.contains('hidden'))await openTradeHuntHub('trade');
+ else{
+  setTradeHuntTab('trade');
   updateTradeHistorySummary();
   renderTradeList();
   const rows=tradeEntries();
   if(rows.some(r=>r.unitValue==null)){
-    $('#tradeValueStat').textContent='Loading…';
-    await ensureTradePrices(rows);
-    renderTradeList();
+   $('#tradeValueStat').textContent='Loading…';
+   await ensureTradePrices(rows);
+   renderTradeList();
   }
+ }
 }
 
 
@@ -3923,7 +3958,7 @@ function applyHuntPriceFilter(){
 }
 async function openGlobalHunt(){
  currentSet=null;view='global';huntGeneration++;
- $('#homeScreen').classList.add('hidden');$('#setScreen').classList.add('hidden');$('#globalHuntScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');
+ $('#homeScreen').classList.add('hidden');$('#setScreen').classList.add('hidden');$('#tradeHuntScreen').classList.add('hidden');$('#globalHuntScreen').classList.remove('hidden');$('#bottomNav').classList.add('hidden');
  $('#globalHuntList').innerHTML='<div class="notice">Loading active collections…</div>';
  const huntSelect=$('#huntSet');
  huntSelect.innerHTML='<option value="all">All active sets</option>'+[...activeSetIds].map(id=>SETS[id]?`<option value="${id}">${SETS[id].name}</option>`:'').join('');
@@ -3958,7 +3993,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
@@ -4088,14 +4123,11 @@ if(collectionHero){
 }
 
 $('#tradeHuntBtn').onclick=openTradeHuntHub;
+$('#tradeHuntBack').onclick=goHome;
 
-$$('[data-th-tab]').forEach(b=>b.onclick=()=>setTradeHuntTab(b.dataset.thTab));
-$('#openFullHuntFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openGlobalHunt()};
-$('#openWishlistFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openWishlist()};
-$('#openFullTradeListFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');openTradeList()};
-$('#clearHubTradeBasket').onclick=()=>{tradeBasket.clear();renderTradeHuntTrade();renderTradeHuntCompare()};
-$('#openTradeCompareFromHub').onclick=()=>{$('#tradeHuntModal').classList.remove('open');prepareTradeCompare()};
-$('#addTargetsToCompare').onclick=addAllTargetsToCompare;
+$$('[data-th-page-tab]').forEach(b=>b.onclick=()=>setTradeHuntTab(b.dataset.thPageTab));
+$('#openFullHuntFromHub').onclick=()=>openGlobalHunt();
+$('#openWishlistFromHub').onclick=()=>openWishlist();
 
 $('#tradeSort').onchange=renderTradeList;
 $('#tradeSetFilter').onchange=renderTradeList;
