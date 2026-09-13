@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.13.1 dashboard refinements */
+/* v0.13.2 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.13.1 — visual consistency pass
+   DexBinder v0.13.2 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Day & Night
+   DexBinder v0.13.2 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Day & Night polish
+   DexBinder v0.13.2 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Interactive Sky Hero
+   DexBinder v0.13.2 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Interactive Sky correction pass
+   DexBinder v0.13.2 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Theme correction + ambient page motion
+   DexBinder v0.13.2 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2111,7 +2111,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — portrait hero polish
+   DexBinder v0.13.2 — portrait hero polish
    ============================================================ */
 .headerHint,.dragSkyLabel{display:none!important}
 
@@ -2211,7 +2211,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Hero structural rebuild
+   DexBinder v0.13.2 — Hero structural rebuild
    ============================================================ */
 
 .heroThemeHint{display:none!important}
@@ -2449,7 +2449,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Clean-source hero rebuild
+   DexBinder v0.13.2 — Clean-source hero rebuild
    User-supplied transparent character renders + fixed portrait zones
    ============================================================ */
 
@@ -2711,7 +2711,7 @@ body[data-theme="umbreon"] .setGroup{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Hero + Umbreon contrast polish
+   DexBinder v0.13.2 — Hero + Umbreon contrast polish
    ============================================================ */
 
 /* 1) Slightly reduce hero character dominance. */
@@ -2909,7 +2909,7 @@ body[data-theme="umbreon"] .sheet .tradeHuntTabs button.on *{
 }
 
 
-/* v0.13.1 — two-state Day / Night polish */
+/* v0.13.2 — two-state Day / Night polish */
 .sceneBird,.themeAtmosphere .bird{display:none!important}
 
 /* exact 50/50 hero */
@@ -2988,7 +2988,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 #collectionHero .skyControl{left:23%!important;right:23%!important}
 
 
-/* v0.13.1 startup hotfix */
+/* v0.13.2 startup hotfix */
 .srOnly{
   position:absolute!important;
   width:1px!important;height:1px!important;
@@ -2999,7 +2999,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 
 
 /* ============================================================
-   DexBinder v0.13.1 FINAL — Active Set hierarchy + Umbreon legibility
+   DexBinder v0.13.2 FINAL — Active Set hierarchy + Umbreon legibility
    ============================================================ */
 
 /* Completion belongs to the information stack, not over the chase artwork. */
@@ -3057,7 +3057,7 @@ body[data-theme="umbreon"] .setChaseLabel small{
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Collection Intelligence & Goals
+   DexBinder v0.13.2 — Collection Intelligence & Goals
    ============================================================ */
 .intelligenceSheet{padding-bottom:28px!important}
 .intelligenceHero{
@@ -3101,7 +3101,7 @@ body[data-theme="umbreon"] .momentumCard small{color:#dfe3f1!important}
 
 
 /* ============================================================
-   DexBinder v0.13.1 — Umbreon badge contrast + momentum cleanup
+   DexBinder v0.13.2 — Umbreon badge contrast + momentum cleanup
    ============================================================ */
 
 /* The top-left variant-count badge remains a pale surface in Umbreon,
@@ -3123,13 +3123,35 @@ body[data-theme="umbreon"] .card .variantCount span{
   color:#17203a!important;
 }
 
+
+/* ============================================================
+   DexBinder v0.13.2 — Smart Focus Queue
+   ============================================================ */
+.focusQueue{display:grid;gap:7px;margin-bottom:4px}
+.focusCard{
+  display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:9px;align-items:center;
+  width:100%;padding:10px 11px;border-radius:14px;border:1px solid var(--db-line);
+  background:var(--db-panel);color:var(--db-text);text-align:left
+}
+.focusRank{
+  width:28px;height:28px;border-radius:50%;display:grid;place-items:center;
+  background:color-mix(in srgb,var(--db-purple) 18%,var(--db-panel));
+  color:var(--db-text);font-size:.62rem;font-weight:950
+}
+.focusMain{min-width:0}.focusMain b{display:block;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.focusMain small{display:block;color:var(--db-muted);font-size:.5rem;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.focusPct{font-size:.78rem;font-weight:950}
+.momentumMilestone{margin-top:6px!important;font-weight:800!important}
+body[data-theme="umbreon"] .focusMain small,
+body[data-theme="umbreon"] .momentumMilestone{color:#dfe3f1!important}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
 <style>
-/* v0.13.1 — static illustrated hero + page-level interactive atmosphere */
+/* v0.13.2 — static illustrated hero + page-level interactive atmosphere */
 #collectionHero.staticSkyHero{position:relative!important;padding:0!important;overflow:hidden!important;min-height:0!important;aspect-ratio:1105/795!important;background:#10182d!important;border-radius:28px!important;box-shadow:0 18px 44px rgba(16,24,55,.18)!important}
 #collectionHero.staticSkyHero:before,#collectionHero.staticSkyHero:after{display:none!important}
 .staticHeroArtwork{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
@@ -3175,7 +3197,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.13.1</div>
+  <div class="version">v0.13.2</div>
 </div>
 
   <section id="homeScreen">
@@ -3430,7 +3452,9 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
     <div class="intelligenceScore" id="intelligenceScore">—</div>
   </div>
   <div class="intelligenceGrid" id="intelligenceGrid"></div>
-  <div class="intelligenceSectionHead"><div><b>Set momentum</b><small>Closest active collections first.</small></div></div>
+  <div class="intelligenceSectionHead"><div><b>Focus queue</b><small>Best unfinished sets to work on next.</small></div></div>
+  <div class="focusQueue" id="focusQueue"></div>
+  <div class="intelligenceSectionHead"><div><b>Set momentum</b><small>Unfinished active collections, closest first.</small></div></div>
   <div class="momentumRail" id="momentumRail"></div>
   <div class="intelligenceSectionHead"><div><b>Wishlist &amp; goals</b><small>Your exact wanted variants and set targets.</small></div></div>
   <div class="goalGrid" id="goalSummary"></div>
@@ -4092,47 +4116,104 @@ function wishlistStats(){
 }
 
 function collectionIntelligence(){
+ const wishes=wishlistEntries();
  const active=[...activeSetIds].map(sid=>{
    const [have,total]=counts(sid),goal=goalTarget(sid)||total||0;
    const target=Math.max(0,goal),remaining=Math.max(0,target-have),pct=target?Math.min(100,Math.round(have/target*100)):0;
-   const wanted=wishlistEntries().filter(x=>x.sid===sid).length;
-   return {sid,have,total,target,remaining,pct,wanted,name:SETS[sid]?.name||sid};
- }).filter(x=>x.target>0).sort((a,b)=>a.remaining-b.remaining||b.pct-a.pct);
+   const setWishes=wishes.filter(x=>x.sid===sid);
+   const wanted=setWishes.length;
+   const highWanted=setWishes.filter(x=>x.w.priority==='high').length;
+   const milestoneMarks=[25,50,75,90,100];
+   const nextMilestone=milestoneMarks.find(x=>pct<x)||100;
+   const milestoneGap=Math.max(0,nextMilestone-pct);
+
+   // Smart focus score:
+   // progress matters most; wishlist/high-priority intent can lift a set;
+   // very low-progress sets are penalized unless the user has clearly prioritised them.
+   let focusScore=(pct*1.35)+(wanted*5)+(highWanted*10);
+   if(pct===0 && wanted===0)focusScore-=35;
+   if(pct<10 && wanted===0)focusScore-=18;
+   if(pct>=75)focusScore+=12;
+   if(remaining>0 && remaining<=25)focusScore+=18;
+   if(remaining>25 && remaining<=75)focusScore+=8;
+
+   return {
+     sid,have,total,target,remaining,pct,wanted,highWanted,
+     nextMilestone,milestoneGap,focusScore,
+     name:SETS[sid]?.name||sid
+   };
+ }).filter(x=>x.target>0);
+
  const ws=wishlistStats();
  const unfinished=active.filter(x=>x.remaining>0);
- const closest=unfinished[0]||null;
+ const focus=[...unfinished].sort((a,b)=>
+   b.focusScore-a.focusScore ||
+   b.pct-a.pct ||
+   a.remaining-b.remaining
+ );
+ const closest=[...unfinished].sort((a,b)=>
+   a.remaining-b.remaining ||
+   b.pct-a.pct
+ )[0]||null;
+ const best=focus[0]||null;
  const near=unfinished.filter(x=>x.pct>=75).length;
  const complete=active.filter(x=>x.remaining===0).length;
  const totalRemaining=unfinished.reduce((n,x)=>n+x.remaining,0);
- const focusScore=closest?Math.max(0,Math.min(100,closest.pct)):100;
- return {active,ws,closest,near,complete,totalRemaining,focusScore};
+
+ return {active,unfinished,focus,ws,closest,best,near,complete,totalRemaining};
 }
 function renderCollectionIntelligence(){
- const hero=$('#intelligenceNextMove'),meta=$('#intelligenceNextMoveMeta'),score=$('#intelligenceScore'),grid=$('#intelligenceGrid'),rail=$('#momentumRail');
- if(!hero||!grid||!rail)return;
+ const hero=$('#intelligenceNextMove'),meta=$('#intelligenceNextMoveMeta'),score=$('#intelligenceScore'),grid=$('#intelligenceGrid'),rail=$('#momentumRail'),focusBox=$('#focusQueue');
+ if(!hero||!grid||!rail||!focusBox)return;
  const d=collectionIntelligence();
- if(d.closest){
-   hero.textContent=`Finish ${d.closest.name}`;
-   meta.textContent=`${d.closest.remaining} position${d.closest.remaining===1?'':'s'} to your current goal · ${d.closest.pct}% complete`;
-   score.textContent=`${d.closest.pct}%`;
+
+ if(d.best){
+   hero.textContent=`Focus on ${d.best.name}`;
+   const reasons=[];
+   if(d.best.pct>=75)reasons.push(`${d.best.pct}% complete`);
+   else if(d.best.pct>0)reasons.push(`${d.best.pct}% toward goal`);
+   if(d.best.highWanted)reasons.push(`${d.best.highWanted} high-priority wanted`);
+   else if(d.best.wanted)reasons.push(`${d.best.wanted} wanted`);
+   if(d.best.remaining<=25)reasons.push(`${d.best.remaining} positions left`);
+   else reasons.push(`${d.best.remaining} remaining`);
+   meta.textContent=reasons.join(' · ');
+   score.textContent=`${d.best.pct}%`;
  }else{
    hero.textContent=d.active.length?'Every active goal is complete':'Choose an active set to start';
    meta.textContent=d.active.length?'Your current collection goals are all cleared.':'Manage Sets to add a collection.';
    score.textContent=d.active.length?'✓':'—';
  }
+
  grid.innerHTML=`
    <div class="intelligenceStat"><b>${d.ws.total}</b><span>Wanted cards</span><small>${d.ws.high} high priority</small></div>
    <div class="intelligenceStat"><b>${d.near}</b><span>Sets in striking distance</span><small>75%+ toward goal</small></div>
    <div class="intelligenceStat"><b>${d.totalRemaining}</b><span>Positions remaining</span><small>Across unfinished goals</small></div>
    <div class="intelligenceStat"><b>${d.complete}</b><span>Goals completed</span><small>Active collections</small></div>`;
- const momentum=d.active.filter(x=>x.pct<100&&x.remaining>0);
+
+ const top=d.focus.slice(0,3);
+ focusBox.innerHTML=top.length?top.map((x,i)=>{
+   const why=x.highWanted?`${x.highWanted} high-priority wanted`
+     :x.wanted?`${x.wanted} wanted card${x.wanted===1?'':'s'}`
+     :x.pct>=75?'Strong completion momentum'
+     :x.remaining<=25?'Very close to goal'
+     :`${x.pct}% complete`;
+   return `<button class="focusCard" data-intel-set="${x.sid}" type="button">
+     <span class="focusRank">${i+1}</span>
+     <span class="focusMain"><b>${escapeHtml(x.name)}</b><small>${why} · ${x.remaining} left</small></span>
+     <span class="focusPct">${x.pct}%</span>
+   </button>`;
+ }).join(''):'<div class="tradeEmpty">No unfinished active-set goals to prioritise. 🎉</div>';
+
+ const momentum=d.active.filter(x=>x.pct<100&&x.remaining>0).sort((a,b)=>a.remaining-b.remaining||b.pct-a.pct);
  rail.innerHTML=momentum.length?momentum.map(x=>`
    <button class="momentumCard" data-intel-set="${x.sid}" type="button">
      <span><b>${escapeHtml(x.name)}</b><small>${x.have}/${x.target} · ${x.remaining} left</small></span>
      <strong>${x.pct}%</strong>
      <i><em style="width:${x.pct}%"></em></i>
+     <small class="momentumMilestone">${x.nextMilestone<100?`${x.milestoneGap}% to ${x.nextMilestone}% milestone`:`${x.milestoneGap}% to completion`}</small>
      ${x.wanted?`<small class="momentumWish">♡ ${x.wanted} wanted</small>`:''}
    </button>`).join(''):'<div class="tradeEmpty">No unfinished active-set goals to show. 🎉</div>';
+
  $$('[data-intel-set]').forEach(b=>b.onclick=()=>{const sid=b.dataset.intelSet;$('#wishlistModal').classList.remove('open');openSet(sid,'binder')});
 }
 function renderGoalSummary(){
