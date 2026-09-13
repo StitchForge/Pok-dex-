@@ -812,6 +812,165 @@ body{background:
 }
 @media(max-width:390px){.dashboardTools{grid-template-columns:1fr!important}.setCard{flex-basis:90%!important}.cabinetCard{flex-basis:80%!important}}
 
+
+/* === v0.10.1 Active Set artwork pass === */
+.setCard{
+  --setHue:250;
+  position:relative!important;
+  overflow:hidden!important;
+  isolation:isolate!important;
+  min-height:225px!important;
+  background:
+    linear-gradient(135deg,
+      hsl(var(--setHue) 72% 94%),
+      hsl(calc(var(--setHue) + 28) 76% 90%))!important;
+}
+body[data-theme="umbreon"] .setCard{
+  background:
+    linear-gradient(135deg,
+      hsl(var(--setHue) 35% 17%),
+      hsl(calc(var(--setHue) + 28) 38% 12%))!important;
+}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] .setCard{
+    background:
+      linear-gradient(135deg,
+        hsl(var(--setHue) 35% 17%),
+        hsl(calc(var(--setHue) + 28) 38% 12%))!important;
+  }
+}
+.setArtBackdrop{
+  position:absolute;
+  inset:-14%;
+  z-index:-4;
+  background-size:cover;
+  background-position:center 34%;
+  filter:blur(13px) saturate(1.55) contrast(1.03);
+  transform:scale(1.08);
+  opacity:.56;
+  pointer-events:none;
+}
+body[data-theme="umbreon"] .setArtBackdrop{opacity:.46;filter:blur(13px) saturate(1.45) brightness(.72)}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] .setArtBackdrop{opacity:.46;filter:blur(13px) saturate(1.45) brightness(.72)}
+}
+.setCard::before{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  z-index:-2!important;
+  background:
+    linear-gradient(90deg,
+      rgba(255,255,255,.88) 0%,
+      rgba(255,255,255,.76) 43%,
+      rgba(255,255,255,.24) 72%,
+      rgba(255,255,255,.10) 100%)!important;
+}
+body[data-theme="umbreon"] .setCard::before{
+  background:
+    linear-gradient(90deg,
+      rgba(12,15,25,.88) 0%,
+      rgba(12,15,25,.72) 43%,
+      rgba(12,15,25,.28) 72%,
+      rgba(12,15,25,.12) 100%)!important;
+}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] .setCard::before{
+    background:
+      linear-gradient(90deg,
+        rgba(12,15,25,.88) 0%,
+        rgba(12,15,25,.72) 43%,
+        rgba(12,15,25,.28) 72%,
+        rgba(12,15,25,.12) 100%)!important;
+  }
+}
+.setChaseArt{
+  position:absolute!important;
+  z-index:-1!important;
+  right:10px!important;
+  bottom:18px!important;
+  top:auto!important;
+  width:auto!important;
+  height:72%!important;
+  max-width:34%!important;
+  object-fit:contain!important;
+  opacity:1!important;
+  filter:none!important;
+  transform:rotate(4deg)!important;
+  border-radius:8px!important;
+  box-shadow:0 15px 30px rgba(20,18,35,.22)!important;
+  pointer-events:none!important;
+}
+.setChaseGlow{display:none!important}
+.setCardTop{max-width:64%!important}
+.setCard h3{
+  font-size:1.35rem!important;
+  line-height:1.02!important;
+  text-shadow:0 1px 0 rgba(255,255,255,.35);
+}
+body[data-theme="umbreon"] .setCard h3{text-shadow:none}
+.setCardMeta{max-width:95%;line-height:1.45}
+.setPct{position:absolute!important;right:16px!important;top:14px!important;z-index:2!important}
+.setCardProgress{
+  position:absolute!important;
+  left:16px!important;
+  right:16px!important;
+  bottom:42px!important;
+  z-index:2!important;
+}
+.setCardHint{
+  position:absolute!important;
+  left:16px!important;
+  bottom:16px!important;
+  z-index:2!important;
+}
+.setChaseLabel{
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  z-index:3;
+  max-width:145px;
+  padding:6px 8px;
+  border-radius:11px;
+  background:color-mix(in srgb,var(--db-panel) 87%,transparent);
+  border:1px solid color-mix(in srgb,var(--db-line) 86%,transparent);
+  box-shadow:0 6px 18px rgba(0,0,0,.10);
+  backdrop-filter:blur(10px);
+  text-align:right;
+}
+.setChaseLabel small{
+  display:block;
+  font-size:.42rem!important;
+  color:var(--db-muted)!important;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  font-weight:850;
+}
+.setChaseLabel b{
+  display:block;
+  font-size:.54rem!important;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.setCard.hasChaseArt .setCardProgress{right:38%!important}
+.setCard.hasChaseArt .setChaseLabel{bottom:12px}
+.setCard.hasChaseArt .setChaseArt{bottom:44px!important}
+.setCard.hasChaseArt .setCardHint{max-width:45%}
+
+@media(max-width:700px){
+  .setCard{min-height:250px!important}
+  .setChaseArt{
+    height:66%!important;
+    max-width:38%!important;
+    right:12px!important;
+    bottom:48px!important;
+  }
+  .setCardTop{max-width:62%!important}
+  .setCard.hasChaseArt .setCardProgress{right:40%!important}
+  .setChaseLabel{right:10px;bottom:10px;max-width:128px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -826,7 +985,7 @@ body{background:
     <button type="button" data-db-theme="espeon">☀️ Espeon</button>
     <button type="button" data-db-theme="umbreon">🌙 Umbreon</button>
   </div>
-  <div class="version">v0.10.0</div>
+  <div class="version">v0.10.1</div>
 </div>
 
   <section id="homeScreen">
@@ -2028,21 +2187,43 @@ function renderStats(){
  renderSetCards();
 }
 
+function dashboardSetHue(sid,name=''){
+ const named={
+  '151':338,'Crown Zenith':214,'Paldean Fates':278,'Scarlet & Violet':332,
+  'Obsidian Flames':24,'Paldea Evolved':152,'Paradox Rift':276,
+  'Temporal Forces':205,'Twilight Masquerade':164,'Shrouded Fable':262,
+  'Stellar Crown':224,'Surging Sparks':42,'Prismatic Evolutions':302,
+  'Journey Together':146,'Destined Rivals':8
+ };
+ if(named[name]!=null)return named[name];
+ let h=0;for(const ch of String(sid||name))h=(h*31+ch.charCodeAt(0))%360;
+ return h;
+}
 function dashboardChaseCard(sid){
- const cards=cardsBySet[sid]||[];
+ const cards=(cardsBySet[sid]||[]).filter(c=>c?.image);
  if(!cards.length)return null;
- const withArt=cards.filter(c=>c?.image);
- if(!withArt.length)return null;
- return [...withArt].sort((a,b)=>{
-   const av=String(a.localId||a.id||'').match(/\d+/g)||['0'];
-   const bv=String(b.localId||b.id||'').match(/\d+/g)||['0'];
-   return Number(bv[bv.length-1])-Number(av[av.length-1]);
- })[0];
+ const scored=cards.map(c=>{
+   const name=String(c.name||'');
+   const local=String(c.localId||c.id||'');
+   const nums=local.match(/\d+/g)||['0'];
+   const number=Number(nums[nums.length-1])||0;
+   const lower=name.toLowerCase();
+   let score=number;
+   if(/\b(ex|vstar|vmax|gx|v)\b/i.test(name))score+=900;
+   if(/^gg/i.test(local))score+=1100;
+   if(c.category==='Pokemon'||c.category==='Pokémon')score+=500;
+   if(/energy/i.test(lower))score-=5000;
+   if(/basic energy/i.test(lower))score-=5000;
+   return {c,score};
+ });
+ scored.sort((a,b)=>b.score-a.score);
+ return scored[0]?.c||cards[cards.length-1];
 }
 function dashboardChaseImage(sid){
  const c=dashboardChaseCard(sid);
  return c?.image?`${c.image}/high.webp`:'';
 }
+
 
 function renderSetCards(){
  let box=$('#setCards'); if(!box)return;
@@ -2056,9 +2237,11 @@ function renderSetCards(){
    let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0;
    let missing=t?Math.max(0,t-n):null;
    let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';
-   const chaseImage=dashboardChaseImage(s.id);
-   return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
-     ${chaseImage?`<img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy"><span class="setChaseGlow"></span>`:''}
+   const chase=dashboardChaseCard(s.id);
+   const chaseImage=chase?.image?`${chase.image}/high.webp`:'';
+   const setHue=dashboardSetHue(s.id,s.name);
+   return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''}" style="--setHue:${setHue}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
+     ${chaseImage?`<span class="setArtBackdrop" style="background-image:url('${chaseImage}')"></span><img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy">`:''}
      <div class="setCardTop">
        <div class="eyebrow" style="color:#777">${s.series||'Pokémon TCG'}</div>
        <h3>${s.name}</h3>
@@ -2071,6 +2254,7 @@ function renderSetCards(){
      <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
      <div class="setCardProgress"><i style="width:${t?p:0}%"></i></div>
      <div class="setCardHint">Tap to open binder</div>
+     ${chaseImage?`<div class="setChaseLabel"><small>Chase-style pick</small><b>${escapeHtml(chase?.name||'Featured card')}</b></div>`:''}
    </article>`;
  }).join('');
  $$('.openSet').forEach(card=>{
@@ -4759,7 +4943,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.10.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.10.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -5239,7 +5423,13 @@ function initDexBinder(){
   // Stage 3: legacy migration is best-effort only.
   try{ migrateV1(); }catch(e){ console.warn('Legacy migration skipped',e); }
   // Stage 4: resolve supported set IDs in the background.
-  resolveSupportedLibrary().then(()=>{renderSetCards();renderStats()}).catch(e=>console.warn('Set library preload skipped',e));
+  resolveSupportedLibrary().then(async()=>{
+    renderSetCards();renderStats();
+    // v0.10.1: load lightweight active-set card lists so dashboard artwork is available
+    // even before the user opens each binder. Variant/detail metadata is not bulk-loaded here.
+    await Promise.allSettled([...activeSetIds].map(sid=>loadSet(sid)));
+    renderSetCards();
+  }).catch(e=>console.warn('Set library preload skipped',e));
   try{bindSwipeNavigation()}catch(e){console.warn('Swipe navigation unavailable',e)}
   try{bindCloudControls()}catch(e){console.warn('Cloud controls unavailable',e)}
   initCloud().catch(e=>console.warn('Cloud initialization unavailable',e));
