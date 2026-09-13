@@ -185,7 +185,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.2</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.2a</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -267,6 +267,10 @@ body.isStandalone .pwaInstallNote{display:none!important}
 <div class="modal" id="tradeModal"><div class="sheet">
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Trade List</h2><p>Cards you've marked as available to trade.</p></div><button class="btn small close">Close</button></div>
+  <div class="tradeCompareActions" style="margin:8px 0 10px">
+    <button class="btn" id="tradeHistoryMainBtn">Trade History</button>
+    <div class="tradeStat"><b id="tradeHistorySummary">0 trades</b><small id="tradeHistoryValueSummary">$0 traded</small></div>
+  </div>
 
   <div class="tradeSummary">
     <div class="tradeStat"><b id="tradeCountStat">0</b><small>Trade cards</small></div>
@@ -1336,7 +1340,18 @@ function searchIncomingCards(){
 function saveTradeHistory(){
   localStorage.setItem(TRADE_HISTORY_KEY,JSON.stringify(tradeHistory));
 }
+
+function updateTradeHistorySummary(){
+  const count=tradeHistory.length;
+  const total=tradeHistory.reduce((s,t)=>s+Math.max(Number(t.giveValue)||0,Number(t.getValue)||0),0);
+  const countEl=$('#tradeHistorySummary');
+  const valueEl=$('#tradeHistoryValueSummary');
+  if(countEl)countEl.textContent=`${count} trade${count===1?'':'s'}`;
+  if(valueEl)valueEl.textContent=`${formatTradeMoney(total)} traded`;
+}
+
 function renderTradeHistory(){
+  updateTradeHistorySummary();
   $('#tradeHistoryList').innerHTML=tradeHistory.length?tradeHistory.map(t=>`
     <div class="historyItem"><b>${new Date(t.completedAt).toLocaleDateString()} · ${t.give.length} given / ${t.get.length} received</b>
     <small>${t.give.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing given'}<br>↔ ${t.get.map(x=>`${x.qty}× ${x.name}`).join(', ')||'Nothing received'}</small>
@@ -1371,7 +1386,7 @@ function completeTrade(){
     give:give.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)})),
     get:get.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)}))
   });
-  tradeHistory=tradeHistory.slice(0,250);saveTradeHistory();save();
+  tradeHistory=tradeHistory.slice(0,250);saveTradeHistory();save();updateTradeHistorySummary();
   tradeBasket.clear();incomingTradeBasket.clear();
   renderSet();renderTradeCompare();renderTradeHistory();
   $('#tradeCompareModal').classList.remove('open');
@@ -1380,6 +1395,7 @@ function completeTrade(){
 
 async function openTradeList(){
   $('#tradeModal').classList.add('open');
+  updateTradeHistorySummary();
   renderTradeList();
   const rows=tradeEntries();
   if(rows.some(r=>r.unitValue==null)){
@@ -1795,6 +1811,7 @@ $('#compareTradeBasket').onclick=prepareTradeCompare;
 $('#incomingTradeSearch').oninput=searchIncomingCards;
 $('#completeTradeBtn').onclick=completeTrade;
 $('#tradeHistoryBtn').onclick=()=>{renderTradeHistory();$('#tradeHistoryModal').classList.add('open')};
+$('#tradeHistoryMainBtn').onclick=()=>{renderTradeHistory();$('#tradeHistoryModal').classList.add('open')};
 
 $('#backupBtn').onclick=()=>{$('#backupBox').value=backup();$('#backupModal').classList.add('open')};
 $('#copyBackup').onclick=async()=>{try{await navigator.clipboard.writeText($('#backupBox').value);toast('Backup copied')}catch(e){toast('Copy unavailable — select the text manually')}};

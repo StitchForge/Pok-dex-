@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v072';
+const CACHE='dexbinder-shell-v072a';
 const APP_SHELL=[
   './',
   './index.html',
