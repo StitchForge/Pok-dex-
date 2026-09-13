@@ -205,13 +205,31 @@ body.isStandalone .pwaInstallNote{display:none!important}
 .historyDelete{font-size:.56rem}
 .dataHealthBox{border:1px solid var(--line);background:#f7f3ec;border-radius:13px;padding:10px;margin-top:10px;font-size:.62rem;line-height:1.45;color:var(--muted)}
 
+
+/* v0.7.3a multi-condition + graded inventory */
+.copyGroups{display:grid;gap:10px}
+.copyGroup{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px}
+.copyGroupHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:9px}
+.copyGroupHead b{font-size:.72rem}.copyGroupHead small{font-size:.55rem;color:var(--muted)}
+.copyGroupGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.copyGroupGrid .full{grid-column:1/-1}
+.copyTypeTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.copyTypeTabs button{border:1px solid var(--line);background:#f7f3ec;border-radius:9px;padding:7px;font-size:.6rem;font-weight:850}
+.copyTypeTabs button.on{background:#171717;color:#fff}
+.copyGroupActions{display:flex;justify-content:space-between;gap:8px;margin-top:9px}
+.copyGroupActions .danger{background:none;border:0;color:#8c4037;text-decoration:underline;font-size:.57rem}
+.gradeFields.hidden{display:none}
+.addCopyGroup{width:100%;margin-top:9px}
+.inventoryHint{font-size:.56rem;color:var(--muted);line-height:1.45;margin-top:8px}
+.lotTag{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 6px;font-size:.5rem;font-weight:850;margin-right:4px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3a</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -312,7 +330,7 @@ body.isStandalone .pwaInstallNote{display:none!important}
   </div>
 
   <div class="dataHealthBox" id="dataHealthBox">Checking collector data…</div>
-  <div class="csvNote">Master-set completion counts collectible positions. Physical card count includes duplicate copies, so these numbers are intentionally different.</div>
+  <div class="csvNote">Master-set completion counts collectible positions. Physical card count includes duplicate copies and mixed conditions/grades, so these numbers are intentionally different.</div>
 </div></div>
 
 <div class="modal" id="globalSearchModal"><div class="sheet">
@@ -1131,42 +1149,86 @@ function updateVisiblePrice(x){if(!x.variant)return;let el=$$('.card').find(node
 
 
 function metaKey(sid,cid,variantId){return key(sid,cid,variantId)}
-function getCollectorMeta(sid,cid,variantId){
-  const k=metaKey(sid,cid,variantId);
-  const raw=collectorMeta[k]||{};
-  const quantity=Math.max(1,Number(raw.quantity)||1);
-  const legacyTrade=raw.forTrade?quantity:0;
-  const tradeQuantity=Math.max(0,Math.min(quantity,Number(raw.tradeQuantity ?? legacyTrade)||0));
+function normaliseCollectorLot(lot,index=0){
+  const quantity=Math.max(1,Number(lot?.quantity)||1);
+  let tradeQuantity=Number(lot?.tradeQuantity);
+  if(!Number.isFinite(tradeQuantity))tradeQuantity=lot?.forTrade?quantity:0;
+  tradeQuantity=Math.max(0,Math.min(quantity,tradeQuantity));
   return {
+    id:lot?.id||`lot-${Date.now()}-${index}-${Math.random().toString(36).slice(2,7)}`,
     quantity,
     tradeQuantity,
+    type:lot?.type==='graded'?'graded':'raw',
+    condition:lot?.condition||'',
+    language:lot?.language||'English',
+    gradingCompany:lot?.gradingCompany||'PSA',
+    grade:lot?.grade||'',
+    certNumber:lot?.certNumber||'',
+    purchasePrice:lot?.purchasePrice??'',
+    purchaseDate:lot?.purchaseDate||'',
+    notes:lot?.notes||'',
+    tradeAddedAt:tradeQuantity>0?(lot?.tradeAddedAt||new Date().toISOString()):''
+  };
+}
+function legacyMetaToLots(raw){
+  if(Array.isArray(raw?.lots)&&raw.lots.length)return raw.lots.map(normaliseCollectorLot);
+  if(!raw||typeof raw!=='object')return [normaliseCollectorLot({})];
+  return [normaliseCollectorLot({
+    quantity:raw.quantity,
+    tradeQuantity:raw.tradeQuantity ?? (raw.forTrade?raw.quantity||1:0),
+    type:raw.type||'raw',
     condition:raw.condition||'',
     language:raw.language||'English',
+    gradingCompany:raw.gradingCompany||'PSA',
+    grade:raw.grade||'',
+    certNumber:raw.certNumber||'',
     purchasePrice:raw.purchasePrice??'',
     purchaseDate:raw.purchaseDate||'',
     notes:raw.notes||'',
-    forTrade:tradeQuantity>0,
     tradeAddedAt:raw.tradeAddedAt||''
+  })];
+}
+function getCollectorLots(sid,cid,variantId){
+  const raw=collectorMeta[metaKey(sid,cid,variantId)]||{};
+  return legacyMetaToLots(raw);
+}
+function getCollectorMeta(sid,cid,variantId){
+  const lots=getCollectorLots(sid,cid,variantId);
+  const quantity=lots.reduce((s,l)=>s+l.quantity,0);
+  const tradeQuantity=lots.reduce((s,l)=>s+l.tradeQuantity,0);
+  const unique=(field)=>{const vals=[...new Set(lots.map(l=>l[field]).filter(Boolean))];return vals.length===1?vals[0]:(vals.length?'Mixed':'')};
+  return {
+    quantity,
+    tradeQuantity,
+    condition:unique('condition'),
+    language:unique('language')||'English',
+    purchasePrice:'',
+    purchaseDate:'',
+    notes:'',
+    forTrade:tradeQuantity>0,
+    tradeAddedAt:lots.map(l=>l.tradeAddedAt).filter(Boolean).sort().at(-1)||'',
+    lots
   };
 }
 function saveCollectorMeta(){
   try{localStorage.setItem(COLLECTOR_META_KEY,JSON.stringify(collectorMeta))}catch(e){console.warn('Collector metadata save failed',e)}
 }
-function setCollectorMeta(sid,cid,variantId,data){
+function setCollectorLots(sid,cid,variantId,lots){
   const k=metaKey(sid,cid,variantId);
-  const prev=collectorMeta[k]||{};
-  const quantity=Math.max(1,Number(data.quantity)||1);
-  let tradeQuantity=Math.max(0,Math.min(quantity,Number(data.tradeQuantity ?? (data.forTrade?quantity:0))||0));
-  const wasTrade=Number(prev.tradeQuantity ?? (prev.forTrade?prev.quantity||1:0))>0;
-  const nowTrade=tradeQuantity>0;
-  collectorMeta[k]={
-    ...data,
-    quantity,
-    tradeQuantity,
-    forTrade:nowTrade,
-    tradeAddedAt: nowTrade ? (wasTrade && prev.tradeAddedAt ? prev.tradeAddedAt : new Date().toISOString()) : ''
-  };
+  const clean=(lots||[]).map(normaliseCollectorLot).filter(l=>l.quantity>0);
+  collectorMeta[k]={schemaVersion:2,lots:clean.length?clean:[normaliseCollectorLot({})]};
   saveCollectorMeta();
+}
+function setCollectorMeta(sid,cid,variantId,data){
+  // Compatibility wrapper for older parts of DexBinder.
+  // If lots are supplied, preserve them. Otherwise update the first group.
+  if(Array.isArray(data?.lots)){setCollectorLots(sid,cid,variantId,data.lots);return}
+  const existing=getCollectorLots(sid,cid,variantId);
+  const first=existing[0]||normaliseCollectorLot({});
+  const quantity=Math.max(1,Number(data.quantity)||first.quantity||1);
+  let tradeQuantity=Math.max(0,Math.min(quantity,Number(data.tradeQuantity ?? (data.forTrade?quantity:0))||0));
+  existing[0]=normaliseCollectorLot({...first,...data,quantity,tradeQuantity});
+  setCollectorLots(sid,cid,variantId,existing);
 }
 function deleteCollectorMeta(sid,cid,variantId){
   delete collectorMeta[metaKey(sid,cid,variantId)];
@@ -1185,17 +1247,20 @@ function tradeEntries(){
   for(const [sid,cards] of Object.entries(cardsBySet)){
     for(const c of (cards||[])){
       for(const v of variantsFor(sid,c)){
-        const k=key(sid,c.id,v.id);
-        if(!owned.has(k))continue;
-        const m=getCollectorMeta(sid,c.id,v.id);
-        if(m.tradeQuantity<=0)continue;
-        const unit=tradeReferencePrice(c,v.id);
-        rows.push({
-          sid,c,v,key:k,meta:m,
-          unitValue:unit,
-          totalValue:unit==null?null:unit*m.tradeQuantity,
-          setName:SETS[sid]?.name||sid
-        });
+        const baseKey=key(sid,c.id,v.id);
+        if(!owned.has(baseKey))continue;
+        const lots=getCollectorLots(sid,c.id,v.id);
+        for(const lot of lots){
+          if(lot.tradeQuantity<=0)continue;
+          const unit=tradeReferencePrice(c,v.id);
+          rows.push({
+            sid,c,v,key:`${baseKey}::${lot.id}`,baseKey,lotId:lot.id,
+            meta:{...lot,forTrade:true},
+            unitValue:unit,
+            totalValue:unit==null?null:unit*lot.tradeQuantity,
+            setName:SETS[sid]?.name||sid
+          });
+        }
       }
     }
   }
@@ -1256,7 +1321,7 @@ function renderTradeList(){
   }else{
     $('#tradeList').innerHTML=rows.map(r=>{
       const inBasket=tradeBasket.has(r.key);
-      const cond=r.meta.condition||'Condition not set';
+      const cond=r.meta.type==='graded'?`${r.meta.gradingCompany||'Graded'} ${r.meta.grade||'grade unset'}${r.meta.certNumber?` · Cert ${r.meta.certNumber}`:''}`:(r.meta.condition||'Condition not set');
       const lang=r.meta.language||'English';
       const unit=r.unitValue==null?'<span class="tradePriceUnknown">Price unavailable</span>':`${formatTradeMoney(r.unitValue)} each`;
       const total=r.totalValue==null?'—':formatTradeMoney(r.totalValue);
@@ -1264,7 +1329,7 @@ function renderTradeList(){
         <div class="tradeThumb"><img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)"></div>
         <div class="tradeMain">
           <b>${r.c.name}</b>
-          <div class="tradeMeta">${r.setName} · #${r.c.localId} · ${r.v.label}<br>${cond} · ${lang}<br><b>${r.meta.tradeQuantity} available</b> · ${r.meta.quantity} owned</div>
+          <div class="tradeMeta">${r.setName} · #${r.c.localId} · ${r.v.label}<br>${cond} · ${lang}<br><b>${r.meta.tradeQuantity} available</b> · ${r.meta.quantity} in this group</div>
           <div class="tradeValue">${total} <small>${unit}</small></div>
         </div>
         <div class="tradeActions">
@@ -1286,8 +1351,10 @@ function renderTradeList(){
   $$('[data-remove-trade]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.removeTrade;
     const r=all.find(x=>x.key===k);if(!r)return;
-    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
-    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,tradeQuantity:0,forTrade:false});
+    const lots=getCollectorLots(r.sid,r.c.id,r.v.id);
+    const lot=lots.find(x=>x.id===r.lotId);
+    if(lot)lot.tradeQuantity=0;
+    setCollectorLots(r.sid,r.c.id,r.v.id,lots);
     tradeBasket.delete(k);
     renderTradeList();
     renderSet();
@@ -1470,23 +1537,27 @@ function completeTrade(){
   if(!confirm(summary))return;
 
   for(const r of give){
-    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
-    const remaining=Math.max(0,m.quantity-r.selectedQty);
-    if(remaining===0){
-      owned.delete(key(r.sid,r.c.id,r.v.id));deleteCollectorMeta(r.sid,r.c.id,r.v.id);
-    }else{
-      setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,quantity:remaining,tradeQuantity:Math.max(0,m.tradeQuantity-r.selectedQty)});
-    }
+    let lots=getCollectorLots(r.sid,r.c.id,r.v.id);
+    const lot=lots.find(x=>x.id===r.lotId);
+    if(!lot)continue;
+    lot.quantity=Math.max(0,lot.quantity-r.selectedQty);
+    lot.tradeQuantity=Math.max(0,lot.tradeQuantity-r.selectedQty);
+    lots=lots.filter(x=>x.quantity>0);
+    if(!lots.length){
+      owned.delete(key(r.sid,r.c.id,r.v.id));
+      deleteCollectorMeta(r.sid,r.c.id,r.v.id);
+    }else setCollectorLots(r.sid,r.c.id,r.v.id,lots);
   }
   for(const r of get){
     const k=key(r.sid,r.c.id,r.v.id),wasOwned=owned.has(k);
     owned.add(k);
-    const m=getCollectorMeta(r.sid,r.c.id,r.v.id);
-    setCollectorMeta(r.sid,r.c.id,r.v.id,{...m,quantity:wasOwned?m.quantity+r.selectedQty:r.selectedQty,tradeQuantity:wasOwned?m.tradeQuantity:0});
+    const lots=wasOwned?getCollectorLots(r.sid,r.c.id,r.v.id):[];
+    lots.push(normaliseCollectorLot({quantity:r.selectedQty,tradeQuantity:0,type:'raw',language:'English',notes:'Received via trade'}));
+    setCollectorLots(r.sid,r.c.id,r.v.id,lots);
   }
   tradeHistory.unshift({
     id:`trade-${Date.now()}`,completedAt:new Date().toISOString(),giveValue,getValue,
-    give:give.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)})),
+    give:give.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r),lotId:r.lotId,type:r.meta.type,condition:r.meta.condition,gradingCompany:r.meta.gradingCompany,grade:r.meta.grade})),
     get:get.map(r=>({sid:r.sid,cid:r.c.id,variantId:r.v.id,name:r.c.name,qty:r.selectedQty,value:lineUnitValue(r)}))
   });
   tradeHistory=tradeHistory.slice(0,250);saveTradeHistory();save();updateTradeHistorySummary();
@@ -1515,14 +1586,13 @@ function migrateCollectorDataV073(){
   let changed=0;
   for(const [k,raw] of Object.entries(collectorMeta)){
     if(!raw || typeof raw!=='object'){delete collectorMeta[k];changed++;continue}
-    const quantity=Math.max(1,Number(raw.quantity)||1);
-    let tq=Number(raw.tradeQuantity);
-    if(!Number.isFinite(tq))tq=raw.forTrade?quantity:0;
-    tq=Math.max(0,Math.min(quantity,tq));
-    if(raw.quantity!==quantity || raw.tradeQuantity!==tq || raw.forTrade!==(tq>0)){
-      collectorMeta[k]={...raw,quantity,tradeQuantity:tq,forTrade:tq>0};
-      changed++;
+    if(raw.schemaVersion===2 && Array.isArray(raw.lots)){
+      const clean=raw.lots.map(normaliseCollectorLot);
+      if(JSON.stringify(clean)!==JSON.stringify(raw.lots)){collectorMeta[k]={schemaVersion:2,lots:clean};changed++}
+      continue;
     }
+    collectorMeta[k]={schemaVersion:2,lots:legacyMetaToLots(raw)};
+    changed++;
   }
   if(changed)saveCollectorMeta();
   localStorage.setItem(COLLECTOR_MIGRATION_KEY,new Date().toISOString());
@@ -1538,7 +1608,7 @@ function collectorOwnedRows(){
         const m=getCollectorMeta(sid,c.id,v.id);
         const unit=tradeReferencePrice(c,v.id);
         rows.push({
-          sid,c,v,key:k,meta:m,setName:SETS[sid]?.name||sid,
+          sid,c,v,key:k,meta:m,lots:m.lots,setName:SETS[sid]?.name||sid,
           unitValue:unit,
           totalValue:unit==null?null:unit*m.quantity,
           duplicateQty:Math.max(0,m.quantity-1),
@@ -1564,10 +1634,10 @@ function collectionStats(){
   const collectionValue=rows.reduce((s,r)=>s+(r.totalValue||0),0);
   const duplicateValue=rows.reduce((s,r)=>s+(r.duplicateValue||0),0);
   const tradeValue=rows.reduce((s,r)=>s+(r.unitValue==null?0:r.unitValue*r.meta.tradeQuantity),0);
-  const recordedSpend=rows.reduce((s,r)=>{
-    const p=Number(r.meta.purchasePrice);
-    return s+(Number.isFinite(p)&&p>=0?p*r.meta.quantity:0);
-  },0);
+  const recordedSpend=rows.reduce((s,r)=>s+r.lots.reduce((ls,l)=>{
+    const p=Number(l.purchasePrice);
+    return ls+(Number.isFinite(p)&&p>=0?p*l.quantity:0);
+  },0),0);
   return {rows,masterOwned,masterTotal,physical,duplicates,tradeQty,completedSets,collectionValue,duplicateValue,tradeValue,recordedSpend};
 }
 async function ensureAllActiveSetsLoaded(){
@@ -1585,8 +1655,29 @@ async function ensurePricesForRows(rows){
     try{await loadPriceFor(r.c)}catch(e){}
   }
 }
+
+function localCollectorStats(){
+  const masterOwned=owned.size;
+  const masterTotal=activeSetIds.reduce((s,sid)=>s+(SETS[sid]?.masterTotal||0),0);
+  let physical=0,duplicates=0,tradeQty=0;
+  for(const k of owned){
+    const raw=collectorMeta[k];
+    const lots=legacyMetaToLots(raw||{quantity:1});
+    const q=lots.reduce((s,l)=>s+l.quantity,0);
+    physical+=q;
+    duplicates+=Math.max(0,q-1);
+    tradeQty+=lots.reduce((s,l)=>s+l.tradeQuantity,0);
+  }
+  const completedSets=activeSetIds.filter(sid=>{
+    let n=0;
+    for(const k of owned)if(k.startsWith(`${sid}|`))n++;
+    return n>=(SETS[sid]?.masterTotal||Infinity);
+  }).length;
+  return {masterOwned,masterTotal,physical,duplicates,tradeQty,completedSets};
+}
+
 function renderCollectorTools(){
-  const s=collectionStats();
+  const s=localCollectorStats();
   $('#metricMasterProgress').textContent=`${s.masterOwned}/${s.masterTotal}`;
   $('#metricPhysicalCards').textContent=s.physical;
   $('#metricDuplicates').textContent=s.duplicates;
@@ -1594,13 +1685,13 @@ function renderCollectorTools(){
   $('#metricCompletedSets').textContent=s.completedSets;
   $('#metricCompletedTrades').textContent=tradeHistory.length;
   const migrated=localStorage.getItem(COLLECTOR_MIGRATION_KEY);
-  $('#dataHealthBox').textContent=`Collector data checked · ${Object.keys(collectorMeta).length} metadata record${Object.keys(collectorMeta).length===1?'':'s'} · trade quantities validated${migrated?' · migration complete':''}.`;
+  $('#dataHealthBox').textContent=`Collector data ready · ${Object.keys(collectorMeta).length} metadata record${Object.keys(collectorMeta).length===1?'':'s'} · multi-condition inventory active${migrated?' · migration complete':''}.`;
 }
 async function openCollectorTools(){
   $('#collectorToolsModal').classList.add('open');
-  await ensureAllActiveSetsLoaded();
   migrateCollectorDataV073();
-  renderCollectorTools();
+  renderCollectorTools(); // local stats first — no network wait
+  ensureAllActiveSetsLoaded().then(()=>renderCollectorTools()).catch(()=>{});
 }
 function globalSearchRows(q){
   q=q.trim().toLowerCase();
@@ -1624,7 +1715,7 @@ function renderGlobalSearch(){
   const rows=globalSearchRows(q);
   if(q.trim().length<2){$('#globalCardSearchResults').innerHTML='<div class="tradeEmpty">Type at least 2 characters.</div>';return}
   $('#globalCardSearchResults').innerHTML=rows.length?rows.map(r=>{
-    const ownedText=r.isOwned?`${r.meta.quantity} owned · ${r.meta.tradeQuantity} trade`:'Not owned';
+    const ownedText=r.isOwned?`${r.meta.quantity} physical · ${r.meta.lots.length} group${r.meta.lots.length===1?'':'s'} · ${r.meta.tradeQuantity} trade`:'Not owned';
     const price=tradeReferencePrice(r.c,r.v.id);
     return `<div class="searchResult">
       <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)">
@@ -1670,7 +1761,14 @@ function renderDuplicates(){
     </div>`).join(''):'<div class="tradeEmpty">No duplicate copies yet.</div>';
   $$('[data-dup-trade]').forEach(b=>b.onclick=()=>{
     const r=collectorOwnedRows().find(x=>x.key===b.dataset.dupTrade);if(!r)return;
-    setCollectorMeta(r.sid,r.c.id,r.v.id,{...r.meta,tradeQuantity:r.duplicateQty});
+    const lots=getCollectorLots(r.sid,r.c.id,r.v.id).map(x=>({...x,tradeQuantity:0}));
+    let reserve=1;
+    for(const l of lots){
+      const keep=Math.min(reserve,l.quantity);
+      reserve-=keep;
+      l.tradeQuantity=l.quantity-keep;
+    }
+    setCollectorLots(r.sid,r.c.id,r.v.id,lots);
     renderDuplicates();renderCollectorTools();toast('Duplicates added to trade binder');
   });
   $$('[data-dup-open]').forEach(b=>b.onclick=async()=>{
@@ -1702,15 +1800,19 @@ function csvEscape(v){
 }
 function exportCollectionCSV(){
   const rows=collectorOwnedRows();
-  const headers=['Set','Card','Number','Variant','Owned Quantity','Trade Quantity','Condition','Language','Purchase Price','Purchase Date','Notes','Reference Price','Estimated Total Value'];
+  const headers=['Set','Card','Number','Variant','Group Type','Owned Quantity','Trade Quantity','Condition','Language','Grading Company','Grade','Certification Number','Purchase Price / Card','Purchase Date','Notes','Reference Price','Estimated Group Value'];
   const lines=[headers.map(csvEscape).join(',')];
   for(const r of rows){
-    lines.push([
-      r.setName,r.c.name,r.c.localId,r.v.label,r.meta.quantity,r.meta.tradeQuantity,
-      r.meta.condition||'',r.meta.language||'',r.meta.purchasePrice||'',r.meta.purchaseDate||'',
-      r.meta.notes||'',r.unitValue==null?'':r.unitValue.toFixed(2),
-      r.totalValue==null?'':r.totalValue.toFixed(2)
-    ].map(csvEscape).join(','));
+    for(const l of r.lots){
+      lines.push([
+        r.setName,r.c.name,r.c.localId,r.v.label,l.type,l.quantity,l.tradeQuantity,
+        l.type==='graded'?'':(l.condition||''),l.language||'',
+        l.type==='graded'?(l.gradingCompany||''):'',l.type==='graded'?(l.grade||''):'',l.type==='graded'?(l.certNumber||''):'',
+        l.purchasePrice||'',l.purchaseDate||'',l.notes||'',
+        r.unitValue==null?'':r.unitValue.toFixed(2),
+        r.unitValue==null?'':(r.unitValue*l.quantity).toFixed(2)
+      ].map(csvEscape).join(','));
+    }
   }
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);
@@ -1733,93 +1835,160 @@ function cardCollectorSummary(sid,c){
 function escapeHtml(v=''){
   return String(v).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
 }
-function collectorPanelHTML(c,v){
-  const m=getCollectorMeta(currentSet,c.id,v.id);
-  const prefix=`collector-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}`;
-  return `<div class="collectorPanel" data-collector="${v.id}">
-    <div class="collectorHead"><div><b>Collector details</b><small>${v.label} · optional</small></div><span>${m.quantity>1?`${m.quantity} copies`:'1 copy'}</span></div>
-    <div class="collectorBody">
-      <div class="collectorGrid">
-        <div class="collectorField">
-          <label>Quantity</label>
-          <div class="qtyControl">
-            <button type="button" data-qty-minus="${v.id}" aria-label="Decrease quantity">−</button>
-            <div class="qtyValue" id="${prefix}-qty">${m.quantity}</div>
-            <button type="button" data-qty-plus="${v.id}" aria-label="Increase quantity">+</button>
-          </div>
-        </div>
-        <div class="collectorField">
-          <label>Condition</label>
-          <select class="collectorSelect" id="${prefix}-condition">
-            <option value="" ${m.condition===''?'selected':''}>Not set</option>
-            <option value="NM" ${m.condition==='NM'?'selected':''}>Near Mint</option>
-            <option value="LP" ${m.condition==='LP'?'selected':''}>Lightly Played</option>
-            <option value="MP" ${m.condition==='MP'?'selected':''}>Moderately Played</option>
-            <option value="HP" ${m.condition==='HP'?'selected':''}>Heavily Played</option>
-            <option value="DMG" ${m.condition==='DMG'?'selected':''}>Damaged</option>
-          </select>
-        </div>
-        <div class="collectorField">
-          <label>Language</label>
-          <select class="collectorSelect" id="${prefix}-language">
-            ${['English','Japanese','Chinese','Korean','French','German','Italian','Spanish','Portuguese','Other'].map(x=>`<option value="${x}" ${m.language===x?'selected':''}>${x}</option>`).join('')}
-          </select>
-        </div>
-        <div class="collectorField">
-          <label>Purchase price</label>
-          <input class="collectorInput" id="${prefix}-price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="${escapeHtml(m.purchasePrice)}">
-        </div>
-        <div class="collectorField">
-          <label>Purchase date</label>
-          <input class="collectorInput" id="${prefix}-date" type="date" value="${escapeHtml(m.purchaseDate)}">
-        </div>
-        <div class="collectorField">
-          <label>Trade quantity</label>
-          <div class="tradeQtyControl">
-            <button type="button" data-trade-minus="${v.id}">−</button>
-            <div class="tradeQtyValue" id="${prefix}-tradeqty">${m.tradeQuantity} of ${m.quantity}</div>
-            <button type="button" data-trade-plus="${v.id}">+</button>
-          </div>
-        </div>
-        <div class="collectorField full">
-          <label>Notes</label>
-          <textarea class="collectorNotes" id="${prefix}-notes" placeholder="Where you found it, grading notes, memories…">${escapeHtml(m.notes)}</textarea>
+function collectorLotHTML(c,v,l,i){
+  const base=`lot-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}-${l.id.replace(/[^a-zA-Z0-9_-]/g,'_')}`;
+  const conditionOptions=[
+    ['','Not set'],['NM','Near Mint'],['LP','Lightly Played'],['MP','Moderately Played'],['HP','Heavily Played'],['DMG','Damaged']
+  ].map(([val,label])=>`<option value="${val}" ${l.condition===val?'selected':''}>${label}</option>`).join('');
+  const grades=['10','9.5','9','8.5','8','7.5','7','6','5','4','3','2','1','Authentic','Other'];
+  return `<div class="copyGroup" data-lot="${l.id}">
+    <div class="copyGroupHead">
+      <div><b>${l.type==='graded'?'Graded':'Raw'} copy group ${i+1}</b><small>${l.quantity} cop${l.quantity===1?'y':'ies'} · ${l.tradeQuantity} trade</small></div>
+      <span class="lotTag">${l.type==='graded'?(escapeHtml(l.gradingCompany)+' '+escapeHtml(l.grade||'')):(l.condition||'Condition unset')}</span>
+    </div>
+    <div class="copyGroupGrid">
+      <div class="collectorField full">
+        <label>Card type</label>
+        <div class="copyTypeTabs">
+          <button type="button" class="${l.type==='raw'?'on':''}" data-lot-type="${l.id}|raw">Raw</button>
+          <button type="button" class="${l.type==='graded'?'on':''}" data-lot-type="${l.id}|graded">Graded</button>
         </div>
       </div>
-      <button class="btn dark collectorSave" type="button" data-save-collector="${v.id}">Save collector details</button>
-      <div class="collectorHint">These details are stored on this device and included in DexBinder backups. Cloud sync for collector details will follow after the v0.7 data model is proven stable.</div>
+      <div class="collectorField">
+        <label>Quantity</label>
+        <div class="qtyControl">
+          <button type="button" data-lot-qty-minus="${l.id}">−</button>
+          <div class="qtyValue" id="${base}-qty">${l.quantity}</div>
+          <button type="button" data-lot-qty-plus="${l.id}">+</button>
+        </div>
+      </div>
+      <div class="collectorField">
+        <label>Trade quantity</label>
+        <div class="tradeQtyControl">
+          <button type="button" data-lot-trade-minus="${l.id}">−</button>
+          <div class="tradeQtyValue" id="${base}-trade">${l.tradeQuantity} of ${l.quantity}</div>
+          <button type="button" data-lot-trade-plus="${l.id}">+</button>
+        </div>
+      </div>
+      <div class="collectorField ${l.type==='graded'?'hidden':''}" data-raw-field="${l.id}">
+        <label>Condition</label>
+        <select class="collectorSelect" id="${base}-condition">${conditionOptions}</select>
+      </div>
+      <div class="collectorField">
+        <label>Language</label>
+        <select class="collectorSelect" id="${base}-language">
+          ${['English','Japanese','Chinese','Korean','French','German','Italian','Spanish','Portuguese','Other'].map(x=>`<option value="${x}" ${l.language===x?'selected':''}>${x}</option>`).join('')}
+        </select>
+      </div>
+      <div class="gradeFields ${l.type==='graded'?'':'hidden'} full" data-grade-fields="${l.id}">
+        <div class="copyGroupGrid">
+          <div class="collectorField">
+            <label>Grading company</label>
+            <select class="collectorSelect" id="${base}-company">
+              ${['PSA','CGC','BGS','SGC','ACE','Other'].map(x=>`<option value="${x}" ${l.gradingCompany===x?'selected':''}>${x}</option>`).join('')}
+            </select>
+          </div>
+          <div class="collectorField">
+            <label>Grade</label>
+            <select class="collectorSelect" id="${base}-grade">
+              <option value="">Not set</option>
+              ${grades.map(x=>`<option value="${x}" ${l.grade===x?'selected':''}>${x}</option>`).join('')}
+            </select>
+          </div>
+          <div class="collectorField full">
+            <label>Certification number</label>
+            <input class="collectorInput" id="${base}-cert" type="text" placeholder="Optional" value="${escapeHtml(l.certNumber)}">
+          </div>
+        </div>
+      </div>
+      <div class="collectorField">
+        <label>Purchase price / card</label>
+        <input class="collectorInput" id="${base}-price" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0.00" value="${escapeHtml(l.purchasePrice)}">
+      </div>
+      <div class="collectorField">
+        <label>Purchase date</label>
+        <input class="collectorInput" id="${base}-date" type="date" value="${escapeHtml(l.purchaseDate)}">
+      </div>
+      <div class="collectorField full">
+        <label>Notes</label>
+        <textarea class="collectorNotes" id="${base}-notes" placeholder="Where you found it, provenance, grading notes…">${escapeHtml(l.notes)}</textarea>
+      </div>
+    </div>
+    <div class="copyGroupActions">
+      <small>${l.type==='graded'?'Graded cards can carry their own grade and cert number.':'Use separate groups for different conditions.'}</small>
+      <button type="button" class="danger" data-remove-lot="${l.id}">Remove group</button>
+    </div>
+  </div>`;
+}
+function collectorPanelHTML(c,v){
+  const m=getCollectorMeta(currentSet,c.id,v.id);
+  const lots=m.lots;
+  return `<div class="collectorPanel" data-collector="${v.id}">
+    <div class="collectorHead"><div><b>Collector copies</b><small>${v.label} · ${lots.length} group${lots.length===1?'':'s'}</small></div><span>${m.quantity} cop${m.quantity===1?'y':'ies'}</span></div>
+    <div class="collectorBody">
+      <div class="copyGroups">${lots.map((l,i)=>collectorLotHTML(c,v,l,i)).join('')}</div>
+      <button class="btn addCopyGroup" type="button" data-add-lot="${v.id}">+ Add condition / graded group</button>
+      <button class="btn dark collectorSave" type="button" data-save-collector="${v.id}">Save collector copies</button>
+      <div class="inventoryHint">Each group can have its own quantity, condition or grade, language, trade quantity and acquisition details. These details remain local + Backup/Restore protected.</div>
     </div>
   </div>`;
 }
 function bindCollectorPanel(c,v){
-  const prefix=`collector-${c.id.replace(/[^a-zA-Z0-9_-]/g,'_')}-${v.id}`;
-  let draft=getCollectorMeta(currentSet,c.id,v.id);
-  const qtyEl=$(`#${prefix}-qty`);
-  const tradeQtyEl=$(`#${prefix}-tradeqty`);
-  const refreshDraftUI=()=>{
-    draft.tradeQuantity=Math.min(draft.quantity,draft.tradeQuantity||0);
-    qtyEl.textContent=draft.quantity;
-    if(tradeQtyEl)tradeQtyEl.textContent=`${draft.tradeQuantity} of ${draft.quantity}`;
+  let lots=getCollectorLots(currentSet,c.id,v.id).map(x=>({...x}));
+  const safe=id=>id.replace(/[^a-zA-Z0-9_-]/g,'_');
+  const baseFor=l=>`lot-${safe(c.id)}-${v.id}-${safe(l.id)}`;
+  const collectDOM=()=>{
+    for(const l of lots){
+      const base=baseFor(l);
+      const cond=$(`#${base}-condition`),lang=$(`#${base}-language`),company=$(`#${base}-company`),grade=$(`#${base}-grade`),cert=$(`#${base}-cert`),price=$(`#${base}-price`),date=$(`#${base}-date`),notes=$(`#${base}-notes`);
+      if(cond)l.condition=cond.value;
+      if(lang)l.language=lang.value;
+      if(company)l.gradingCompany=company.value;
+      if(grade)l.grade=grade.value;
+      if(cert)l.certNumber=cert.value.trim();
+      if(price)l.purchasePrice=price.value;
+      if(date)l.purchaseDate=date.value;
+      if(notes)l.notes=notes.value.trim();
+    }
   };
-  $(`[data-qty-minus="${v.id}"]`).onclick=()=>{draft.quantity=Math.max(1,draft.quantity-1);draft.tradeQuantity=Math.min(draft.tradeQuantity,draft.quantity);refreshDraftUI()};
-  $(`[data-qty-plus="${v.id}"]`).onclick=()=>{draft.quantity=Math.min(99,draft.quantity+1);refreshDraftUI()};
-  $(`[data-trade-minus="${v.id}"]`).onclick=()=>{draft.tradeQuantity=Math.max(0,(draft.tradeQuantity||0)-1);refreshDraftUI()};
-  $(`[data-trade-plus="${v.id}"]`).onclick=()=>{draft.tradeQuantity=Math.min(draft.quantity,(draft.tradeQuantity||0)+1);refreshDraftUI()};
-  $(`[data-save-collector="${v.id}"]`).onclick=()=>{
-    draft={
-      quantity:draft.quantity,
-      tradeQuantity:draft.tradeQuantity||0,
-      condition:$(`#${prefix}-condition`).value,
-      language:$(`#${prefix}-language`).value,
-      purchasePrice:$(`#${prefix}-price`).value,
-      purchaseDate:$(`#${prefix}-date`).value,
-      notes:$(`#${prefix}-notes`).value.trim(),
-      forTrade:(draft.tradeQuantity||0)>0
+  const rerender=()=>{setCollectorLots(currentSet,c.id,v.id,lots);openCard(c.id,v.id)};
+  const refreshLot=l=>{
+    const base=baseFor(l);
+    const q=$(`#${base}-qty`),t=$(`#${base}-trade`);
+    if(q)q.textContent=l.quantity;
+    if(t)t.textContent=`${l.tradeQuantity} of ${l.quantity}`;
+  };
+  for(const l of lots){
+    const base=baseFor(l);
+    const minus=$(`[data-lot-qty-minus="${l.id}"]`),plus=$(`[data-lot-qty-plus="${l.id}"]`);
+    const tminus=$(`[data-lot-trade-minus="${l.id}"]`),tplus=$(`[data-lot-trade-plus="${l.id}"]`);
+    if(minus)minus.onclick=()=>{l.quantity=Math.max(1,l.quantity-1);l.tradeQuantity=Math.min(l.tradeQuantity,l.quantity);refreshLot(l)};
+    if(plus)plus.onclick=()=>{l.quantity=Math.min(99,l.quantity+1);refreshLot(l)};
+    if(tminus)tminus.onclick=()=>{l.tradeQuantity=Math.max(0,l.tradeQuantity-1);refreshLot(l)};
+    if(tplus)tplus.onclick=()=>{l.tradeQuantity=Math.min(l.quantity,l.tradeQuantity+1);refreshLot(l)};
+    $$(`[data-lot-type^="${l.id}|"]`).forEach(b=>b.onclick=()=>{
+      collectDOM();l.type=b.dataset.lotType.split('|')[1];rerender();
+    });
+    const remove=$(`[data-remove-lot="${l.id}"]`);
+    if(remove)remove.onclick=()=>{
+      collectDOM();
+      if(lots.length===1){toast('Keep at least one copy group');return}
+      if(!confirm('Remove this copy group?'))return;
+      lots=lots.filter(x=>x.id!==l.id);rerender();
     };
-    setCollectorMeta(currentSet,c.id,v.id,draft);
-    toast('Collector details saved');
-    renderSet();
-    openCard(c.id,v.id);
+  }
+  const add=$(`[data-add-lot="${v.id}"]`);
+  if(add)add.onclick=()=>{
+    collectDOM();
+    lots.push(normaliseCollectorLot({quantity:1,tradeQuantity:0,type:'raw',language:'English'}));
+    rerender();
+  };
+  const save=$(`[data-save-collector="${v.id}"]`);
+  if(save)save.onclick=()=>{
+    collectDOM();
+    setCollectorLots(currentSet,c.id,v.id,lots);
+    toast('Collector copies saved');
+    renderSet();openCard(c.id,v.id);
   };
 }
 
