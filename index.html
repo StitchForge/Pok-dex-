@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.10.2 dashboard refinements */
+/* v0.10.3 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1011,6 +1011,156 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
   .chasePickerGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.achievementStrandCard{flex-basis:156px;min-height:214px}
 }
 
+
+/* ============================================================
+   DexBinder v0.10.3 — visual consistency pass
+   ============================================================ */
+
+/* Theme-aware primary CTA */
+body[data-theme="espeon"] #addCardsBtn{
+  background:linear-gradient(135deg,#b9c6ff,#cfbcff 52%,#f0c5df)!important;
+  border-color:rgba(113,105,187,.18)!important;
+  box-shadow:0 16px 34px rgba(121,110,194,.18)!important
+}
+body[data-theme="espeon"] #addCardsBtn b,
+body[data-theme="espeon"] #addCardsBtn small{color:#17213f!important}
+
+body[data-theme="umbreon"] #addCardsBtn{
+  background:linear-gradient(135deg,#29365e,#3a315d 52%,#4b2f5f)!important;
+  border-color:rgba(181,166,255,.16)!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.34)!important
+}
+body[data-theme="umbreon"] #addCardsBtn b,
+body[data-theme="umbreon"] #addCardsBtn small{color:#f8f7ff!important}
+
+body[data-theme="system"] #addCardsBtn{
+  background:linear-gradient(135deg,#b9c6ff,#cfbcff 52%,#f0c5df)!important;
+  border-color:rgba(113,105,187,.18)!important
+}
+body[data-theme="system"] #addCardsBtn b,
+body[data-theme="system"] #addCardsBtn small{color:#17213f!important}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] #addCardsBtn{
+    background:linear-gradient(135deg,#29365e,#3a315d 52%,#4b2f5f)!important;
+    border-color:rgba(181,166,255,.16)!important;
+    box-shadow:0 16px 38px rgba(0,0,0,.34)!important
+  }
+  body[data-theme="system"] #addCardsBtn b,
+  body[data-theme="system"] #addCardsBtn small{color:#f8f7ff!important}
+}
+
+/* Secondary pages now share the home hero visual language */
+#setScreen>.hero,
+#globalHuntScreen>.hero,
+#libraryScreen>.hero,
+.tradeDestinationHead{
+  position:relative!important;
+  overflow:hidden!important;
+  border:1px solid var(--db-line)!important;
+  border-radius:24px!important;
+  box-shadow:var(--db-shadow)!important;
+  color:var(--db-text)!important;
+  background:linear-gradient(125deg,
+    color-mix(in srgb,var(--db-blue) 78%,var(--db-panel)),
+    color-mix(in srgb,var(--db-pink) 72%,var(--db-panel)) 52%,
+    color-mix(in srgb,var(--db-purple) 20%,var(--db-panel)))!important
+}
+#setScreen>.hero:after,
+#globalHuntScreen>.hero:after,
+#libraryScreen>.hero:after,
+.tradeDestinationHead:after{
+  content:"";position:absolute;width:220px;height:220px;border-radius:50%;
+  right:-70px;top:-120px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--db-purple) 24%,transparent),transparent 68%);
+  pointer-events:none
+}
+#setScreen>.hero .eyebrow,
+#globalHuntScreen>.hero .eyebrow,
+#libraryScreen>.hero .eyebrow,
+.tradeDestinationHead .eyebrow,
+#setScreen>.hero p,
+#globalHuntScreen>.hero p,
+#libraryScreen>.hero p,
+.tradeDestinationHead p{color:var(--db-muted)!important}
+#setScreen>.hero h1,
+#globalHuntScreen>.hero h1,
+#libraryScreen>.hero h1,
+.tradeDestinationHead h1,
+#setScreen>.hero .stats b{color:var(--db-text)!important}
+#setScreen>.hero .stats span{color:var(--db-purple)!important}
+#setScreen>.hero .progress,
+#globalHuntScreen>.hero .progress,
+#libraryScreen>.hero .progress,
+.tradeDestinationHead .progress{background:color-mix(in srgb,var(--db-line) 72%,transparent)!important}
+#setScreen>.hero .progress i,
+#globalHuntScreen>.hero .progress i,
+#libraryScreen>.hero .progress i,
+.tradeDestinationHead .progress i{background:linear-gradient(90deg,var(--db-purple),#e6b35b)!important}
+
+/* Espeon: light pastel hero with strong navy text */
+body[data-theme="espeon"] #setScreen>.hero,
+body[data-theme="espeon"] #globalHuntScreen>.hero,
+body[data-theme="espeon"] #libraryScreen>.hero,
+body[data-theme="espeon"] .tradeDestinationHead{
+  background:linear-gradient(125deg,#dce7ff,#eadcff 52%,#f5d9ea)!important
+}
+body[data-theme="espeon"] #setScreen>.hero h1,
+body[data-theme="espeon"] #globalHuntScreen>.hero h1,
+body[data-theme="espeon"] #libraryScreen>.hero h1,
+body[data-theme="espeon"] .tradeDestinationHead h1,
+body[data-theme="espeon"] #setScreen>.hero .stats b{color:#17213f!important}
+body[data-theme="espeon"] #setScreen>.hero .eyebrow,
+body[data-theme="espeon"] #globalHuntScreen>.hero .eyebrow,
+body[data-theme="espeon"] #libraryScreen>.hero .eyebrow,
+body[data-theme="espeon"] .tradeDestinationHead .eyebrow,
+body[data-theme="espeon"] #setScreen>.hero p,
+body[data-theme="espeon"] #globalHuntScreen>.hero p,
+body[data-theme="espeon"] #libraryScreen>.hero p,
+body[data-theme="espeon"] .tradeDestinationHead p{color:#66708b!important}
+
+/* Umbreon: deep navy/plum hero with off-white text */
+body[data-theme="umbreon"] #setScreen>.hero,
+body[data-theme="umbreon"] #globalHuntScreen>.hero,
+body[data-theme="umbreon"] #libraryScreen>.hero,
+body[data-theme="umbreon"] .tradeDestinationHead{
+  background:linear-gradient(125deg,#18223a,#28213a 52%,#38203e)!important
+}
+body[data-theme="umbreon"] #setScreen>.hero h1,
+body[data-theme="umbreon"] #globalHuntScreen>.hero h1,
+body[data-theme="umbreon"] #libraryScreen>.hero h1,
+body[data-theme="umbreon"] .tradeDestinationHead h1,
+body[data-theme="umbreon"] #setScreen>.hero .stats b{color:#faf9ff!important}
+body[data-theme="umbreon"] #setScreen>.hero .eyebrow,
+body[data-theme="umbreon"] #globalHuntScreen>.hero .eyebrow,
+body[data-theme="umbreon"] #libraryScreen>.hero .eyebrow,
+body[data-theme="umbreon"] .tradeDestinationHead .eyebrow,
+body[data-theme="umbreon"] #setScreen>.hero p,
+body[data-theme="umbreon"] #globalHuntScreen>.hero p,
+body[data-theme="umbreon"] #libraryScreen>.hero p,
+body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
+
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] #setScreen>.hero,
+  body[data-theme="system"] #globalHuntScreen>.hero,
+  body[data-theme="system"] #libraryScreen>.hero,
+  body[data-theme="system"] .tradeDestinationHead{
+    background:linear-gradient(125deg,#18223a,#28213a 52%,#38203e)!important
+  }
+  body[data-theme="system"] #setScreen>.hero h1,
+  body[data-theme="system"] #globalHuntScreen>.hero h1,
+  body[data-theme="system"] #libraryScreen>.hero h1,
+  body[data-theme="system"] .tradeDestinationHead h1,
+  body[data-theme="system"] #setScreen>.hero .stats b{color:#faf9ff!important}
+  body[data-theme="system"] #setScreen>.hero .eyebrow,
+  body[data-theme="system"] #globalHuntScreen>.hero .eyebrow,
+  body[data-theme="system"] #libraryScreen>.hero .eyebrow,
+  body[data-theme="system"] .tradeDestinationHead .eyebrow,
+  body[data-theme="system"] #setScreen>.hero p,
+  body[data-theme="system"] #globalHuntScreen>.hero p,
+  body[data-theme="system"] #libraryScreen>.hero p,
+  body[data-theme="system"] .tradeDestinationHead p{color:#c9c5d9!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -1025,7 +1175,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
     <button type="button" data-db-theme="espeon">☀️ Espeon</button>
     <button type="button" data-db-theme="umbreon">🌙 Umbreon</button>
   </div>
-  <div class="version">v0.10.2</div>
+  <div class="version">v0.10.3</div>
 </div>
 
   <section id="homeScreen">
@@ -2242,6 +2392,44 @@ function renderStats(){
 }
 
 
+
+const WATCHTOWER_CHASE_DEFAULTS={
+  'Scarlet & Violet':{localId:'245',name:'Gardevoir ex'},
+  'Paldea Evolved':{localId:'203',name:'Magikarp'},
+  'Obsidian Flames':{localId:'223',name:'Charizard ex'},
+  '151':{localId:'199',name:'Charizard ex'},
+  'Paradox Rift':{localId:'199',name:'Groudon'},
+  'Paldean Fates':{localId:'232',name:'Mew ex'},
+  'Temporal Forces':{localId:'177',name:'Gastly'},
+  'Twilight Masquerade':{localId:'214',name:'Greninja ex'},
+  'Shrouded Fable':{localId:'078',name:'Persian'},
+  'Stellar Crown':{localId:'148',name:'Squirtle'},
+  'Surging Sparks':{localId:'238',name:'Pikachu ex'},
+  'Prismatic Evolutions':{localId:'161',name:'Umbreon ex'},
+  'Journey Together':{localId:'184',name:"Lillie's Clefairy ex"},
+  'Destined Rivals':{localId:'231',name:"Team Rocket's Mewtwo ex"},
+
+  'Delta Reign':{localId:'113',name:'Mega Rayquaza ex'},
+  '30th Anniversary':{localId:'149',name:'Pikachu ex'},
+  'Pitch Black':{localId:'116',name:'Mega Darkrai ex'},
+  'Chaos Rising':{localId:'116',name:'Mega Greninja ex'},
+  'Perfect Order':{localId:'124',name:'Mega Zygarde ex'},
+  'Ascended Heroes':{localId:'276',name:'Pikachu ex'},
+  'Phantasmal Flames':{localId:'125',name:'Mega Charizard X ex'},
+  'Mega Evolution':{localId:'188',name:'Mega Lucario ex'}
+};
+
+function watchtowerChaseCard(sid){
+  const s=SETS[sid],rule=WATCHTOWER_CHASE_DEFAULTS[s?.name];
+  if(!rule)return null;
+  const cards=cardsBySet[sid]||[];
+  const number=String(rule.localId).replace(/^0+/,'');
+  return cards.find(c=>
+    String(c.localId||'').replace(/^0+/,'')===number &&
+    String(c.name||'').toLowerCase()===String(rule.name||'').toLowerCase()
+  )||null;
+}
+
 const CHASE_PICKS_KEY='dexbinder_v102_chase_picks';
 const ERA_OPEN_KEY='dexbinder_v102_open_eras';
 function loadChasePicks(){try{const x=JSON.parse(localStorage.getItem(CHASE_PICKS_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(e){return {}}}
@@ -2286,6 +2474,7 @@ function dashboardSetHue(sid,name=''){
 }
 function dashboardChaseCard(sid){
  const custom=customChaseCard(sid);if(custom?.image)return custom;
+ const watchtower=watchtowerChaseCard(sid);if(watchtower?.image)return watchtower;
  const cards=(cardsBySet[sid]||[]).filter(c=>c?.image);
  if(!cards.length)return null;
  const scored=cards.map(c=>{
@@ -2328,9 +2517,9 @@ function renderSetCards(){
      return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''} ${logo?'hasSetLogo':''}" style="--setHue:${setHue}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(s.name)} binder">
        ${chaseImage?`<span class="setArtBackdrop" style="background-image:url('${chaseImage}')"></span><img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy">`:''}
        <div class="setCardTop">
-         ${logo?`<div class="setLogoWrap"><img class="setLogo" src="${logo}" alt="${escapeHtml(s.name)} logo" loading="lazy"></div>`:''}
-         <div class="eyebrow" style="color:#777">${escapeHtml(s.series||'Pokémon TCG')}</div>
-         <h3>${escapeHtml(s.name)}</h3>
+         ${logo
+           ? `<div class="setLogoWrap"><img class="setLogo" src="${logo}" alt="${escapeHtml(s.name)} logo" loading="lazy"></div>`
+           : `<div class="eyebrow" style="color:#777">${escapeHtml(s.series||'Pokémon TCG')}</div><h3>${escapeHtml(s.name)}</h3>`}
          <div class="setCardMeta"><span>${n} / ${t||'—'} collected</span>${missing!==null?`<span>· ${missing} missing</span>`:''}${prep?`<span>${prep}</span>`:''}</div>
        </div>
        <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
@@ -5066,7 +5255,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.10.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.10.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
