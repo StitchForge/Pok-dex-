@@ -971,6 +971,46 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
   .setChaseLabel{right:10px;bottom:10px;max-width:128px}
 }
 
+
+/* v0.10.2 dashboard refinements */
+.setGroups{display:grid;gap:14px}
+.setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
+.setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
+.setGroup>summary::-webkit-details-marker{display:none}.setGroup>summary:after{content:"⌄";font-size:.9rem;color:var(--db-muted);transition:.2s}.setGroup[open]>summary:after{transform:rotate(180deg)}
+.setGroupTitle{display:flex;flex-direction:column;gap:2px}.setGroupTitle b{font-size:.82rem}.setGroupTitle small{font-size:.5rem;color:var(--db-muted)}
+.setRail{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 12px 12px}
+
+.setLogoWrap{min-height:38px;display:flex;align-items:flex-start}.setLogo{display:block;max-width:142px;max-height:54px;object-fit:contain;object-position:left center;filter:drop-shadow(0 3px 7px rgba(20,18,35,.14))}
+.setCard.hasSetLogo h3{font-size:.76rem!important;margin:5px 0 2px!important;color:var(--db-muted)!important}
+.setHeroLogo{display:block;max-width:min(280px,64vw);max-height:92px;object-fit:contain;object-position:left center;margin:0 0 8px;filter:drop-shadow(0 7px 14px rgba(0,0,0,.18))}
+.setHeroLogo.hidden{display:none!important}.setHero.hasLogo h1{font-size:1.08rem!important;margin-top:4px!important;color:#cbc7c0!important}
+body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero.hasLogo h1{color:var(--db-muted)!important}
+
+.chasePickButton{position:absolute;right:10px;bottom:10px;z-index:5;max-width:145px;padding:6px 8px;border-radius:11px;background:color-mix(in srgb,var(--db-panel) 89%,transparent);border:1px solid color-mix(in srgb,var(--db-line) 88%,transparent);box-shadow:0 6px 18px rgba(0,0,0,.11);backdrop-filter:blur(11px);text-align:right;color:var(--db-text)}
+.chasePickButton small{display:block;font-size:.42rem!important;color:var(--db-muted)!important;text-transform:uppercase;letter-spacing:.06em;font-weight:900}.chasePickButton b{display:block;font-size:.54rem!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chasePickButton:active{transform:scale(.98)}
+.setChaseLabel{display:none!important}
+
+.chasePickerActions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:10px}.chasePickerCurrent{font-size:.58rem;color:var(--db-muted);margin:0 2px 10px}
+.chasePickerGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.chasePickerCard{position:relative;border:1px solid var(--db-line);background:var(--db-panel);border-radius:12px;padding:6px;text-align:left;color:var(--db-text)}
+.chasePickerCard.on{outline:3px solid var(--db-purple)}.chasePickerCard img{display:block;width:100%;aspect-ratio:245/337;object-fit:cover;border-radius:8px;background:var(--db-panel-2)}
+.chasePickerCard b{display:block;font-size:.48rem;margin:5px 1px 1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.chasePickerCard small{display:block;font-size:.42rem!important;color:var(--db-muted)!important}
+.cardHeroActions{display:flex;gap:7px;flex-wrap:wrap;margin:-4px 0 12px}
+
+.dashboardAchievementSection{margin-top:24px}.dashboardAchievementHead{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:0 2px 10px}.dashboardAchievementHead h2{margin:0;font-size:1.18rem}.dashboardAchievementHead p{margin:3px 0 0;color:var(--db-muted);font-size:.68rem}
+.dashboardAchievementStrand{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:2px 2px 10px}.dashboardAchievementStrand::-webkit-scrollbar{display:none}
+.achievementStrandCard{flex:0 0 180px;min-height:225px;scroll-snap-align:start;border:1px solid var(--db-line);border-radius:18px;padding:13px 10px;background:var(--db-panel);box-shadow:var(--db-shadow-soft);color:var(--db-text);display:flex;flex-direction:column;align-items:center;text-align:center}
+.achievementStrandCard.tier-bronze{background:color-mix(in srgb,#c98557 18%,var(--db-panel))}.achievementStrandCard.tier-silver{background:color-mix(in srgb,#8ea0b8 18%,var(--db-panel))}.achievementStrandCard.tier-gold{background:color-mix(in srgb,#e3b73e 22%,var(--db-panel))}.achievementStrandCard.tier-diamond{background:color-mix(in srgb,#7aa8e8 20%,var(--db-panel))}
+.achievementStrandIcon{font-size:1.35rem;margin-bottom:5px}.achievementStrandCard h3{font-size:.62rem;margin:0 0 8px}
+.achievementStrandRing{--p:0;width:96px;height:96px;border-radius:50%;position:relative;display:grid;place-items:center;background:conic-gradient(var(--db-purple) calc(var(--p)*1%),color-mix(in srgb,var(--db-line) 85%,transparent) 0);margin:2px 0 9px}
+.achievementStrandRing:after{content:"";position:absolute;inset:9px;border-radius:50%;background:color-mix(in srgb,var(--db-panel) 94%,transparent)}.achievementStrandRing span{position:relative;z-index:1;font-size:1.25rem}
+.achievementStrandTier{margin-top:-20px;z-index:2;border:1px solid var(--db-line);border-radius:999px;background:var(--db-panel);padding:3px 8px;font-size:.45rem;font-weight:950;text-transform:uppercase}
+.achievementStrandValue{font-size:.72rem;font-weight:950;margin-top:7px}.achievementStrandNext{font-size:.49rem;color:var(--db-muted);margin-top:3px}
+
+@media(max-width:700px){
+  .setGroup{border-radius:18px}.setRail{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:10px;padding:0 12px 12px;scrollbar-width:none}.setRail::-webkit-scrollbar{display:none}.setRail .setCard{flex:0 0 88%!important;scroll-snap-align:center}.setGroups{margin-left:-2px;margin-right:-2px}
+  .chasePickerGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.achievementStrandCard{flex-basis:156px;min-height:214px}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -985,7 +1025,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
     <button type="button" data-db-theme="espeon">☀️ Espeon</button>
     <button type="button" data-db-theme="umbreon">🌙 Umbreon</button>
   </div>
-  <div class="version">v0.10.1</div>
+  <div class="version">v0.10.2</div>
 </div>
 
   <section id="homeScreen">
@@ -1003,23 +1043,25 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
         <button class="btn small" id="setLibraryHome">＋ Manage Sets</button>
       </div>
     </section>
-
-    <section class="dashboardMilestone" id="dashboardMilestone">
-      <div class="dashboardMilestoneHead"><b>Latest milestone</b><button class="btn small" id="dashboardAchievementsBtn">View achievements</button></div>
-      <div class="dashboardMilestoneBody" id="dashboardMilestoneBody"><span class="achievementIcon">🏅</span><div><b>Building your collection…</b><small>Achievements will appear here as your Dex grows.</small></div></div>
-    </section>
-
-    <div class="activeHead"><div><h2>My Active Sets</h2><p>Swipe through your collections and tap a set to open its binder.</p></div></div>
-    <div class="sets" id="setCards">
+<div class="activeHead"><div><h2>My Active Sets</h2><p>Swipe through your collections and tap a set to open its binder.</p></div></div>
+    <div class="setGroups" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
     </div>
+    <section class="dashboardAchievementSection" id="dashboardAchievementSection">
+      <div class="dashboardAchievementHead">
+        <div><h2>🏆 Achievements</h2><p>Swipe through your collector milestones.</p></div>
+        <button class="btn small" id="dashboardAchievementsBtn">View All →</button>
+      </div>
+      <div class="dashboardAchievementStrand" id="dashboardAchievementStrand"></div>
+    </section>
+
   <div class="pwaInstallNote">Tip: on iPhone, Safari → Share → Add to Home Screen installs DexBinder like an app.</div>
   </section>
 
   <section id="setScreen" class="hidden">
     <button class="btn small" id="backBtn">← My Dex</button>
-    <div class="hero" style="margin-top:10px"><div class="heroRow"><div><div class="eyebrow" id="setSeries"></div><h1 id="setTitle"></h1><p id="setDesc"></p></div><div class="stats"><b id="setOwned">0 / 0</b><span id="setPct">0% complete</span></div></div><div class="progress"><i id="setProgress"></i></div></div>
+    <div class="hero setHero" style="margin-top:10px"><div class="heroRow"><div class="setHeroIdentity"><img id="setLogo" class="setHeroLogo hidden" alt=""><div class="eyebrow" id="setSeries"></div><h1 id="setTitle"></h1><p id="setDesc"></p></div><div class="stats"><b id="setOwned">0 / 0</b><span id="setPct">0% complete</span></div></div><div class="progress"><i id="setProgress"></i></div></div>
     <div class="toolbar"><input class="search" id="search" placeholder="Search name or card #…"/><select class="select" id="pageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="all">All</option></select></div>
     <div class="chips" id="chips">
       <button class="chip active" data-mode="compact">Compact</button><button class="chip" data-mode="full">Full binder</button><button class="chip" id="bulkBtn">Bulk edit</button><button class="chip" id="snapshotBtn">📷 Snapshot</button>
@@ -1190,7 +1232,19 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
   </div>
 </div></div>
 
-<div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small" id="cardModalBack">Close</button></div><div class="cardContextActions hidden" id="cardContextActions"><button class="btn small" id="openCardInBinder">Open in Binder</button></div><div class="variants" id="detailVariants"></div></div></div>
+<div class="modal" id="cardModal"><div class="sheet"><div class="grab"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p></div><button class="btn small" id="cardModalBack">Close</button></div><div class="cardHeroActions"><button class="btn small" id="setAsChasePick">★ Set as Chase Pick</button><button class="btn small hidden" id="resetCardChasePick">Reset to automatic</button></div><div class="cardContextActions hidden" id="cardContextActions"><button class="btn small" id="openCardInBinder">Open in Binder</button></div><div class="variants" id="detailVariants"></div></div></div>
+
+<div class="modal" id="chasePickerModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2 id="chasePickerTitle">Choose Chase Pick</h2><p>Pick the card that represents this set on your dashboard.</p></div><button class="btn small close">Close</button></div>
+  <div class="chasePickerActions">
+    <input class="collectorInput" id="chasePickerSearch" type="search" placeholder="Search cards in this set…">
+    <button class="btn" id="resetChasePick">Reset to automatic</button>
+  </div>
+  <div class="chasePickerCurrent" id="chasePickerCurrent"></div>
+  <div class="chasePickerGrid" id="chasePickerGrid"></div>
+</div></div>
+
 <div class="modal" id="bulkModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Bulk edit</h2><p>Fast initial entry without fighting the binder pages.</p></div><button class="btn small close">Close</button></div><div class="chips"><button class="chip" id="allBase">Own all base</button><button class="chip" id="allReverse">Own all reverse</button><button class="chip" id="clearSet">Clear set</button></div><div class="bulk" id="bulkList"></div></div></div>
 
 <div class="modal" id="pagePickerModal"><div class="sheet">
@@ -2181,10 +2235,41 @@ function counts(sid){
   return [Math.min(n,total||n),total||n];
 }
 function renderStats(){
-  try{renderDashboardMilestone()}catch(e){}
+  try{renderDashboardAchievementStrand()}catch(e){}
  let gn=0,gt=0; [...activeSetIds].forEach(s=>{if(!SETS[s])return;let [n,t]=counts(s);gn+=n;gt+=t}); $('#globalOwned').textContent=`${gn} / ${gt}`; let gp=gt?Math.round(gn/gt*100):0;$('#globalPct').textContent=`${gp}% collected`;$('#globalProgress').style.width=gp+'%';
  if(currentSet){let [n,t]=counts(currentSet);let p=t?Math.round(n/t*100):0;$('#setOwned').textContent=`${n} / ${t}`;$('#setPct').textContent=`${p}% complete`;$('#setProgress').style.width=p+'%'}
  renderSetCards();
+}
+
+
+const CHASE_PICKS_KEY='dexbinder_v102_chase_picks';
+const ERA_OPEN_KEY='dexbinder_v102_open_eras';
+function loadChasePicks(){try{const x=JSON.parse(localStorage.getItem(CHASE_PICKS_KEY)||'{}');return x&&typeof x==='object'&&!Array.isArray(x)?x:{}}catch(e){return {}}}
+function saveChasePicks(){try{localStorage.setItem(CHASE_PICKS_KEY,JSON.stringify(chasePicks))}catch(e){}}
+let chasePicks=loadChasePicks();
+function loadOpenEras(){try{const x=JSON.parse(localStorage.getItem(ERA_OPEN_KEY)||'[]');return new Set(Array.isArray(x)?x:[])}catch(e){return new Set()}}
+function saveOpenEras(){try{localStorage.setItem(ERA_OPEN_KEY,JSON.stringify([...openSetEras]))}catch(e){}}
+let openSetEras=loadOpenEras();
+
+function setCustomChasePick(sid,cid){if(cid)chasePicks[sid]=cid;else delete chasePicks[sid];saveChasePicks();renderSetCards()}
+function customChaseCard(sid){const cid=chasePicks[sid];return cid?(cardsBySet[sid]||[]).find(c=>c.id===cid):null}
+function setEraName(s){
+ const raw=String(s?.series||'Pokémon TCG');
+ if(/mega/i.test(raw))return 'Mega Evolution';if(/scarlet.*violet/i.test(raw))return 'Scarlet & Violet';if(/sword.*shield/i.test(raw))return 'Sword & Shield';if(/sun.*moon/i.test(raw))return 'Sun & Moon';if(/\bxy\b/i.test(raw))return 'XY';if(/black.*white/i.test(raw))return 'Black & White';return raw;
+}
+function eraFallbackRank(era){return ({'Mega Evolution':700,'Scarlet & Violet':600,'Sword & Shield':500,'Sun & Moon':400,'XY':300,'Black & White':200})[era]||100}
+function setReleaseTime(s){const d=Date.parse(s?.releaseDate||'');return Number.isFinite(d)?d:0}
+function normalizeSetLogo(raw){if(!raw)return '';if(typeof raw==='object')raw=raw.url||raw.image||raw.path||'';raw=String(raw||'');if(!raw)return '';return /\.(png|webp|jpg|jpeg|svg)(\?|$)/i.test(raw)?raw:raw+'.webp'}
+function setLogoUrl(sid){
+ const direct=normalizeSetLogo(SETS[sid]?.logo);if(direct)return direct;
+ const c=(cardsBySet[sid]||[]).find(x=>x?.image);return c?.image?String(c.image).replace(/\/[^/]+$/,'/logo.webp'):'';
+}
+function bindLogoFallback(img){img.onerror=()=>{img.classList.add('hidden');img.closest('.setCard')?.classList.remove('hasSetLogo')}}
+function renderSetBranding(sid){
+ const s=SETS[sid],img=$('#setLogo'),hero=img?.closest('.setHero');if(!img||!s)return;
+ const logo=setLogoUrl(sid);
+ if(logo){img.classList.remove('hidden');img.src=logo;img.alt=`${s.name} logo`;img.onerror=()=>{img.classList.add('hidden');hero?.classList.remove('hasLogo')};hero?.classList.add('hasLogo')}
+ else{img.classList.add('hidden');hero?.classList.remove('hasLogo')}
 }
 
 function dashboardSetHue(sid,name=''){
@@ -2200,6 +2285,7 @@ function dashboardSetHue(sid,name=''){
  return h;
 }
 function dashboardChaseCard(sid){
+ const custom=customChaseCard(sid);if(custom?.image)return custom;
  const cards=(cardsBySet[sid]||[]).filter(c=>c?.image);
  if(!cards.length)return null;
  const scored=cards.map(c=>{
@@ -2226,46 +2312,39 @@ function dashboardChaseImage(sid){
 
 
 function renderSetCards(){
- let box=$('#setCards'); if(!box)return;
+ const box=$('#setCards');if(!box)return;
  const active=[...activeSetIds].map(id=>SETS[id]).filter(Boolean);
- if(!active.length){
-   box.innerHTML='<div class="emptyState">No active collections yet.<br><br><button class="btn dark" id="emptyLibraryBtn">Browse Set Library</button></div>';
-   const b=$('#emptyLibraryBtn'); if(b)b.onclick=openLibrary;
-   return;
- }
- box.innerHTML=active.map(s=>{
-   let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0;
-   let missing=t?Math.max(0,t-n):null;
-   let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';
-   const chase=dashboardChaseCard(s.id);
-   const chaseImage=chase?.image?`${chase.image}/high.webp`:'';
-   const setHue=dashboardSetHue(s.id,s.name);
-   return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''}" style="--setHue:${setHue}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${s.name} binder">
-     ${chaseImage?`<span class="setArtBackdrop" style="background-image:url('${chaseImage}')"></span><img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy">`:''}
-     <div class="setCardTop">
-       <div class="eyebrow" style="color:#777">${s.series||'Pokémon TCG'}</div>
-       <h3>${s.name}</h3>
-       <div class="setCardMeta">
-         <span>${n} / ${t||'—'} collected</span>
-         ${missing!==null?`<span>· ${missing} missing</span>`:''}
-         ${prep?`<span>${prep}</span>`:''}
+ if(!active.length){box.innerHTML='<div class="emptyState">No active collections yet.<br><br><button class="btn dark" id="emptyLibraryBtn">Browse Set Library</button></div>';const b=$('#emptyLibraryBtn');if(b)b.onclick=openLibrary;return}
+ const grouped=new Map();
+ for(const s of active){const era=setEraName(s);if(!grouped.has(era))grouped.set(era,[]);grouped.get(era).push(s)}
+ const groups=[...grouped.entries()].map(([era,sets])=>{sets.sort((a,b)=>setReleaseTime(b)-setReleaseTime(a)||(b.id||'').localeCompare(a.id||''));return {era,sets,latest:Math.max(0,...sets.map(setReleaseTime))}}).sort((a,b)=>(b.latest-a.latest)||(eraFallbackRank(b.era)-eraFallbackRank(a.era))||a.era.localeCompare(b.era));
+ if(!openSetEras.size&&groups[0])openSetEras.add(groups[0].era);
+ box.innerHTML=groups.map((group,gi)=>{
+   const open=openSetEras.has(group.era)||(!localStorage.getItem(ERA_OPEN_KEY)&&gi===0);
+   const cards=group.sets.map(s=>{
+     let[n,t]=counts(s.id),p=t?Math.round(n/t*100):0,missing=t?Math.max(0,t-n):null;
+     let prep=!variantReadyBySet[s.id]?' · master metadata prepares on first open':'';
+     const chase=dashboardChaseCard(s.id),chaseImage=chase?.image?`${chase.image}/high.webp`:'',logo=setLogoUrl(s.id),setHue=dashboardSetHue(s.id,s.name);
+     return `<article class="setCard openSet ${chaseImage?'hasChaseArt':''} ${logo?'hasSetLogo':''}" style="--setHue:${setHue}" data-set="${s.id}" role="button" tabindex="0" aria-label="Open ${escapeHtml(s.name)} binder">
+       ${chaseImage?`<span class="setArtBackdrop" style="background-image:url('${chaseImage}')"></span><img class="setChaseArt" src="${chaseImage}" alt="" loading="lazy">`:''}
+       <div class="setCardTop">
+         ${logo?`<div class="setLogoWrap"><img class="setLogo" src="${logo}" alt="${escapeHtml(s.name)} logo" loading="lazy"></div>`:''}
+         <div class="eyebrow" style="color:#777">${escapeHtml(s.series||'Pokémon TCG')}</div>
+         <h3>${escapeHtml(s.name)}</h3>
+         <div class="setCardMeta"><span>${n} / ${t||'—'} collected</span>${missing!==null?`<span>· ${missing} missing</span>`:''}${prep?`<span>${prep}</span>`:''}</div>
        </div>
-     </div>
-     <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
-     <div class="setCardProgress"><i style="width:${t?p:0}%"></i></div>
-     <div class="setCardHint">Tap to open binder</div>
-     ${chaseImage?`<div class="setChaseLabel"><small>Chase-style pick</small><b>${escapeHtml(chase?.name||'Featured card')}</b></div>`:''}
-   </article>`;
+       <div class="setPct">${t?p+'%':'—'}<small>complete</small></div>
+       <div class="setCardProgress"><i style="width:${t?p:0}%"></i></div>
+       <div class="setCardHint">Tap to open binder</div>
+       ${chaseImage?`<button class="chasePickButton" data-chase-pick="${s.id}" type="button"><small>★ Chase Pick</small><b>${escapeHtml(chase?.name||'Featured card')}</b></button>`:''}
+     </article>`;
+   }).join('');
+   return `<details class="setGroup" data-era="${escapeHtml(group.era)}" ${open?'open':''}><summary><span class="setGroupTitle"><b>${escapeHtml(group.era)}</b><small>${group.sets.length} active set${group.sets.length===1?'':'s'} · newest first</small></span></summary><div class="setRail">${cards}</div></details>`;
  }).join('');
- $$('.openSet').forEach(card=>{
-   card.onclick=()=>openSet(card.dataset.set,'binder');
-   card.onkeydown=e=>{
-     if(e.key==='Enter'||e.key===' '){
-       e.preventDefault();
-       openSet(card.dataset.set,'binder');
-     }
-   };
- });
+ $$('.setLogo').forEach(bindLogoFallback);
+ $$('[data-chase-pick]').forEach(btn=>btn.onclick=e=>{e.stopPropagation();openChasePicker(btn.dataset.chasePick)});
+ $$('.setGroup').forEach(d=>d.ontoggle=()=>{const era=d.dataset.era;if(d.open)openSetEras.add(era);else openSetEras.delete(era);saveOpenEras()});
+ $$('.openSet').forEach(card=>{card.onclick=()=>openSet(card.dataset.set,'binder');card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSet(card.dataset.set,'binder')}}});
 }
 async function loadSet(sid){
  if(cardsBySet[sid])return cardsBySet[sid];
@@ -2274,10 +2353,12 @@ async function loadSet(sid){
  const main=await r.json();
  let cs=(main.cards||[]).map(x=>({...x}));
 
+ const apiSeries=(typeof main.serie==='string'?main.serie:(main.serie?.name||main.series?.name||main.series||''));
  if(!SETS[sid]){
-   SETS[sid]={id:sid,name:main.name||sid,series:'Pokémon TCG',desc:'Master set',baseTotal:main.cardCount?.total||cs.length,masterTotal:main.cardCount?.total||cs.length,variantStrategy:'detail'};
+   SETS[sid]={id:sid,name:main.name||sid,series:apiSeries||'Pokémon TCG',desc:'Master set',baseTotal:main.cardCount?.total||cs.length,masterTotal:main.cardCount?.total||cs.length,variantStrategy:'detail',releaseDate:main.releaseDate||'',logo:main.logo||''};
  }else{
-   SETS[sid].baseTotal=main.cardCount?.total||cs.length;
+   SETS[sid].baseTotal=main.cardCount?.total||cs.length;SETS[sid].releaseDate=main.releaseDate||SETS[sid].releaseDate||'';SETS[sid].logo=main.logo||SETS[sid].logo||'';
+   if(apiSeries&&(!SETS[sid].series||SETS[sid].series==='Pokémon TCG'))SETS[sid].series=apiSeries;
  }
 
  if(sid==='swsh12.5'){
@@ -2370,9 +2451,10 @@ function migrateV1(){
 }
 async function openSet(sid,target='binder'){
  currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#tradeListScreen').classList.add('hidden');$('#tradeCompareScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');
- let s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;$('#setDesc').textContent=s.desc;$('#content').innerHTML='<div class="notice">Loading cards…</div>';
+ let s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;$('#setDesc').textContent=s.desc;renderSetBranding(sid);$('#content').innerHTML='<div class="notice">Loading cards…</div>';
  try{
    await loadSet(sid);
+   s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;renderSetBranding(sid);
    renderStats();
    renderSet();
    if(sid!=='sv03.5'&&!variantReadyBySet[sid]){
@@ -4214,6 +4296,14 @@ function openAchievementDetail(id){
  $('#achievementDetailModal').classList.add('open');
 }
 
+
+function renderDashboardAchievementStrand(){
+ const box=$('#dashboardAchievementStrand');if(!box)return;
+ const cats=achievementCategories();
+ box.innerHTML=cats.map(c=>`<button class="achievementStrandCard ${achievementTierClass(c.state)}" data-dash-ach="${c.id}" type="button"><div class="achievementStrandIcon">${c.icon}</div><h3>${escapeHtml(c.title)}</h3><div class="achievementStrandRing" style="--p:${c.state.progress}"><span>♛</span></div><div class="achievementStrandTier">${escapeHtml(c.state.tier)}</div><div class="achievementStrandValue">${c.value.toLocaleString()} ${escapeHtml(c.unit)}</div><div class="achievementStrandNext">${escapeHtml(cabinetProgressCopy(c))}</div></button>`).join('');
+ $$('[data-dash-ach]').forEach(b=>b.onclick=()=>openAchievementDetail(b.dataset.dashAch));
+}
+
 function latestUnlockedAchievement(){
  const cats=achievementCategories().filter(c=>c.state.index>=0);
  if(!cats.length)return null;
@@ -4229,7 +4319,7 @@ function openAchievements(){ $('#achievementsModal').classList.add('open'); rend
 
 function renderCollectorTools(){
   const s=localCollectorStats();
-  renderDashboardMilestone();
+  renderDashboardAchievementStrand();
   $('#metricMasterProgress').textContent=`${s.masterOwned}/${s.masterTotal}`;
   $('#metricPhysicalCards').textContent=s.physical;
   $('#metricDuplicates').textContent=s.duplicates;
@@ -4613,11 +4703,44 @@ async function openHuntCard(sid,cid,variantId){
  await openCard(cid,variantId);
 }
 
+
+let chasePickerSet=null;
+function dashboardChaseCardAuto(sid){
+ const saved=chasePicks[sid];if(saved)delete chasePicks[sid];
+ const c=dashboardChaseCard(sid);if(saved)chasePicks[sid]=saved;return c;
+}
+function chasePickerRows(){
+ const sid=chasePickerSet,q=($('#chasePickerSearch')?.value||'').trim().toLowerCase();
+ let cards=(cardsBySet[sid]||[]).filter(c=>c?.image);
+ if(q)cards=cards.filter(c=>`${c.name||''} ${c.localId||''}`.toLowerCase().includes(q));
+ const auto=dashboardChaseCardAuto(sid);
+ cards.sort((a,b)=>(a.id===chasePicks[sid]?-1:b.id===chasePicks[sid]?1:a.id===auto?.id?-1:b.id===auto?.id?1:numSort(a,b)));
+ return cards.slice(0,180);
+}
+function renderChasePicker(){
+ const sid=chasePickerSet;if(!sid)return;
+ const current=customChaseCard(sid),auto=dashboardChaseCardAuto(sid);
+ $('#chasePickerCurrent').textContent=current?`Current custom pick: ${current.name}`:`Automatic pick: ${auto?.name||'No artwork available yet'}`;
+ const rows=chasePickerRows();
+ $('#chasePickerGrid').innerHTML=rows.length?rows.map(c=>`<button class="chasePickerCard ${current?.id===c.id?'on':''}" data-pick-chase="${c.id}" type="button"><img src="${image(c,'low')}" data-fallback="${assetFallback(c,'low')}" onerror="retryImage(this)" alt=""><b>${escapeHtml(c.name||'Card')}</b><small>#${escapeHtml(String(c.localId||''))}</small></button>`).join(''):'<div class="tradeEmpty">No matching cards.</div>';
+ $$('[data-pick-chase]').forEach(b=>b.onclick=()=>{setCustomChasePick(sid,b.dataset.pickChase);const c=(cardsBySet[sid]||[]).find(x=>x.id===b.dataset.pickChase);toast(`${c?.name||'Card'} is now the Chase Pick`);renderChasePicker()});
+}
+async function openChasePicker(sid){
+ chasePickerSet=sid;$('#chasePickerTitle').textContent=`Choose Chase Pick · ${SETS[sid]?.name||sid}`;$('#chasePickerSearch').value='';$('#chasePickerGrid').innerHTML='<div class="tradeEmpty">Loading set cards…</div>';$('#chasePickerModal').classList.add('open');
+ try{await loadSet(sid);renderChasePicker()}catch(e){$('#chasePickerGrid').innerHTML='<div class="notice error">Could not load this set.</div>'}
+}
+
 async function openCard(cid,forcedVariant){
  rememberAllScroll();
  let c=(cardsBySet[currentSet]||[]).find(x=>x.id===cid);if(!c)return;
  selected=c;$('#detailImg').dataset.fallback=assetFallback(c,'high');$('#detailImg').onerror=function(){retryImage(this)};$('#detailImg').src=image(c,'high');$('#detailName').textContent=c.name;
  $('#detailMeta').textContent=`${SETS[currentSet].name} · #${c.localId}${forcedVariant?` · ${variantsFor(currentSet,c).find(v=>v.id===forcedVariant)?.label||''}`:''}`;
+ const chaseBtn=$('#setAsChasePick'),resetChaseBtn=$('#resetCardChasePick'),isCurrentChase=chasePicks[currentSet]===c.id;
+ chaseBtn.textContent=isCurrentChase?'★ Current Chase Pick':'★ Set as Chase Pick';
+ chaseBtn.onclick=()=>{setCustomChasePick(currentSet,c.id);toast(`${c.name} is now the Chase Pick`);openCard(cid,forcedVariant)};
+ resetChaseBtn.classList.toggle('hidden',!isCurrentChase);
+ resetChaseBtn.onclick=()=>{setCustomChasePick(currentSet,null);toast('Chase Pick reset to automatic');openCard(cid,forcedVariant)};
+
  $('#detailVariants').innerHTML='<div class="notice">Loading variants & prices…</div>';$('#cardModal').classList.add('open');
  await loadPriceFor(c);
  let vs=variantsFor(currentSet,c);
@@ -4943,8 +5066,11 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.10.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.10.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
+$('#chasePickerSearch').oninput=renderChasePicker;
+$('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
+
 
 $('#cardModalBack').onclick=closeCardDetail;
 $('#openCardInBinder').onclick=()=>{
@@ -5143,6 +5269,7 @@ function restoreBackupObject(d){
   if(d.wishlist && typeof d.wishlist==='object' && !Array.isArray(d.wishlist)){wishlist=d.wishlist;saveWishlist()}
   if(d.setGoals && typeof d.setGoals==='object' && !Array.isArray(d.setGoals)){setGoals=d.setGoals;saveSetGoals()}
   if(Array.isArray(d.tradeTargets)){tradeTargets=new Set(d.tradeTargets);saveTradeTargets()}
+  if(d.chasePicks && typeof d.chasePicks==='object' && !Array.isArray(d.chasePicks)){chasePicks=d.chasePicks;saveChasePicks()}
   save();renderSetCards();renderStats();$('#backupModal').classList.remove('open');toast('Collection restored');
 }
 $('#restoreBackup').onclick=()=>{try{restoreBackupObject(JSON.parse($('#backupBox').value))}catch(e){toast('That backup could not be read')}};
