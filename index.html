@@ -291,13 +291,42 @@ body.isStandalone .pwaInstallNote{display:none!important}
   .fastAddForm .full{grid-column:1}
 }
 
+
+/* v0.8.1 iOS interaction polish */
+button,a,.btn,.chip,.toggle,.setCard,.libraryCard,#collectionHero{
+  touch-action:manipulation;
+}
+input,select,textarea,
+.collectorInput,.collectorSelect,.collectorNotes{
+  font-size:16px !important;
+  -webkit-text-size-adjust:100%;
+}
+button,.btn,.chip{
+  -webkit-text-size-adjust:100%;
+}
+html{-webkit-text-size-adjust:100%}
+
+/* v0.8.1 Global Catalogue */
+.fastAddScopeTabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}
+.fastAddScopeTabs button{border:1px solid var(--line);background:#f7f3ec;border-radius:10px;padding:9px;font-weight:850}
+.fastAddScopeTabs button.on{background:#171717;color:#fff}
+.cataloguePanel{display:none}
+.cataloguePanel.open{display:block}
+.catalogueSetResults{display:grid;gap:8px;max-height:42vh;overflow:auto;margin-top:8px}
+.catalogueSetCard{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:13px;padding:9px}
+.catalogueSetCard b{display:block;font-size:.72rem}
+.catalogueSetCard small{display:block;color:var(--muted);font-size:.55rem;margin-top:2px;line-height:1.35}
+.catalogueSelectedHead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:8px 0}
+.catalogueSelectedHead b{font-size:.75rem}
+.catalogueHint{font-size:.56rem;color:var(--muted);line-height:1.4;margin-top:6px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.0</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.8.1</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -382,11 +411,38 @@ body.isStandalone .pwaInstallNote{display:none!important}
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Fast Add</h2><p>Search, record, save, repeat.</p></div><button class="btn small close">Close</button></div>
 
-  <div class="fastAddSearch">
-    <input class="collectorInput" id="fastAddSearchInput" type="search" placeholder="Search active sets by card name or number…">
-    <button class="btn small" id="fastAddClearBtn">Clear</button>
+  <div class="fastAddScopeTabs">
+    <button id="fastAddMySetsTab" class="on">My Sets</button>
+    <button id="fastAddCatalogueTab">All Sets</button>
   </div>
-  <div class="fastAddResults" id="fastAddResults"></div>
+
+  <div id="fastAddMySetsPanel">
+    <div class="fastAddSearch">
+      <input class="collectorInput" id="fastAddSearchInput" type="search" placeholder="Search active sets by card name or number…">
+      <button class="btn small" id="fastAddClearBtn">Clear</button>
+    </div>
+    <div class="fastAddResults" id="fastAddResults"></div>
+  </div>
+
+  <div class="cataloguePanel" id="fastAddCataloguePanel">
+    <div class="fastAddSearch" id="catalogueSetSearchWrap">
+      <input class="collectorInput" id="catalogueSetSearch" type="search" placeholder="Search every TCGdex set…">
+      <button class="btn small" id="catalogueSetClear">Clear</button>
+    </div>
+    <div class="catalogueSetResults" id="catalogueSetResults"></div>
+
+    <div class="hidden" id="catalogueCardPanel">
+      <div class="catalogueSelectedHead">
+        <div><b id="catalogueSelectedSetName">Set</b><div class="catalogueHint">Search cards in this set. Adding a card will also add the set to My Dex.</div></div>
+        <button class="btn small" id="catalogueChangeSet">Change set</button>
+      </div>
+      <div class="fastAddSearch">
+        <input class="collectorInput" id="catalogueCardSearch" type="search" placeholder="Search this set by card name or number…">
+        <button class="btn small" id="catalogueCardClear">Clear</button>
+      </div>
+      <div class="fastAddResults" id="catalogueCardResults"></div>
+    </div>
+  </div>
 
   <div class="fastAddEditor" id="fastAddEditor">
     <div class="fastAddSelected">
@@ -1765,8 +1821,113 @@ async function openTradeList(){
 const COLLECTOR_MIGRATION_KEY='dexbinder_v073_migrated';
 
 let fastAddSelection=null;
+let fastAddScope='mine';
+let catalogueSelectedSet=null;
+let catalogueSetsReady=false;
 let fastAddDraft={qty:1,tradeQty:0,type:'raw'};
 let fastAddRecent=[];
+
+
+async function ensureGlobalCatalogue(){
+  if(catalogueSetsReady && allSetBriefs.length)return allSetBriefs;
+  const r=await fetch(`${API}/sets`);
+  if(!r.ok)throw new Error(`Catalogue HTTP ${r.status}`);
+  allSetBriefs=await r.json();
+  catalogueSetsReady=true;
+  return allSetBriefs;
+}
+function setFastAddScope(scope){
+  fastAddScope=scope;
+  $('#fastAddMySetsTab').classList.toggle('on',scope==='mine');
+  $('#fastAddCatalogueTab').classList.toggle('on',scope==='all');
+  $('#fastAddMySetsPanel').classList.toggle('hidden',scope!=='mine');
+  $('#fastAddCataloguePanel').classList.toggle('open',scope==='all');
+  $('#fastAddEditor').classList.remove('open');
+  fastAddSelection=null;
+  if(scope==='all'){
+    ensureGlobalCatalogue().then(()=>{renderCatalogueSetResults();$('#catalogueSetSearch').focus()})
+      .catch(e=>{$('#catalogueSetResults').innerHTML=`<div class="notice error">Could not load catalogue: ${e.message}</div>`});
+  }else $('#fastAddSearchInput').focus();
+}
+function renderCatalogueSetResults(){
+  const q=$('#catalogueSetSearch').value.trim().toLowerCase();
+  const rows=(allSetBriefs||[]).filter(x=>{
+    if(!q)return true;
+    return String(x.name||'').toLowerCase().includes(q)||String(x.id||'').toLowerCase().includes(q);
+  }).slice(0,80);
+  $('#catalogueSetResults').innerHTML=rows.length?rows.map(x=>`
+    <div class="catalogueSetCard">
+      <div><b>${x.name||x.id}</b><small>${x.id} · ${x.cardCount?.total||'—'} cards${activeSetIds.has(x.id)?' · In My Dex':''}</small></div>
+      <button class="btn small ${activeSetIds.has(x.id)?'':'dark'}" data-catalogue-set="${x.id}">${activeSetIds.has(x.id)?'Browse':'Choose'}</button>
+    </div>`).join(''):'<div class="tradeEmpty">No matching sets.</div>';
+  $$('[data-catalogue-set]').forEach(b=>b.onclick=()=>selectCatalogueSet(b.dataset.catalogueSet));
+}
+async function selectCatalogueSet(sid){
+  const brief=(allSetBriefs||[]).find(x=>x.id===sid);
+  if(!brief)return;
+  if(!SETS[sid]){
+    SETS[sid]={
+      id:sid,name:brief.name||sid,series:'Pokémon TCG',
+      desc:'TCGdex catalogue set',
+      baseTotal:brief.cardCount?.total||0,
+      masterTotal:brief.cardCount?.total||0,
+      variantStrategy:sid==='sv03.5'?'known-151':'detail'
+    };
+  }
+  if(!variantReadyBySet.hasOwnProperty(sid))variantReadyBySet[sid]=(sid==='sv03.5');
+  catalogueSelectedSet=sid;
+  $('#catalogueSelectedSetName').textContent=brief.name||sid;
+  $('#catalogueSetSearchWrap').classList.add('hidden');
+  $('#catalogueSetResults').classList.add('hidden');
+  $('#catalogueCardPanel').classList.remove('hidden');
+  $('#catalogueCardResults').innerHTML='<div class="tradeEmpty">Loading set…</div>';
+  try{
+    await loadSet(sid);
+    $('#catalogueCardResults').innerHTML='<div class="tradeEmpty">Search this set by card name or number.</div>';
+    $('#catalogueCardSearch').focus();
+  }catch(e){
+    $('#catalogueCardResults').innerHTML=`<div class="notice error">Could not load this set: ${e.message}</div>`;
+  }
+}
+function changeCatalogueSet(){
+  catalogueSelectedSet=null;
+  $('#catalogueCardPanel').classList.add('hidden');
+  $('#catalogueSetSearchWrap').classList.remove('hidden');
+  $('#catalogueSetResults').classList.remove('hidden');
+  $('#catalogueCardSearch').value='';
+  renderCatalogueSetResults();
+  $('#catalogueSetSearch').focus();
+}
+function renderCatalogueCards(){
+  const sid=catalogueSelectedSet;
+  if(!sid)return;
+  const q=$('#catalogueCardSearch').value.trim().toLowerCase();
+  if(q.length<1){$('#catalogueCardResults').innerHTML='<div class="tradeEmpty">Search this set by card name or number.</div>';return}
+  const cards=(cardsBySet[sid]||[]).filter(c=>
+    c.name.toLowerCase().includes(q)||
+    String(c.localId).toLowerCase()===q||
+    String(c.id).toLowerCase().includes(q)
+  ).slice(0,40);
+  $('#catalogueCardResults').innerHTML=cards.length?cards.map(c=>`
+    <div class="fastAddCard">
+      <img src="${image(c,'low')}" data-fallback="${assetFallback(c,'low')}" onerror="retryImage(this)">
+      <div><b>${c.name}</b><small>${SETS[sid]?.name||sid} · #${c.localId}</small>
+        <div class="fastAddVariants">${variantsFor(sid,c).map(v=>`<button data-catalogue-card="${sid}|${c.id}|${v.id}">${v.label}</button>`).join('')}</div>
+      </div>
+    </div>`).join(''):'<div class="tradeEmpty">No matching cards in this set.</div>';
+  $$('[data-catalogue-card]').forEach(b=>b.onclick=()=>{
+    const [setId,cid,variantId]=b.dataset.catalogueCard.split('|');
+    const c=(cardsBySet[setId]||[]).find(x=>x.id===cid); if(!c)return;
+    const v=variantsFor(setId,c).find(x=>x.id===variantId); if(!v)return;
+    fastAddSelection={sid:setId,c,v,fromCatalogue:true};
+    resetFastAddDraft();
+    $('#fastAddImage').src=image(c,'low');
+    $('#fastAddImage').dataset.fallback=assetFallback(c,'low');
+    $('#fastAddName').textContent=c.name;
+    $('#fastAddMeta').textContent=`${SETS[setId]?.name||setId} · #${c.localId} · ${v.label}`;
+    $('#fastAddEditor').classList.add('open');
+  });
+}
 
 function resetFastAddDraft(){
   fastAddDraft={qty:1,tradeQty:0,type:'raw'};
@@ -1859,6 +2020,10 @@ function fastAddSave(next=false){
   });
   owned.add(k);
   setCollectorLots(sid,c.id,v.id,[...existing,lot]);
+  if(fastAddSelection?.fromCatalogue && !activeSetIds.has(sid)){
+    activeSetIds.add(sid);
+    saveActiveSets();
+  }
   save();
   fastAddRecent.unshift({
     name:c.name,variant:v.label,qty:lot.quantity,type:lot.type,condition:lot.condition,company:lot.gradingCompany,grade:lot.grade
@@ -1870,14 +2035,20 @@ function fastAddSave(next=false){
     $('#fastAddEditor').classList.remove('open');
     fastAddSelection=null;
     resetFastAddDraft();
-    $('#fastAddSearchInput').focus();
-    $('#fastAddSearchInput').select();
+    if(fastAddScope==='all' && catalogueSelectedSet){
+      $('#catalogueCardSearch').focus();
+      $('#catalogueCardSearch').select();
+    }else{
+      $('#fastAddSearchInput').focus();
+      $('#fastAddSearchInput').select();
+    }
   }
 }
 async function openFastAdd(){
   $('#fastAddModal').classList.add('open');
-  await ensureAllActiveSetsLoaded();
   renderFastAddRecent();
+  setFastAddScope('mine');
+  ensureAllActiveSetsLoaded().catch(()=>{});
   $('#fastAddSearchInput').focus();
 }
 
@@ -2609,6 +2780,15 @@ $('#csvExportBtn').onclick=exportCollectionCSV;
 
 
 $('#fastAddBtn').onclick=openFastAdd;
+
+$('#fastAddMySetsTab').onclick=()=>setFastAddScope('mine');
+$('#fastAddCatalogueTab').onclick=()=>setFastAddScope('all');
+$('#catalogueSetSearch').oninput=renderCatalogueSetResults;
+$('#catalogueSetClear').onclick=()=>{$('#catalogueSetSearch').value='';renderCatalogueSetResults();$('#catalogueSetSearch').focus()};
+$('#catalogueCardSearch').oninput=renderCatalogueCards;
+$('#catalogueCardClear').onclick=()=>{$('#catalogueCardSearch').value='';renderCatalogueCards();$('#catalogueCardSearch').focus()};
+$('#catalogueChangeSet').onclick=changeCatalogueSet;
+
 $('#fastAddSearchInput').oninput=renderFastAddResults;
 $('#fastAddClearBtn').onclick=()=>{
   $('#fastAddSearchInput').value='';
