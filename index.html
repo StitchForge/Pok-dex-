@@ -972,7 +972,7 @@ body[data-theme="umbreon"] .setCard h3{text-shadow:none}
 }
 
 
-/* v0.11.2 dashboard refinements */
+/* v0.11.3 dashboard refinements */
 .setGroups{display:grid;gap:14px}
 .setGroup{border:1px solid var(--db-line);border-radius:20px;background:color-mix(in srgb,var(--db-panel) 60%,transparent);overflow:hidden}
 .setGroup>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;cursor:pointer;font-weight:950;color:var(--db-text)}
@@ -1013,7 +1013,7 @@ body[data-theme="espeon"] .setHero.hasLogo h1,body[data-theme="system"] .setHero
 
 
 /* ============================================================
-   DexBinder v0.11.2 — visual consistency pass
+   DexBinder v0.11.3 — visual consistency pass
    ============================================================ */
 
 /* Theme-aware primary CTA */
@@ -1163,7 +1163,7 @@ body[data-theme="umbreon"] .tradeDestinationHead p{color:#c9c5d9!important}
 
 
 /* ============================================================
-   DexBinder v0.11.2 — Day & Night
+   DexBinder v0.11.3 — Day & Night
    ============================================================ */
 
 :root{
@@ -1384,7 +1384,7 @@ body[data-theme="umbreon"] .collectorInput::placeholder{color:#858ca2!important}
 
 
 /* ============================================================
-   DexBinder v0.11.2 — Day & Night polish
+   DexBinder v0.11.3 — Day & Night polish
    ============================================================ */
 
 /* The horizon is intentionally level. */
@@ -1538,7 +1538,7 @@ body[data-theme="umbreon"] .sheet .miniCard.lightSurface *{color:inherit!importa
 
 
 /* ============================================================
-   DexBinder v0.11.2 — Interactive Sky Hero
+   DexBinder v0.11.3 — Interactive Sky Hero
    ============================================================ */
 
 .themeAtmosphere{display:none!important}
@@ -1693,7 +1693,7 @@ body[data-theme="umbreon"] #collectionHero{border-color:rgba(179,180,255,.18)!im
 
 
 /* ============================================================
-   DexBinder v0.11.2 — Interactive Sky correction pass
+   DexBinder v0.11.3 — Interactive Sky correction pass
    Target: Espeon/day LEFT → twilight → Umbreon/night RIGHT
    ============================================================ */
 
@@ -1907,7 +1907,7 @@ body[data-theme="umbreon"] .top{
 
 
 /* ============================================================
-   DexBinder v0.11.2 — Theme correction + ambient page motion
+   DexBinder v0.11.3 — Theme correction + ambient page motion
    ============================================================ */
 
 /* Characters are now transparent layers: no rectangular crop backgrounds. */
@@ -2109,6 +2109,106 @@ body[data-theme="umbreon"] .setGroup{
   .sceneCloud,.sceneBird,.heroStar,.heroMeteor{animation:none!important}
 }
 
+
+/* ============================================================
+   DexBinder v0.11.3 — portrait hero polish
+   ============================================================ */
+.headerHint,.dragSkyLabel{display:none!important}
+
+/* Keep characters as independent transparent foreground layers. */
+.heroPokemon{
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:transparent!important;
+  max-width:31%!important;
+  filter:drop-shadow(0 10px 16px rgba(5,8,24,.24))!important;
+}
+.heroEspeon{left:1.5%!important;bottom:5%!important;height:53%!important}
+.heroUmbreon{right:1.5%!important;bottom:4%!important;height:55%!important}
+
+/* Give the copy a protected central column. */
+.collectionHeroContent,
+.heroCopy{
+  position:relative!important;
+  z-index:8!important;
+}
+.heroGreeting,
+#heroGreeting{
+  max-width:58%!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  text-align:center!important;
+  line-height:1.02!important;
+}
+.heroSubtitle,
+#heroSubtitle{
+  max-width:52%!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+  text-align:center!important;
+  line-height:1.28!important;
+}
+.heroStats,
+.collectionHeroStats{
+  z-index:9!important;
+}
+
+/* Phone portrait: prevent greeting/stats/subtitle collisions. */
+@media (max-width:700px) and (orientation:portrait){
+  #collectionHero{min-height:470px!important}
+  .heroEyebrow{
+    width:100%!important;
+    text-align:center!important;
+    padding-right:0!important;
+  }
+  .heroGreeting,#heroGreeting{
+    max-width:76%!important;
+    font-size:clamp(30px,8vw,42px)!important;
+    padding:0!important;
+    margin-top:6px!important;
+  }
+  .heroSubtitle,#heroSubtitle{
+    max-width:68%!important;
+    font-size:clamp(16px,4.5vw,20px)!important;
+    margin-top:8px!important;
+  }
+  .heroStats,.collectionHeroStats{
+    position:absolute!important;
+    top:18px!important;
+    right:18px!important;
+    width:auto!important;
+    max-width:32%!important;
+    text-align:right!important;
+  }
+  .heroStats strong,.collectionHeroStats strong{
+    font-size:clamp(21px,6vw,30px)!important;
+    white-space:nowrap!important;
+  }
+  .heroStats small,.collectionHeroStats small{
+    display:block!important;
+    white-space:nowrap!important;
+  }
+  .heroTools,.collectionTools{
+    margin-top:12px!important;
+  }
+  .heroPokemon{max-width:29%!important}
+  .heroEspeon{height:45%!important;left:1%!important;bottom:7%!important}
+  .heroUmbreon{height:47%!important;right:1%!important;bottom:6%!important}
+  .skyControl,.heroSkyControl{
+    bottom:42px!important;
+    z-index:10!important;
+  }
+}
+@media (max-width:430px) and (orientation:portrait){
+  #collectionHero{min-height:455px!important}
+  .heroGreeting,#heroGreeting{max-width:72%!important;font-size:32px!important}
+  .heroSubtitle,#heroSubtitle{max-width:64%!important;font-size:16px!important}
+  .heroStats,.collectionHeroStats{top:16px!important;right:14px!important;max-width:31%!important}
+  .heroPokemon{max-width:27%!important}
+  .heroEspeon{height:41%!important;left:0!important}
+  .heroUmbreon{height:43%!important;right:0!important}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -2135,7 +2235,7 @@ body[data-theme="umbreon"] .setGroup{
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
   <div class="heroThemeHint" aria-hidden="true">Drag the sky</div>
-  <div class="version">v0.11.2</div>
+  <div class="version">v0.11.3</div>
 </div>
 
   <section id="homeScreen">
@@ -6301,7 +6401,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.11.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.11.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $('#chasePickerSearch').oninput=renderChasePicker;
 $('#resetChasePick').onclick=()=>{if(!chasePickerSet)return;setCustomChasePick(chasePickerSet,null);toast('Chase Pick reset to automatic');renderChasePicker()};
