@@ -60,7 +60,7 @@
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6A.1</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.6A.2</div></div>
 
   <section id="homeScreen">
     <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -134,7 +134,7 @@
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Jump to page</h2><p id="pagePickerMeta">Choose a page.</p></div><button class="btn small close">Close</button></div>
   <div class="pagePickerGrid" id="pagePickerGrid"></div>
-</div>
+</div></div>
 
 <div class="modal" id="backupModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><h2>Collection backup</h2><p>Copy this JSON somewhere safe, or paste it back to restore.</p></div><button class="btn small close">Close</button></div><textarea id="backupBox" style="width:100%;height:190px;border:1px solid var(--line);border-radius:13px;padding:10px;font:11px ui-monospace,monospace"></textarea><button class="btn dark" style="width:100%;margin-top:8px" id="copyBackup">Copy backup</button><button class="btn" style="width:100%;margin-top:7px" id="restoreBackup">Restore pasted backup</button></div></div>
 <div class="toast" id="toast"></div>
@@ -675,7 +675,7 @@ async function renderGlobalHunt(){
  applyHuntPriceFilter();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.5.2',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.6A.2',owned:[...owned],activeSets:[...activeSetIds],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('open')});
 $('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
