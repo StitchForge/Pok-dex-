@@ -250,17 +250,27 @@ body.isStandalone .pwaInstallNote{display:none!important}
   .copyGroupGrid .full,.gradeFields.full{grid-column:1}
 }
 
+
+/* v0.7.3d tappable collection hero */
+#collectionHero{
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+  transition:transform .12s ease,opacity .12s ease;
+}
+#collectionHero:active{transform:scale(.995);opacity:.97}
+#collectionHero:focus-visible{outline:3px solid #f0c94a;outline-offset:3px}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3c</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.7.3d</div></div>
 
   <section id="homeScreen">
-    <div class="hero"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
-    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="collectorToolsBtn">Collector Tools</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
+    <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
+    <div class="dexHead"><div><h2>Active collections</h2><p>Tap a set to open its binder.</p></div><button class="btn small" id="backupBtn">Backup</button><button class="btn small" id="tradeBtn">↔ Trade</button><button class="btn small" id="cloudBtn">☁️ Sync</button></div>
     <div class="sets" id="setCards">
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Scarlet &amp; Violet</div><h3>151</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
       <article class="setCard"><div><div class="eyebrow" style="color:#777">Sword &amp; Shield</div><h3>Crown Zenith</h3><p>Loading collection…</p></div><div class="setPct">—<small>complete</small></div><div class="setActions"><button class="btn dark" disabled>Loading…</button></div></article>
@@ -2324,7 +2334,7 @@ function updatePhysicalCountLabels(){
 }
 
 
-$('#collectorToolsBtn').onclick=openCollectorTools;
+
 $('#globalSearchBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#globalSearchModal').classList.add('open');$('#globalCardSearchInput').focus();renderGlobalSearch()};
 $('#globalCardSearchInput').oninput=renderGlobalSearch;
 $('#duplicatesBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#duplicatesModal').classList.add('open');renderDuplicates()};
@@ -2332,6 +2342,18 @@ $('#duplicateSort').onchange=renderDuplicates;
 $('#duplicateSetFilter').onchange=renderDuplicates;
 $('#collectionValueBtn').onclick=async()=>{$('#collectionValueModal').classList.add('open');await renderCollectionValue()};
 $('#csvExportBtn').onclick=exportCollectionCSV;
+
+
+const collectionHero=$('#collectionHero');
+if(collectionHero){
+  collectionHero.onclick=openCollectorTools;
+  collectionHero.onkeydown=(e)=>{
+    if(e.key==='Enter'||e.key===' '){
+      e.preventDefault();
+      openCollectorTools();
+    }
+  };
+}
 
 $('#tradeBtn').onclick=openTradeList;
 $('#tradeSort').onchange=renderTradeList;
