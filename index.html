@@ -611,6 +611,29 @@ html{-webkit-text-size-adjust:100%}
 .dashboardMilestoneBody small{display:block;color:var(--muted);font-size:.5rem;line-height:1.35}
 @media(max-width:430px){.achievementSummary{grid-template-columns:1fr 1fr}.achievementGrid{grid-template-columns:1fr}}
 
+
+/* v0.9.4a Achievement Cabinet */
+.achievementSummary{grid-template-columns:repeat(2,1fr)}
+.achievementCabinet{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.cabinetCard{border:1px solid var(--line);background:#fff;border-radius:16px;padding:12px;text-align:left;display:grid;gap:10px;cursor:pointer}
+.cabinetCard:active{transform:scale(.99)}
+.cabinetVisual{display:flex;align-items:center;gap:11px}
+.tierRing{--p:0;position:relative;width:66px;height:66px;border-radius:50%;flex:0 0 66px;background:conic-gradient(var(--ink) calc(var(--p)*1%),#eee6dc 0);display:grid;place-items:center}
+.tierRing:after{content:"";position:absolute;inset:6px;border-radius:50%;background:#fff}
+.tierRing span{position:relative;z-index:1;font-size:1.45rem}
+.cabinetCopy{min-width:0}.cabinetCopy h3{font-size:.73rem;margin:0}.cabinetCopy strong{display:block;font-size:.62rem;margin-top:3px}.cabinetCopy small{display:block;font-size:.5rem;color:var(--muted);margin-top:2px;line-height:1.35}
+.tierPill{display:inline-flex!important;width:max-content;border:1px solid var(--line);border-radius:999px;padding:3px 7px;font-size:.44rem!important;font-weight:950;color:var(--ink)!important;background:#f7f3ec}
+.cabinetProgressText{display:flex;justify-content:space-between;gap:8px;font-size:.47rem;color:var(--muted)}
+.cabinetDetailHero{display:flex;align-items:center;gap:13px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:13px;margin:10px 0}
+.cabinetDetailHero .tierRing{width:76px;height:76px;flex-basis:76px}
+.tierTrack{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0}
+.tierStep{border:1px solid var(--line);border-radius:11px;padding:8px 5px;text-align:center;background:#fff}
+.tierStep.done{background:#f3f6f1}.tierStep b{display:block;font-size:.5rem}.tierStep small{display:block;font-size:.43rem;color:var(--muted);margin-top:2px}
+.cabinetDetailList{display:grid;gap:7px;margin-top:10px}
+.cabinetDetailRow{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px}
+.cabinetDetailRow b{display:block;font-size:.62rem}.cabinetDetailRow small{display:block;font-size:.49rem;color:var(--muted);margin-top:2px}
+@media(max-width:430px){.achievementCabinet{grid-template-columns:1fr}.tierTrack{grid-template-columns:repeat(2,1fr)}}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -618,7 +641,7 @@ html{-webkit-text-size-adjust:100%}
 </head>
 <body>
 <div class="app">
-  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4</div></div>
+  <div class="top"><div class="brand"><div class="ball"></div>DexBinder</div><div class="version">v0.9.4a</div></div>
 
   <section id="homeScreen">
     <div id="collectionHero" class="hero" role="button" tabindex="0" aria-label="Open Collector Tools"><div class="heroRow"><div><div class="eyebrow">Your collection</div><h1>My Dex</h1><p>Every master set. Every missing card. One hunt list.</p></div><div class="stats"><b id="globalOwned">0 / 702</b><span id="globalPct">0% collected</span></div></div><div class="progress"><i id="globalProgress"></i></div></div>
@@ -1081,21 +1104,18 @@ html{-webkit-text-size-adjust:100%}
 
 <div class="modal" id="achievementsModal"><div class="sheet">
   <div class="grab"></div>
-  <div class="detailTop"><div><h2>Achievements</h2><p>A collector trophy cabinet built from your real DexBinder progress.</p></div><button class="btn small close">Close</button></div>
+  <div class="detailTop"><div><h2>Achievements</h2><p>Your collector cabinet. Each category levels up as your collection grows.</p></div><button class="btn small close">Close</button></div>
   <div class="achievementSummary">
-    <div class="achievementMetric"><b id="achievementUnlockedCount">0</b><small>Milestones unlocked</small></div>
-    <div class="achievementMetric"><b id="achievementTotalCount">0</b><small>Total milestones</small></div>
-    <div class="achievementMetric"><b id="achievementNextLabel">—</b><small>Next milestone</small></div>
+    <div class="achievementMetric"><b id="achievementCategoryCount">0 / 6</b><small>Categories with a tier unlocked</small></div>
+    <div class="achievementMetric"><b id="achievementTopTier">—</b><small>Highest tier reached</small></div>
   </div>
-  <div class="achievementFilters">
-    <button class="on" data-ach-filter="all">All</button>
-    <button data-ach-filter="collection">Collection</button>
-    <button data-ach-filter="sets">Sets</button>
-    <button data-ach-filter="trades">Trades</button>
-    <button data-ach-filter="grading">Grading</button>
-    <button data-ach-filter="acquisition">Acquisition</button>
-  </div>
-  <div class="achievementGrid" id="achievementGrid"></div>
+  <div class="achievementCabinet" id="achievementCabinet"></div>
+</div></div>
+
+<div class="modal" id="achievementDetailModal"><div class="sheet">
+  <div class="grab"></div>
+  <div class="detailTop"><div><h2 id="achievementDetailTitle">Achievement</h2><p id="achievementDetailSubtitle">Progress details</p></div><button class="btn small close">Close</button></div>
+  <div id="achievementDetailBody"></div>
 </div></div>
 
 <div class="modal" id="acquisitionHistoryModal"><div class="sheet">
@@ -3664,18 +3684,20 @@ async function openAcquisitionHistory(){
 }
 
 
-let achievementFilter='all';
+
+const ACHIEVEMENT_TIERS=['Bronze','Silver','Gold','Diamond'];
+const ACHIEVEMENT_ICONS={collection:'🗂️',sets:'🏆',trades:'🤝',grading:'💎',acquisition:'✨',era:'👑'};
 
 function achievementStats(){
  const stats=localCollectorStats();
- let graded=0,purchaseLots=0,tradeLots=0,giftLots=0,pullLots=0;
+ let graded=0,purchaseLots=0,tradeLots=0,giftLots=0,pullLots=0,recordedAcq=0;
  const eraProgress={};
  for(const [k,raw] of Object.entries(collectorMeta)){
-   const sid=k.split('|')[0];
-   const series=SETS[sid]?.series||'Other';
+   const sid=k.split('|')[0],series=SETS[sid]?.series||'Other';
    if(!eraProgress[series])eraProgress[series]={owned:0,total:0};
    for(const l of legacyMetaToLots(raw)){
      if(l.type==='graded')graded+=l.quantity;
+     if(l.acquisitionType)recordedAcq+=l.quantity;
      if(l.acquisitionType==='purchase')purchaseLots+=l.quantity;
      if(l.acquisitionType==='trade')tradeLots+=l.quantity;
      if(l.acquisitionType==='gift')giftLots+=l.quantity;
@@ -3688,65 +3710,118 @@ function achievementStats(){
    eraProgress[series].total+=(SETS[sid]?.masterTotal||0);
    for(const k of owned)if(k.startsWith(`${sid}|`))eraProgress[series].owned++;
  }
- return {...stats,graded,completedTrades:tradeHistory.length,purchaseLots,tradeLots,giftLots,pullLots,eraProgress};
+ const acquisitionTypes=[purchaseLots,tradeLots,giftLots,pullLots].filter(Boolean).length;
+ let bestEraPct=0;
+ for(const p of Object.values(eraProgress))if(p.total)bestEraPct=Math.max(bestEraPct,Math.min(100,Math.round(p.owned/p.total*100)));
+ return {...stats,graded,completedTrades:tradeHistory.length,purchaseLots,tradeLots,giftLots,pullLots,recordedAcq,acquisitionTypes,eraProgress,bestEraPct};
 }
 
-function achievementDefinitions(){
- const s=achievementStats(),defs=[];
- const add=(id,category,title,desc,icon,current,target,tier='Bronze')=>{
-   const unlocked=current>=target;
-   defs.push({id,category,title,desc,icon,current,target,tier,unlocked,progress:Math.max(0,Math.min(1,target?current/target:0))});
- };
- [['Bronze',100],['Silver',250],['Gold',500],['Diamond',1000]].forEach(([tier,target])=>add(`cards-${target}`,'collection',`${target} physical cards`,`Own ${target} physical cards across your collection.`,'🗂️',s.physical,target,tier));
- [['Bronze',1],['Silver',2],['Gold',3],['Diamond',5]].forEach(([tier,target])=>add(`sets-${target}`,'sets',target===1?'First completed set':`${target} completed sets`,`Complete ${target} master set${target===1?'':'s'}.`,'🏆',s.completedSets,target,tier));
- [['Bronze',1],['Silver',5],['Gold',10],['Diamond',25]].forEach(([tier,target])=>add(`trades-${target}`,'trades',target===1?'First completed trade':`${target} completed trades`,`Complete ${target} trade${target===1?'':'s'} in DexBinder.`,'🤝',s.completedTrades,target,tier));
- [['Bronze',1],['Silver',5],['Gold',10],['Diamond',25]].forEach(([tier,target])=>add(`graded-${target}`,'grading',target===1?'First graded card':`${target} graded cards`,`Own ${target} graded card${target===1?'':'s'}.`,'💎',s.graded,target,tier));
- add('first-purchase','acquisition','First recorded purchase','Record your first purchased card.','🛍️',s.purchaseLots,1,'Bronze');
- add('first-trade-acq','acquisition','First trade acquisition','Receive your first card through a completed trade.','🔄',s.tradeLots,1,'Bronze');
- add('first-gift','acquisition','First gifted card','Record a card received as a gift.','🎁',s.giftLots,1,'Bronze');
- add('first-pull','acquisition','First recorded pull','Record a card you pulled yourself.','✨',s.pullLots,1,'Bronze');
+function tierState(value,thresholds){
+ let index=-1;
+ thresholds.forEach((x,i)=>{if(value>=x)index=i});
+ const tier=index>=0?ACHIEVEMENT_TIERS[index]:'Not yet Bronze';
+ if(index>=thresholds.length-1)return {index,tier,progress:100,next:null,nextTier:null,start:thresholds[index]||0};
+ const start=index>=0?thresholds[index]:0,next=thresholds[index+1],nextTier=ACHIEVEMENT_TIERS[index+1];
+ const progress=Math.max(0,Math.min(100,Math.round((value-start)/(next-start)*100)));
+ return {index,tier,progress,next,nextTier,start};
+}
 
- for(const sid of activeSetIds){
-   const total=SETS[sid]?.masterTotal||0;
-   if(!total)continue;
-   let n=0;for(const k of owned)if(k.startsWith(`${sid}|`))n++;
-   const pct=Math.min(100,Math.round(n/total*100));
-   [['Bronze',25],['Silver',50],['Gold',75],['Diamond',100]].forEach(([tier,target])=>add(`set-${sid}-${target}`,'sets',`${SETS[sid]?.name||sid} · ${target}%`,`Reach ${target}% completion in ${SETS[sid]?.name||sid}.`,'📚',pct,target,tier));
- }
- for(const [era,p] of Object.entries(s.eraProgress)){
-   if(!p.total)continue;
-   const pct=Math.min(100,Math.round(p.owned/p.total*100));
-   add(`era-${era}-50`,'collection',`${era} · halfway`,`Reach 50% across your active ${era} sets.`,'🌟',pct,50,'Gold');
-   add(`era-${era}-100`,'collection',`${era} · complete`,`Complete every active ${era} master-set position.`,'👑',pct,100,'Diamond');
- }
- return defs;
+function achievementCategories(){
+ const s=achievementStats();
+ const collectionThresholds=[1000,5000,10000,15000];
+ const setThresholds=[1,2,3,5];
+ const tradeThresholds=[1,5,10,25];
+ const gradingThresholds=[1,5,10,25];
+ // Acquisition: Bronze first recorded acquisition, Silver 2 source types,
+ // Gold all 4 core types, Diamond 100 cards with recorded provenance.
+ let acqIndex=-1,acqProgress=0,acqNext='Record your first acquisition';
+ if(s.recordedAcq>=1){acqIndex=0;acqProgress=Math.min(100,Math.round(s.acquisitionTypes/2*100));acqNext='Use 2 acquisition types'}
+ if(s.acquisitionTypes>=2){acqIndex=1;acqProgress=Math.min(100,Math.round((s.acquisitionTypes-2)/2*100));acqNext='Use all 4 core acquisition types'}
+ if(s.acquisitionTypes>=4){acqIndex=2;acqProgress=Math.min(100,Math.round(s.recordedAcq/100*100));acqNext='Record provenance for 100 cards'}
+ if(s.acquisitionTypes>=4 && s.recordedAcq>=100){acqIndex=3;acqProgress=100;acqNext='Max tier'}
+ const acqState={index:acqIndex,tier:acqIndex>=0?ACHIEVEMENT_TIERS[acqIndex]:'Not yet Bronze',progress:acqProgress,nextTier:acqIndex<3?ACHIEVEMENT_TIERS[acqIndex+1]:null,nextText:acqNext};
+
+ const eraState=tierState(s.bestEraPct,[25,50,75,100]);
+ return [
+  {id:'collection',title:'Collection Size',icon:ACHIEVEMENT_ICONS.collection,value:s.physical,unit:'physical cards',thresholds:collectionThresholds,state:tierState(s.physical,collectionThresholds)},
+  {id:'sets',title:'Set Mastery',icon:ACHIEVEMENT_ICONS.sets,value:s.completedSets,unit:'completed sets',thresholds:setThresholds,state:tierState(s.completedSets,setThresholds)},
+  {id:'trades',title:'Trading',icon:ACHIEVEMENT_ICONS.trades,value:s.completedTrades,unit:'completed trades',thresholds:tradeThresholds,state:tierState(s.completedTrades,tradeThresholds)},
+  {id:'grading',title:'Grading',icon:ACHIEVEMENT_ICONS.grading,value:s.graded,unit:'graded cards',thresholds:gradingThresholds,state:tierState(s.graded,gradingThresholds)},
+  {id:'acquisition',title:'Acquisition',icon:ACHIEVEMENT_ICONS.acquisition,value:s.recordedAcq,unit:'cards with provenance',thresholds:null,state:acqState},
+  {id:'era',title:'Era Mastery',icon:ACHIEVEMENT_ICONS.era,value:s.bestEraPct,unit:'best active-era completion',thresholds:[25,50,75,100],state:eraState}
+ ];
+}
+
+function cabinetProgressCopy(c){
+ const s=c.state;
+ if(s.index>=3)return 'MAX TIER';
+ if(c.id==='acquisition')return s.nextText;
+ return `${c.value.toLocaleString()} / ${s.next.toLocaleString()} to ${s.nextTier}`;
 }
 
 function renderAchievements(){
- const defs=achievementDefinitions(),visible=achievementFilter==='all'?defs:defs.filter(x=>x.category===achievementFilter);
- const unlocked=defs.filter(x=>x.unlocked).length;
- const next=defs.filter(x=>!x.unlocked).sort((a,b)=>(b.progress-a.progress)||a.target-b.target)[0];
- $('#achievementUnlockedCount').textContent=unlocked;
- $('#achievementTotalCount').textContent=defs.length;
- $('#achievementNextLabel').textContent=next?`${Math.round(next.progress*100)}%`:'Complete';
- $('#achievementGrid').innerHTML=visible.length?visible.map(a=>`<article class="achievementCard ${a.unlocked?'unlocked':'locked'}"><div class="achievementTop"><div style="display:flex;gap:8px;align-items:flex-start"><span class="achievementIcon">${a.icon}</span><div><h3>${escapeHtml(a.title)}</h3><p>${escapeHtml(a.desc)}</p></div></div><span class="achievementTier">${a.tier}</span></div><div class="achievementProgress"><i style="width:${Math.round(a.progress*100)}%"></i></div><div class="achievementMeta"><span>${a.unlocked?'Unlocked':'In progress'}</span><span>${Math.min(a.current,a.target)} / ${a.target}</span></div></article>`).join(''):'<div class="tradeEmpty">No achievements in this category yet.</div>';
+ const cats=achievementCategories();
+ const unlocked=cats.filter(c=>c.state.index>=0);
+ const highest=unlocked.length?Math.max(...unlocked.map(c=>c.state.index)):-1;
+ $('#achievementCategoryCount').textContent=`${unlocked.length} / ${cats.length}`;
+ $('#achievementTopTier').textContent=highest>=0?ACHIEVEMENT_TIERS[highest]:'—';
+ $('#achievementCabinet').innerHTML=cats.map(c=>`
+  <button class="cabinetCard" data-ach-category="${c.id}">
+    <div class="cabinetVisual">
+      <div class="tierRing" style="--p:${c.state.progress}"><span>${c.icon}</span></div>
+      <div class="cabinetCopy"><h3>${c.title}</h3><span class="tierPill">${c.state.tier}</span><strong>${c.value.toLocaleString()} ${c.unit}</strong></div>
+    </div>
+    <div class="cabinetProgressText"><span>${cabinetProgressCopy(c)}</span><span>${c.state.progress}%</span></div>
+  </button>`).join('');
+ $$('[data-ach-category]').forEach(b=>b.onclick=()=>openAchievementDetail(b.dataset.achCategory));
+}
+
+function achievementDetailRows(c){
+ const s=achievementStats();
+ if(c.id==='sets'){
+   return [...activeSetIds].map(sid=>{
+     const total=SETS[sid]?.masterTotal||0;let n=0;for(const k of owned)if(k.startsWith(`${sid}|`))n++;
+     const pct=total?Math.min(100,Math.round(n/total*100)):0;
+     return `<div class="cabinetDetailRow"><b>${escapeHtml(SETS[sid]?.name||sid)} · ${pct}%</b><small>${n.toLocaleString()} / ${total.toLocaleString()} master positions</small><div class="achievementProgress" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>`;
+   }).join('')||'<div class="tradeEmpty">No active sets.</div>';
+ }
+ if(c.id==='era'){
+   return Object.entries(s.eraProgress).filter(([,p])=>p.total).map(([era,p])=>{
+     const pct=Math.min(100,Math.round(p.owned/p.total*100));
+     return `<div class="cabinetDetailRow"><b>${escapeHtml(era)} · ${pct}%</b><small>${p.owned.toLocaleString()} / ${p.total.toLocaleString()} active master positions</small><div class="achievementProgress" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>`;
+   }).join('')||'<div class="tradeEmpty">No era progress yet.</div>';
+ }
+ if(c.id==='acquisition'){
+   const items=[['Purchase',s.purchaseLots],['Trade',s.tradeLots],['Gift',s.giftLots],['Pulled',s.pullLots]];
+   return items.map(([name,n])=>`<div class="cabinetDetailRow"><b>${name}</b><small>${n.toLocaleString()} card${n===1?'':'s'} recorded</small></div>`).join('');
+ }
+ return '';
+}
+
+function openAchievementDetail(id){
+ const c=achievementCategories().find(x=>x.id===id);if(!c)return;
+ $('#achievementDetailTitle').textContent=c.title;
+ $('#achievementDetailSubtitle').textContent=c.state.index>=3?'Diamond · maximum tier reached':`${c.state.tier} · ${c.state.progress}% toward ${c.state.nextTier||'next tier'}`;
+ const steps=c.thresholds?c.thresholds.map((n,i)=>({tier:ACHIEVEMENT_TIERS[i],label:`${n.toLocaleString()}${c.id==='era'?'%':''}`,done:c.value>=n})):
+  [{tier:'Bronze',label:'1 record',done:c.state.index>=0},{tier:'Silver',label:'2 types',done:c.state.index>=1},{tier:'Gold',label:'4 types',done:c.state.index>=2},{tier:'Diamond',label:'100 recorded',done:c.state.index>=3}];
+ $('#achievementDetailBody').innerHTML=`
+   <div class="cabinetDetailHero"><div class="tierRing" style="--p:${c.state.progress}"><span>${c.icon}</span></div><div class="cabinetCopy"><h3>${c.title}</h3><span class="tierPill">${c.state.tier}</span><strong>${c.value.toLocaleString()} ${c.unit}</strong><small>${cabinetProgressCopy(c)}</small></div></div>
+   <div class="tierTrack">${steps.map(x=>`<div class="tierStep ${x.done?'done':''}"><b>${x.tier}</b><small>${x.label}</small></div>`).join('')}</div>
+   <div class="cabinetDetailList">${achievementDetailRows(c)}</div>`;
+ $('#achievementDetailModal').classList.add('open');
 }
 
 function latestUnlockedAchievement(){
- const unlocked=achievementDefinitions().filter(x=>x.unlocked);
- if(!unlocked.length)return null;
- const tierRank={Bronze:1,Silver:2,Gold:3,Diamond:4};
- return [...unlocked].sort((a,b)=>(tierRank[b.tier]||0)-(tierRank[a.tier]||0)||b.target-a.target)[0];
+ const cats=achievementCategories().filter(c=>c.state.index>=0);
+ if(!cats.length)return null;
+ return [...cats].sort((a,b)=>b.state.index-a.state.index || b.state.progress-a.state.progress)[0];
 }
 
 function renderDashboardMilestone(){
- const a=latestUnlockedAchievement(),body=$('#dashboardMilestoneBody');
- if(!body)return;
- if(!a){body.innerHTML='<span class="achievementIcon">🏅</span><div><b>No milestones yet</b><small>Your first achievement will appear here as your collection grows.</small></div>';return}
- const unlocked=achievementDefinitions().filter(x=>x.unlocked).length;
- body.innerHTML=`<span class="achievementIcon">${a.icon}</span><div><b>${escapeHtml(a.title)} · ${a.tier}</b><small>${unlocked} milestone${unlocked===1?'':'s'} unlocked so far.</small></div>`;
+ const a=latestUnlockedAchievement(),body=$('#dashboardMilestoneBody');if(!body)return;
+ if(!a){body.innerHTML='<span class="achievementIcon">🏅</span><div><b>No tier unlocked yet</b><small>Your first category tier will appear here as your collection grows.</small></div>';return}
+ body.innerHTML=`<span class="achievementIcon">${a.icon}</span><div><b>${escapeHtml(a.title)} · ${a.state.tier}</b><small>${cabinetProgressCopy(a)}</small></div>`;
 }
-
 function openAchievements(){ $('#achievementsModal').classList.add('open'); renderAchievements(); }
 
 function renderCollectorTools(){
@@ -4465,7 +4540,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.9.4',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.9.4a',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('open'));
 
 $('#cardModalBack').onclick=closeCardDetail;
@@ -4538,7 +4613,7 @@ function updatePhysicalCountLabels(){
 $('#acquisitionHistoryBtn').onclick=openAcquisitionHistory;
 $('#achievementsBtn').onclick=openAchievements;
 $('#dashboardAchievementsBtn').onclick=openAchievements;
-$$('[data-ach-filter]').forEach(b=>b.onclick=()=>{achievementFilter=b.dataset.achFilter;$$('[data-ach-filter]').forEach(x=>x.classList.toggle('on',x===b));renderAchievements()});
+
 $('#acqTypeFilter').onchange=renderAcquisitionHistory;
 $('#acqSort').onchange=renderAcquisitionHistory;
 $('#globalSearchBtn').onclick=async()=>{await ensureAllActiveSetsLoaded();$('#globalSearchModal').classList.add('open');$('#globalCardSearchInput').focus();renderGlobalSearch()};
