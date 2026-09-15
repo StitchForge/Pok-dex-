@@ -3915,7 +3915,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 .newBinderChoices{display:grid;gap:8px;margin-top:10px}.newBinderChoice{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:14px;padding:10px;text-align:left}.newBinderChoice>span{font-size:1.15rem}.newBinderChoice b{display:block;font-size:.62rem}.newBinderChoice small{display:block;color:var(--db-muted);font-size:.45rem;line-height:1.3;margin-top:2px}.newBinderIdeas{margin-top:12px;padding-top:10px;border-top:1px solid var(--db-line)}.newBinderIdeas>small{display:block;color:var(--db-muted);font-size:.45rem;margin-bottom:7px}.newBinderIdeaRail{display:flex;gap:7px;overflow-x:auto}.newBinderIdea{flex:0 0 150px;border:1px solid var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:13px;padding:9px;text-align:left}.newBinderIdea b{display:block;font-size:.52rem}.newBinderIdea small{display:block;color:var(--db-muted);font-size:.41rem;margin-top:3px}.smartCoverHero{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center}.smartCoverHero img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:8px}.smartCoverHeroCopy{min-width:0}
 
 </style>
-<div class="version" id="buildVersion">v0.17.3d</div>
+<div class="version" id="buildVersion">v0.17.3e</div>
 </div>
 
   <section id="homeScreen">
@@ -7070,7 +7070,19 @@ function renderSmartBinderView(){
  $('#smartBinderPageLabel').textContent=isAll?'All cards':`Page ${smartBinderViewPage} / ${pages}`;$('#smartBinderPageStats').textContent=smartBinderFilter==='all'?`${total} live positions`:`${rows.length} ${smartBinderFilter}`;$('#smartBinderPrevPage').disabled=isAll||smartBinderViewPage<=1;$('#smartBinderNextPage').disabled=isAll||smartBinderViewPage>=pages;$('#smartBinderPrevPage').classList.toggle('hidden',isAll);$('#smartBinderNextPage').classList.toggle('hidden',isAll);if($('#smartBinderPageSize').value!==smartBinderPageSize)$('#smartBinderPageSize').value=smartBinderPageSize;
  $('#smartBinderStatus').textContent=`${total} live positions · recalculated from your current collection${smartBinderChasePicking?' · Tap a card to make it the Chase Pick':''}`;
  $('#smartBinderGrid').innerHTML=pageRows.length?pageRows.map((r,i)=>binderPocketHTML({sid:r.sid,cid:r.c.id,variantId:r.v.id,key:r.key,c:r.c,v:r.v,setName:r.c.set?.name||SETS[r.sid]?.name||r.sid,owned:r.owned,wanted:r.wanted,tradeTarget:tradeTargets.has(r.key)},begin+i)).join(''):'<div class="collectionEmpty">No cards currently match this binder view.</div>';
- $$('#smartBinderGrid [data-binder-card]').forEach(el=>el.onclick=()=>{const r=smartBinderRows.find(x=>x.key===el.dataset.binderCard);if(!r)return;if(smartBinderChasePicking){rememberSmartBinderChase(b,r);smartBinderChasePicking=false;saveSmartBinders();renderSmartBinderView();renderDashboardCustomBinders();toast('Binder Chase Pick updated ⭐');return}$('#smartBinderModal').classList.remove('open');currentSet=r.sid;setCardDetailContext('smartBinder',{binderId:b.id});openCard(r.c.id,r.v.id)});
+ $$('#smartBinderGrid [data-binder-card]').forEach(el=>el.onclick=()=>{const r=smartBinderRows.find(x=>x.key===el.dataset.binderCard);if(!r)return;if(smartBinderChasePicking){rememberSmartBinderChase(b,r);smartBinderChasePicking=false;saveSmartBinders();renderSmartBinderView();renderDashboardCustomBinders();toast('Binder Chase Pick updated ⭐');return}
+   // Smart Binder rows can come directly from the universal catalogue and may not yet
+   // exist in cardsBySet. Card Detail reads from cardsBySet, so seed the exact card
+   // before opening it instead of falling through to the dashboard with no modal.
+   if(!cardsBySet[r.sid])cardsBySet[r.sid]=[];
+   const existingIndex=cardsBySet[r.sid].findIndex(c=>c.id===r.c.id);
+   if(existingIndex<0)cardsBySet[r.sid].push(r.c);else if((r.c.variants||r.c.pricing)&&!(cardsBySet[r.sid][existingIndex]?.variants||cardsBySet[r.sid][existingIndex]?.pricing))cardsBySet[r.sid][existingIndex]=r.c;
+   cacheDiscoveryCard(r.sid,r.c);saveDiscoveryCardCache();
+   const returnState={binderId:b.id,page:smartBinderViewPage,filter:smartBinderFilter,pageSize:smartBinderPageSize};
+   currentSet=r.sid;setCardDetailContext('smartBinder',returnState);
+   $('#smartBinderModal').classList.remove('open');
+   openCard(r.c.id,r.v.id);
+ });
 }
 async function openSmartBinder(id){const b=smartBinderById(id);if(!b)return;smartBinderChasePicking=false;b.lastOpenedAt=new Date().toISOString();saveSmartBinders();activeSmartBinderId=id;smartBinderFilter='all';smartBinderViewPage=1;$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x.dataset.smartFilter==='all'));$('#smartBinderModal').classList.add('open');const cached=cachedSmartBinderRows(b);smartBinderRows=cached;renderSmartBinderView();$('#smartBinderStatus').textContent=cached.length?'Showing saved binder while refreshing…':'Refreshing live catalogue rules…';if(!cached.length)$('#smartBinderGrid').innerHTML='<div class="collectionEmpty">Loading binder…</div>';try{const fresh=await smartSearchRows(b);if(fresh.length){smartBinderRows=fresh;rememberSmartBinderRows(b,fresh);saveSmartBinders();renderSmartBinderView();hydrateSmartBinderInBackground(b,fresh)}else{const local=cached.length?cached:smartRowsFromLocalCatalogue(b);smartBinderRows=local;if(local.length){rememberSmartBinderRows(b,local);saveSmartBinders()}renderSmartBinderView();$('#smartBinderStatus').textContent=local.length?'Refresh returned no matches · keeping your last saved binder.':'No catalogue cards currently match these Smart Rules.'}}catch(e){const local=cached.length?cached:smartRowsFromLocalCatalogue(b);smartBinderRows=local;if(local.length){rememberSmartBinderRows(b,local);saveSmartBinders()}renderSmartBinderView();$('#smartBinderStatus').textContent=local.length?'Live refresh unavailable · showing your last saved binder.':'Smart Binder recovery could not reach the catalogue. Tap Refresh when online.'}}
 function openSmartBinderDetails(){const b=smartBinderById(activeSmartBinderId);if(!b)return;$('#smartBinderDetailsTitle').textContent=b.name;$('#smartBinderDetailsBody').innerHTML=`<b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules)||'Live custom collection')}</small><small>Binder type · Smart</small><small>Purpose · Collection View</small><small>${b.chaseKey?'Manual Chase Pick selected':'Chase Pick · Automatic'}</small>`;$('#smartBinderDetailsModal').classList.add('open')}
@@ -9687,7 +9699,7 @@ function bindCollectorPanel(c,v){
       if(notes)l.notes=notes.value.trim();
     }
   };
-  const rerender=()=>{setCollectorLots(currentSet,c.id,v.id,lots);setCardDetailContext(null);openCard(c.id,v.id)};
+  const rerender=()=>{const origin=cardDetailOrigin,state=cardDetailOriginState;setCollectorLots(currentSet,c.id,v.id,lots);openCard(c.id,v.id);setCardDetailContext(origin,state)};
   const refreshLot=l=>{
     const base=baseFor(l);
     const q=$(`#${base}-qty`),t=$(`#${base}-trade`);
@@ -9777,6 +9789,10 @@ function closeCardDetail(){
    renderCustomBinderView();
  }else if(origin==='smartBinder'){
    if(state?.binderId)activeSmartBinderId=state.binderId;
+   if(state?.filter)smartBinderFilter=state.filter;
+   if(state?.pageSize)smartBinderPageSize=state.pageSize;
+   if(Number.isFinite(Number(state?.page)))smartBinderViewPage=Math.max(1,Number(state.page));
+   $$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x.dataset.smartFilter===smartBinderFilter));
    $('#smartBinderModal').classList.add('open');
    renderSmartBinderView();
  }else if(origin==='artist'){
@@ -10884,11 +10900,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0173d',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0173e',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0173d_controller_reload';
+      const key='dexbinder_v0173e_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
