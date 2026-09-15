@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v0182';
+const CACHE='dexbinder-shell-v0182a';
 const APP_SHELL=[
   './',
   './index.html',
@@ -10,7 +10,9 @@ const APP_SHELL=[
   './assets/hero-espeon.png',
   './assets/hero-umbreon.png',
   './assets/temporal-forces-logo.png',
-  './trainer-scene-hannah.webp'
+  './trainer-bg-sunset-lake.webp',
+  './trainer-bg-cozy-town.webp',
+  './trainer-bg-forest-trail.webp'
 ];
 
 self.addEventListener('install',event=>{

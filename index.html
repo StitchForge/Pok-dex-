@@ -3927,24 +3927,33 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 body[data-theme="umbreon"] .trainerCard{background:radial-gradient(circle at 78% 5%,rgba(156,143,255,.16),transparent 28%),linear-gradient(135deg,#211c35,#191b2b 52%,#172635);border-color:rgba(158,149,255,.32)}body[data-theme="umbreon"] .trainerCardName,body[data-theme="umbreon"] .trainerStatBox b,body[data-theme="umbreon"] .badgeCaseHead b{color:#f5f6fb}body[data-theme="umbreon"] .trainerNo,body[data-theme="umbreon"] .trainerCardLabel,body[data-theme="umbreon"] .trainerStatBox small,body[data-theme="umbreon"] .trainerCardFoot span{color:#b7b3d2}body[data-theme="umbreon"] .trainerStatBox,body[data-theme="umbreon"] .badgeCase{background:rgba(29,35,49,.76);border-color:rgba(238,240,255,.10)}body[data-theme="umbreon"] .trainerArt{background:linear-gradient(180deg,#2b2a50,#32253e 62%,#1e3935)}
 
 </style>
-<style id="v0182-trainer-art">
-/* v0.18.2 — approved Trainer Profile art direction */
+<style id="v0182a-trainer-art">
+/* v0.18.2a — modular Trainer Scene artwork pipeline */
 .trainerCard{padding:12px;background:linear-gradient(135deg,#f7e9ff 0%,#fff5fb 52%,#eaf2ff 100%)}
 .trainerScene{grid-template-columns:minmax(0,1.45fr) minmax(118px,.78fr);gap:9px}
-.trainerArt{min-height:190px;background-image:url('./trainer-scene-hannah.webp');background-size:cover;background-position:center;border-color:rgba(98,77,151,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45)}
+.trainerArt{min-height:190px;aspect-ratio:3/2;background-image:var(--trainer-bg,url('./trainer-bg-sunset-lake.webp'));background-size:cover;background-position:center;border-color:rgba(98,77,151,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.45);isolation:isolate}
 .trainerArt:before,.trainerSprite,.partnerMon{display:none!important}
+.trainerArt:after{content:'SCENE PREVIEW';position:absolute;left:9px;bottom:8px;padding:4px 7px;border-radius:999px;background:rgba(20,20,45,.48);color:white;font-size:.31rem;font-weight:1000;letter-spacing:.11em;backdrop-filter:blur(6px)}
 .trainerStats{align-content:stretch}.trainerStatBox{display:flex;flex-direction:column;justify-content:center;min-height:56px}
+.trainerScenePicker{position:relative;z-index:1;margin-top:9px;padding:9px;border:1px solid rgba(98,77,151,.14);background:rgba(255,255,255,.60);border-radius:15px}
+.trainerScenePickerHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.trainerScenePickerHead b{font-size:.5rem;color:#27274b}.trainerScenePickerHead span{font-size:.36rem;color:#74698d}
+.trainerSceneChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:7px}
+.trainerSceneChoice{border:2px solid transparent;background:transparent;border-radius:12px;padding:3px;color:#27274b;font-size:.36rem;font-weight:900}
+.trainerSceneChoice img{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:9px;margin-bottom:4px}
+.trainerSceneChoice.active{border-color:#806be6;background:rgba(128,107,230,.08)}
 .badgeCase{background:rgba(255,255,255,.72)}
-.trainerBadge{border-radius:22%;font-size:.72rem;transform:rotate(0);box-shadow:inset 0 0 0 2px rgba(255,255,255,.62),0 3px 8px rgba(50,40,80,.13)}
+.trainerBadge{border-radius:22%;font-size:.72rem;box-shadow:inset 0 0 0 2px rgba(255,255,255,.62),0 3px 8px rgba(50,40,80,.13)}
 .trainerBadge:nth-child(1){clip-path:polygon(50% 0,93% 24%,86% 78%,50% 100%,14% 78%,7% 24%)}
 .trainerBadge:nth-child(2){clip-path:polygon(50% 0,92% 22%,92% 76%,50% 100%,8% 76%,8% 22%)}
 .trainerBadge:nth-child(3){border-radius:50%}.trainerBadge:nth-child(4){clip-path:polygon(50% 0,64% 31%,100% 38%,73% 61%,82% 100%,50% 79%,18% 100%,27% 61%,0 38%,36% 31%)}
 .trainerBadge:nth-child(5){clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%)}
 body[data-theme="umbreon"] .trainerCard{background:linear-gradient(135deg,#211c35,#191b2b 52%,#172635)}
 body[data-theme="umbreon"] .trainerArt{filter:saturate(.86) brightness(.78);border-color:rgba(238,240,255,.12)}
+body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);border-color:rgba(238,240,255,.10)}
+body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2a</div>
 </div>
 
   <section id="homeScreen">
@@ -5043,7 +5052,7 @@ body[data-theme="umbreon"] .trainerArt{filter:saturate(.86) brightness(.78);bord
   <div class="trainerProfileHead"><div><span class="eyebrow">MY PROFILE</span><h2 id="profilePageTitle">Trainer Profile</h2><p>Your collection. Your journey.</p></div><button class="btn close trainerProfileMenu">Close</button></div>
   <section class="trainerCard" id="trainerCardShareArea">
     <div class="trainerCardTop"><div><div class="trainerCardLabel">DEXBINDER · TRAINER CARD</div><div class="trainerCardName" id="trainerCardName">MY PROFILE</div></div><div class="trainerNo" id="trainerCardNo">TRAINER NO. 0001</div></div>
-    <div class="trainerScene"><div class="trainerArt" role="img" aria-label="Trainer and partner scene"></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div>
+    <div class="trainerScene"><div class="trainerArt" role="img" aria-label="Trainer and partner scene"></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
     <div class="badgeCase"><div class="badgeCaseHead"><div><div class="trainerCardLabel">SHOWCASE BADGES</div><b>Your collector achievements</b></div><button class="btn small" id="profileAchievementsBtn">View all</button></div><div class="trainerBadges"><div class="trainerBadge">★</div><div class="trainerBadge">◆</div><div class="trainerBadge">↔</div><div class="trainerBadge">✦</div><div class="trainerBadge">▣</div><div class="trainerBadge empty">＋</div></div></div>
     <div class="trainerCardFoot"><span id="trainerSince">DEXBINDER COLLECTOR</span><button class="shareTrainerBtn" id="shareTrainerCardBtn">Share Trainer Card ↗</button></div>
   </section>
@@ -11172,7 +11181,7 @@ function renderProfiles(){
  let rows=[];try{rows=ownedCollectionRows()}catch(e){} const physical=rows.reduce((n,r)=>n+(Number(r.qty)||0),0),graded=rows.reduce((n,r)=>n+(Number(r.gradedQty)||0),0),trade=rows.reduce((n,r)=>n+(Number(r.tradeQty)||0),0); const priced=rows.filter(r=>Number.isFinite(r.totalValue)),value=priced.reduce((n,r)=>n+r.totalValue,0);
  let binders=0,wish=0;try{binders=(loadCustomBinders?.()||[]).length+(loadSmartBinders?.()||[]).length}catch(e){const x=profileSummary(cur);binders=x.binders}try{wish=wishlist?.size||0}catch(e){}
  const active=[...activeSetIds];let mastered=0,have=0,total=0;try{active.forEach(sid=>{const c=counts(sid);if(c?.total){total+=c.total;have+=c.have||0;if((c.have||0)>=c.total)mastered++}})}catch(e){} const pct=total?Math.round(have/total*1000)/10:0;
- const set=(id,v)=>{const el=$(id);if(el)el.textContent=v};set('#trainerMasterPct',`${pct}%`);set('#trainerPhysicalCards',physical.toLocaleString());set('#trainerMasteredSets',mastered.toLocaleString());set('#profileBinderCount',binders.toLocaleString());set('#profileWishlistCount',wish.toLocaleString());set('#profileTradeCount',trade.toLocaleString());set('#profileGradedCount',graded.toLocaleString());set('#profileCollectionValue',priced.length?formatTradeMoney(value):'—');set('#profileValueCoverage',priced.length?`${priced.length}/${rows.length} owned positions priced`:'Prices populate as cards refresh');if($('#trainerMasterBar'))$('#trainerMasterBar').style.width=`${Math.min(100,pct)}%`;
+ const set=(id,v)=>{const el=$(id);if(el)el.textContent=v};set('#trainerMasterPct',`${pct}%`);set('#trainerPhysicalCards',physical.toLocaleString());set('#trainerMasteredSets',mastered.toLocaleString());set('#profileBinderCount',binders.toLocaleString());set('#profileWishlistCount',wish.toLocaleString());set('#profileTradeCount',trade.toLocaleString());set('#profileGradedCount',graded.toLocaleString());set('#profileCollectionValue',priced.length?formatTradeMoney(value):'—');set('#profileValueCoverage',priced.length?`${priced.length}/${rows.length} owned positions priced`:'Prices populate as cards refresh');if($('#trainerMasterBar'))$('#trainerMasterBar').style.width=`${Math.min(100,pct)}%`;try{renderTrainerScenePrefs()}catch(e){}
  if(list){list.innerHTML=m.profiles.map(p=>{const x=profileSummary(p),selected=p.id===m.activeId;return `<button class="profileRow ${selected?'active':''}" data-profile-switch="${p.id}" ${selected?'disabled':''}><div class="miniAvatar">${p.archived?'📦':'🧢'}</div><div style="text-align:left"><b>${escapeHtml(profileDisplayName(p))}${p.archived?'<span class="profileBadge">ARCHIVED</span>':''}</b><small>${selected?`${x.owned.toLocaleString()} owned positions · ${x.binders} binders`:'Tap to collect with this profile'}</small></div>${selected?'<span class="profileBadge">✓ SELECTED</span>':'<span>›</span>'}</button>`}).join('');$$('[data-profile-switch]',list).forEach(b=>b.onclick=()=>switchProfile(b.dataset.profileSwitch))}
 }
 function openProfiles(){const modal=document.getElementById('profileModal');if(!modal)return;modal.classList.add('open');try{renderProfiles()}catch(e){console.warn('Profile render unavailable',e)}}
@@ -11183,11 +11192,32 @@ async function duplicateProfile(){const m=profileMeta(),p=currentProfile();if(!p
 function toggleArchiveProfile(){const m=profileMeta(),p=currentProfile();if(!p)return;p.archived=!p.archived;p.updatedAt=new Date().toISOString();saveProfileMeta(m);renderProfiles();$('#profileArchiveBtn').textContent=p.archived?'Unarchive':'Archive';toast(p.archived?'Profile archived':'Profile restored')}
 async function resetProfile(){const p=currentProfile();if(!p||!confirm(`Reset “${p.name}”? This clears this profile’s collection data on this device. Other profiles are not affected.`))return;const blank={'dexbinder_v05_active_sets':'[]'};try{await putProfileSnapshot(p.id,blank)}catch(e){}window.DexBinderProfiles.USER_KEYS.forEach(k=>localStorage.removeItem(k));localStorage.setItem('dexbinder_v05_active_sets','[]');location.reload()}
 async function deleteProfile(){const m=profileMeta(),p=currentProfile();if(!p)return;if(m.profiles.length<=1){toast('Keep at least one profile');return}if(!confirm(`Delete “${p.name}” from this device? This cannot be undone unless you have a backup.`))return;const next=m.profiles.find(x=>x.id!==p.id);try{await removeProfileSnapshot(p.id);localStorage.removeItem(PROFILE_DATA_PREFIX+p.id);await restoreProfileSnapshot(next.id);m.profiles=m.profiles.filter(x=>x.id!==p.id);m.activeId=next.id;saveProfileMeta(m);location.reload()}catch(e){console.error('Delete profile failed',e);toast('Could not delete profile')}}
+
+const TRAINER_PREFS_KEY='dexbinder_v0182_trainer_prefs';
+const TRAINER_SCENES={
+ 'sunset-lake':'./trainer-bg-sunset-lake.webp',
+ 'cozy-town':'./trainer-bg-cozy-town.webp',
+ 'forest-trail':'./trainer-bg-forest-trail.webp'
+};
+function trainerPrefsAll(){try{return JSON.parse(localStorage.getItem(TRAINER_PREFS_KEY)||'{}')||{}}catch(e){return {}}}
+function trainerPrefsForCurrent(){const p=currentProfile(),all=trainerPrefsAll();return all[p?.id]||{scene:'sunset-lake'}}
+function saveTrainerPrefsForCurrent(next){const p=currentProfile();if(!p)return;const all=trainerPrefsAll(),prev=all[p.id]||{};all[p.id]={...prev,...next,updatedAt:new Date().toISOString()};localStorage.setItem(TRAINER_PREFS_KEY,JSON.stringify(all))}
+function renderTrainerScenePrefs(){
+ const art=$('.trainerArt');if(!art)return;
+ const pref=trainerPrefsForCurrent(),scene=TRAINER_SCENES[pref.scene]?pref.scene:'sunset-lake';
+ art.style.setProperty('--trainer-bg',`url("${TRAINER_SCENES[scene]}")`);
+ art.setAttribute('aria-label',`${scene.replaceAll('-',' ')} trainer background preview`);
+ $$('[data-trainer-scene]').forEach(b=>b.classList.toggle('active',b.dataset.trainerScene===scene));
+}
+function bindTrainerScenePrefs(){
+ $$('[data-trainer-scene]').forEach(b=>b.onclick=()=>{const scene=b.dataset.trainerScene;if(!TRAINER_SCENES[scene])return;saveTrainerPrefsForCurrent({scene});renderTrainerScenePrefs();toast('Trainer scene saved to this profile')});
+ renderTrainerScenePrefs();
+}
 function bindProfileControls(){const h=$('#profileHeaderBtn');if(h)h.onclick=openProfiles;const ds=$('#profileDataSyncBtn'),pb=$('#profileBackupBtn'),pv=$('#profileValueBtn'),pa=$('#profileAchievementsBtn'),pe=$('#profileExportBtn'),sh=$('#shareTrainerCardBtn');if(ds)ds.onclick=()=>{$('#profileModal').classList.remove('open');$('#dataSyncModal').classList.add('open')};if(pb)pb.onclick=()=>{$('#profileModal').classList.remove('open');$('#backupModal').classList.add('open')};if(pv)pv.onclick=()=>{$('#profileModal').classList.remove('open');openCollectionValueIntelligence()};if(pa)pa.onclick=()=>{$('#profileModal').classList.remove('open');openAchievements()};if(pe)pe.onclick=()=>{$('#profileModal').classList.remove('open');openMyCollection()};if(sh)sh.onclick=()=>{toast('Trainer Card preview uses the first finished trainer + partner art treatment · customization arrives next')};const create=$('#profileCreateBtn'),rename=$('#profileRenameBtn'),duplicate=$('#profileDuplicateBtn'),archive=$('#profileArchiveBtn'),reset=$('#profileResetBtn'),del=$('#profileDeleteBtn'),saveName=$('#profileNameSaveBtn'),nameInput=$('#profileNameInput');if(create)create.onclick=()=>openProfileName('create');if(rename)rename.onclick=()=>openProfileName('rename');if(duplicate)duplicate.onclick=duplicateProfile;if(archive)archive.onclick=toggleArchiveProfile;if(reset)reset.onclick=resetProfile;if(del)del.onclick=deleteProfile;if(saveName)saveName.onclick=saveProfileName;if(nameInput)nameInput.addEventListener('keydown',e=>{if(e.key==='Enter')saveProfileName()});window.addEventListener('pagehide',()=>{saveCurrentProfileSnapshot().catch(e=>console.warn('Profile autosave skipped',e))});renderProfiles()}
 
 function initDexBinder(){
   bindDexBinderTheme();
-  try{bindProfileControls()}catch(e){console.warn('Profile controls unavailable',e)}
+  try{bindProfileControls();bindTrainerScenePrefs()}catch(e){console.warn('Profile controls unavailable',e)}
   renderDashboardGreeting();
   registerDexBinderServiceWorker();
   // Stage 1: render the core UI first. Optional migration/cache work must never block it.
