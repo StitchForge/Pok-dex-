@@ -3693,6 +3693,9 @@ body[data-theme="umbreon"] .btn.dark{background:var(--db-purple);color:#10131d;b
  body[data-theme="system"] .btn.dark{background:var(--db-purple);color:#10131d;border-color:var(--db-purple)}
 }
 
+
+/* v0.17.3 — Smart Binder completion + physical allocation polish */
+.binderAllocationSummary{margin-top:8px;border:1px solid var(--db-line);background:var(--db-panel-2);border-radius:11px;padding:8px;color:var(--db-muted);font-size:.46rem;line-height:1.45}.binderAllocationSummary:empty{display:none}.discoveryCheck{display:flex;align-items:center;gap:7px;min-height:44px;border:1px solid var(--db-line);border-radius:10px;padding:0 10px;color:var(--db-text);font-size:.5rem}.discoveryCheck input{width:18px;height:18px}.binderViewActionsFour{grid-template-columns:repeat(5,minmax(0,1fr))}@media(max-width:430px){.binderViewActionsFour{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.binderViewActionsFour .btn{padding:9px 4px;font-size:.48rem}}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -3902,7 +3905,7 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBinderHero{background:var(--db-panel-2);color:var(--db-text)}
 @media(prefers-color-scheme:dark){body[data-theme="system"] .smartBinderCard,body[data-theme="system"] .smartBinderHero{background:var(--db-panel-2);color:var(--db-text)}}
 
-/* v0.17.2 — unified My Binders dashboard */
+/* v0.17.3 — unified My Binders dashboard */
 .dashboardCustomBinderRail{gap:10px;padding-bottom:7px}
 .dashboardCustomBinderCard,.dashboardSmartBinderCard{flex:0 0 min(205px,58vw);display:block;position:relative;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:17px;padding:9px;text-align:left;scroll-snap-align:start;overflow:hidden}
 .dashboardUnifiedCover{width:100%;height:116px;border-radius:12px;background:var(--db-panel-2);overflow:hidden;display:grid;place-items:center;margin-bottom:8px}
@@ -3912,7 +3915,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 .newBinderChoices{display:grid;gap:8px;margin-top:10px}.newBinderChoice{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:14px;padding:10px;text-align:left}.newBinderChoice>span{font-size:1.15rem}.newBinderChoice b{display:block;font-size:.62rem}.newBinderChoice small{display:block;color:var(--db-muted);font-size:.45rem;line-height:1.3;margin-top:2px}.newBinderIdeas{margin-top:12px;padding-top:10px;border-top:1px solid var(--db-line)}.newBinderIdeas>small{display:block;color:var(--db-muted);font-size:.45rem;margin-bottom:7px}.newBinderIdeaRail{display:flex;gap:7px;overflow-x:auto}.newBinderIdea{flex:0 0 150px;border:1px solid var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:13px;padding:9px;text-align:left}.newBinderIdea b{display:block;font-size:.52rem}.newBinderIdea small{display:block;color:var(--db-muted);font-size:.41rem;margin-top:3px}.smartCoverHero{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center}.smartCoverHero img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:8px}.smartCoverHeroCopy{min-width:0}
 
 </style>
-<div class="version" id="buildVersion">v0.17.2</div>
+<div class="version" id="buildVersion">v0.17.3</div>
 </div>
 
   <section id="homeScreen">
@@ -4186,7 +4189,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
   <div class="binderEditorForm">
     <label><span>Name</span><input class="collectorInput" id="binderNameInput" maxlength="40" placeholder="e.g. Eeveelutions"></label>
     <label><span>Description</span><textarea class="collectorNotes" id="binderDescInput" maxlength="120" placeholder="Optional"></textarea></label>
-    <label><span>Binder purpose</span><select class="select" id="binderPurposeInput"><option value="reference">Collection View · does not reserve copies</option><option value="physical">Physical Collection · reserves physical copies</option></select><small class="binderPurposeHelp">Physical Collections count toward copy allocation. Collection Views can overlap freely.</small></label>
+    <label><span>Binder purpose</span><select class="select" id="binderPurposeInput"><option value="reference">Collection View · does not reserve copies</option><option value="physical">Physical Collection · reserves physical copies</option></select><small class="binderPurposeHelp">Physical Collections reserve one physical copy for each card position. Collection Views can overlap freely.</small><div class="binderAllocationSummary" id="binderAllocationSummary"></div></label>
   </div>
   <div class="binderEditorActions"><button class="btn dark" id="binderSaveBtn">Save Binder</button><button class="btn hidden" id="binderDeleteBtn">Delete Binder</button></div>
 </div></div>
@@ -4208,7 +4211,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
     <button class="btn small huntModeLaunch" id="binderHuntBtn">🎯 Hunt Mode</button>
     <button class="btn small" id="binderEditBtn">🔒 Edit Layout</button>
     <button class="btn small dark" id="binderBlankPocketBtn">＋ Blank Pocket</button>
-    <button class="btn small" id="binderCoverBtn">🖼 Cover</button>
+    <button class="btn small" id="binderCoverBtn">⭐ Chase Pick</button>
     <button class="btn small" id="binderDetailsBtn">⚙️ Details</button>
   </div>
 
@@ -4268,7 +4271,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 <div class="modal" id="binderCoverModal"><div class="sheet binderCoverSheet">
   <div class="grab"></div>
   <div class="detailTop">
-    <div><div class="eyebrow">BINDER ARTWORK</div><h2>Choose Binder Cover</h2><p>Pick any planned card to represent this binder.</p></div>
+    <div><div class="eyebrow">CHASE PICK</div><h2>Choose Chase Pick</h2><p>Your Chase Pick is the featured card and cover artwork for this binder.</p></div>
     <button class="btn small close">Close</button>
   </div>
   <div class="binderCoverCurrent" id="binderCoverCurrent"></div>
@@ -4759,14 +4762,14 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 <div class="modal" id="discoveryModal"><div class="sheet discoverySheet"><div class="grab"></div>
 <div class="detailTop"><div><div class="eyebrow">DISCOVERY</div><h2>Saved Searches &amp; Discovery</h2><p>Build repeatable catalogue searches, then freeze results into a Custom Binder or keep the rules live as a Smart Binder.</p></div><button class="btn small close">Close</button></div>
 <div class="discoveryBuilder"><input class="collectorInput" id="discoveryName" placeholder="Search name, e.g. Missing Pikachus"><input class="collectorInput" id="discoveryQuery" placeholder="Pokémon / card name, e.g. Pikachu">
-<div class="discoveryFilters"><select class="select" id="discoveryOwnership"><option value="missing">Missing</option><option value="all">All</option><option value="owned">Owned</option><option value="wishlist">Wishlist</option></select><select class="select" id="discoveryRarity"><option value="">Any rarity</option></select><input class="collectorInput" id="discoveryArtist" placeholder="Artist (optional)"><input class="collectorInput" id="discoveryMaxPrice" type="number" min="0" step="0.01" placeholder="Max price"></div>
+<div class="discoveryFilters"><select class="select" id="discoveryOwnership"><option value="missing">Missing</option><option value="all">All</option><option value="owned">Owned</option><option value="wishlist">Wishlist</option></select><select class="select" id="discoveryRarity"><option value="">Any rarity</option></select><input class="collectorInput" id="discoveryArtist" placeholder="Artist (optional)"><select class="select" id="discoveryType"><option value="">Any Pokémon type</option><option>Colorless</option><option>Darkness</option><option>Dragon</option><option>Fairy</option><option>Fighting</option><option>Fire</option><option>Grass</option><option>Lightning</option><option>Metal</option><option>Psychic</option><option>Water</option></select><select class="select" id="discoveryEra"><option value="">Any era</option><option>Mega Evolution</option><option>Scarlet &amp; Violet</option><option>Sword &amp; Shield</option><option>Sun &amp; Moon</option><option>XY</option><option>Black &amp; White</option><option>HeartGold &amp; SoulSilver</option><option>Platinum</option><option>Diamond &amp; Pearl</option><option>EX</option><option>e-Card</option><option>Neo</option><option>Gym</option><option>Original Series</option></select><input class="collectorInput" id="discoverySet" placeholder="Set name (optional)"><input class="collectorInput" id="discoveryYear" type="number" min="1999" max="2100" step="1" placeholder="Release year"><input class="collectorInput" id="discoveryMinPrice" type="number" min="0" step="0.01" placeholder="Min price"><input class="collectorInput" id="discoveryMaxPrice" type="number" min="0" step="0.01" placeholder="Max price"><select class="select" id="discoverySort"><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="priceHigh">Price high → low</option><option value="priceLow">Price low → high</option><option value="az">Name A–Z</option></select><label class="discoveryCheck"><input type="checkbox" id="discoveryMySetsOnly"> <span>My active sets only</span></label></div>
 <div class="discoveryActions"><button class="btn dark" id="runDiscoverySearch">Search</button><button class="btn" id="saveDiscoverySearch">☆ Save Search</button><button class="btn" id="discoveryCreateBinder">＋ Create Binder from Results</button><button class="btn" id="discoveryCreateSmartBinder">✨ Create Smart Binder</button></div></div>
 <div class="setMarketStatus" id="discoveryStatus">Enter a Pokémon or card name to search the full catalogue.</div><div class="discoveryResults" id="discoveryResults"></div></div></div>
 <div class="modal" id="smartBinderModal"><div class="sheet binderViewSheet smartBinderSheet"><div class="grab"></div>
 <div class="detailTop"><div><div class="eyebrow">CUSTOM BINDER</div><h2 id="smartBinderTitle">Binder</h2><p id="smartBinderMeta">Live catalogue collection</p></div><button class="btn small close">Close</button></div>
 <div class="binderViewHero" id="smartBinderHero"></div>
 <div class="binderViewActions binderViewActionsFour">
-<button class="btn small" id="smartBinderEditRules">⚙️ Edit Rules</button><button class="btn small" id="smartBinderRefresh">↻ Refresh</button><button class="btn small dark" id="smartBinderChasePick">⭐ Chase Pick</button><button class="btn small" id="smartBinderCover">🖼 Cover</button><button class="btn small" id="smartBinderDetails">⚙️ Details</button>
+<button class="btn small" id="smartBinderEditRules">⚙️ Edit Rules</button><button class="btn small" id="smartBinderRefresh">↻ Refresh</button><button class="btn small dark" id="smartBinderChasePick">⭐ Chase Pick</button><button class="btn small" id="smartBinderDetails">⚙️ Details</button>
 </div>
 <div class="binderFilterChips"><button class="chip active" data-smart-filter="all">Binder</button><button class="chip" data-smart-filter="missing">Missing</button><button class="chip" data-smart-filter="wishlist">Wishlist</button><button class="chip" data-smart-filter="owned">Owned</button></div>
 <div class="binderPageMeta"><div><b id="smartBinderPageLabel">Page 1 / 1</b><span id="smartBinderPageStats"></span></div><select class="select binderPageSize" id="smartBinderPageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="all">All</option></select></div>
@@ -5114,12 +5117,12 @@ function saveCustomBinders(){
   try{if(typeof renderDashboardCustomBinders==='function')renderDashboardCustomBinders()}catch(e){}
 }
 let customBinders=loadCustomBinders();
-function loadSmartBinders(){try{const x=JSON.parse(localStorage.getItem(SMART_BINDERS_KEY)||'[]');return Array.isArray(x)?x.filter(b=>b&&b.id&&b.name&&b.rules).map(b=>({...b,chaseKey:b.chaseKey||'',lastOpenedAt:b.lastOpenedAt||b.updatedAt||b.createdAt||'',rules:{query:String(b.rules.query||''),ownership:b.rules.ownership||'all',rarity:b.rules.rarity||'',artist:b.rules.artist||'',maxPrice:b.rules.maxPrice||''}})):[]}catch(e){return []}}
+function loadSmartBinders(){try{const x=JSON.parse(localStorage.getItem(SMART_BINDERS_KEY)||'[]');return Array.isArray(x)?x.filter(b=>b&&b.id&&b.name&&b.rules).map(b=>({...b,chaseKey:b.chaseKey||'',lastOpenedAt:b.lastOpenedAt||b.updatedAt||b.createdAt||'',rules:{query:String(b.rules.query||''),ownership:b.rules.ownership||'all',rarity:b.rules.rarity||'',artist:b.rules.artist||'',type:b.rules.type||'',era:b.rules.era||'',set:b.rules.set||'',year:b.rules.year||'',minPrice:b.rules.minPrice||'',maxPrice:b.rules.maxPrice||'',sort:b.rules.sort||'newest',mySetsOnly:!!b.rules.mySetsOnly}})):[]}catch(e){return []}}
 function saveSmartBinders(){try{localStorage.setItem(SMART_BINDERS_KEY,JSON.stringify(smartBinders))}catch(e){}try{renderSmartBinderRails()}catch(e){}}
 let smartBinders=loadSmartBinders(),activeSmartBinderId=null,editingSmartBinderId=null,smartBinderRows=[],smartBinderFilter='all',smartBinderChasePicking=false,smartBinderViewPage=1;
 let smartBinderPageSize=(()=>{try{return localStorage.getItem('dexbinder_smart_binder_page_size')||localStorage.getItem('dexbinder_custom_binder_page_size')||'12'}catch(e){return '12'}})();
 function smartBinderById(id){return smartBinders.find(b=>b.id===id)||null}
-function smartRuleSummary(r={}){return [r.query,r.ownership&&r.ownership!=='all'?r.ownership:null,r.rarity,r.artist,r.maxPrice?`≤ $${r.maxPrice}`:null].filter(Boolean).join(' · ')}
+function smartRuleSummary(r={}){return [r.query,r.ownership&&r.ownership!=='all'?r.ownership:null,r.rarity,r.artist,r.type,r.era,r.set,r.year,r.mySetsOnly?'My Sets':null,r.minPrice?`≥ $${r.minPrice}`:null,r.maxPrice?`≤ $${r.maxPrice}`:null].filter(Boolean).join(' · ')}
 function renderSmartBinderRails(){
  const make=()=>smartBinders.map(b=>`<button class="smartBinderCard" data-smart-binder="${b.id}"><span class="smartTag">SMART</span><b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules)||'Live catalogue rules')}</small><em>Updates automatically →</em></button>`).join('');
  const a=$('#smartBinderRail');if(a)a.innerHTML=make();$$('[data-smart-binder]').forEach(x=>x.onclick=()=>openSmartBinder(x.dataset.smartBinder));
@@ -5130,6 +5133,8 @@ function smartBinderChaseRow(b,rows){return (b?.chaseKey&&(rows||[]).find(r=>r.k
 function customBinderReservedCountForKey(k){return customBinders.filter(b=>b.purpose==='physical'&&Array.isArray(b.cards)&&b.cards.includes(k)).length}
 function ownedQuantityForKey(k){try{const [sid,cid,v]=String(k).split('|');return getCollectorLots(sid,cid,v).reduce((n,l)=>n+Number(l.quantity||0),0)|| (owned.has(k)?1:0)}catch(e){return owned.has(k)?1:0}}
 function spareQuantityForKey(k){return Math.max(0,ownedQuantityForKey(k)-customBinderReservedCountForKey(k))}
+function binderAllocationStats(b){const keys=[...new Set((b?.cards||[]).filter(k=>!isBlankBinderPocket(k)))];let reserved=0,covered=0,short=0,spare=0;for(const k of keys){reserved++;const q=ownedQuantityForKey(k);if(q>0)covered++;else short++;spare+=spareQuantityForKey(k)}return {reserved,covered,short,spare}}
+function renderBinderAllocationSummary(b){const el=$('#binderAllocationSummary');if(!el)return;if(!b){el.textContent='Collection View · no physical copies are reserved.';return}if((b.purpose||'reference')!=='physical'){el.textContent='Collection View · this binder can overlap other collections without consuming another copy.';return}const a=binderAllocationStats(b);el.textContent=`Physical Collection · ${a.reserved} positions reserve copies · ${a.covered} currently covered${a.short?` · ${a.short} still missing`:''} · ${a.spare} spare copies remain after all physical-binder reservations.`}
 
 let activeCustomBinderId=null,binderEditorId=null,binderPickerKeys=[],collectionSelectMode=false,collectionSelectedKeys=new Set();
 let binderViewFilter='all',binderViewPage=1,binderPlannerSetId=null,binderPlannerSetsReady=false;
@@ -6775,7 +6780,14 @@ function openDiscoveryWithPreset(preset={}){
   $('#discoveryQuery').value=preset.query||'';
   $('#discoveryOwnership').value=preset.ownership||'missing';
   $('#discoveryArtist').value=preset.artist||'';
+  $('#discoveryType').value=preset.type||'';
+  $('#discoveryEra').value=preset.era||'';
+  $('#discoverySet').value=preset.set||'';
+  $('#discoveryYear').value=preset.year||'';
+  $('#discoveryMinPrice').value=preset.minPrice||'';
   $('#discoveryMaxPrice').value=preset.maxPrice||'';
+  $('#discoverySort').value=preset.sort||'newest';
+  $('#discoveryMySetsOnly').checked=!!preset.mySetsOnly;
   renderDiscoveryRarities().then(()=>{
     $('#discoveryRarity').value=preset.rarity||'';
     if(preset.autoRun&&String(preset.query||'').trim().length>=2)runDiscoverySearch();
@@ -6829,7 +6841,7 @@ function renderBinderCoverPicker(){
     <button class="binderCoverChoice ${b.coverKey===r.key?'selected':''}" data-binder-cover="${escapeHtml(r.key)}">
       <img src="${image(r.c,'low')}" data-fallback="${assetFallback(r.c,'low')}" onerror="retryImage(this)" alt="">
       <span><b>${escapeHtml(r.c.name)}</b><small>${escapeHtml(r.setName)} · #${escapeHtml(String(r.c.localId))} · ${escapeHtml(r.v.label)}</small></span>
-      <strong>${b.coverKey===r.key?'Cover ✓':'Choose'}</strong>
+      <strong>${b.coverKey===r.key?'Chase Pick ✓':'Choose'}</strong>
     </button>`).join('')
     : '<div class="collectionEmpty">No cards are available to use as cover artwork yet.</div>';
 
@@ -6887,7 +6899,7 @@ function renderCustomBinderRail(){
   $('#binderEditorTitle').textContent='New Binder';
   $('#binderNameInput').value='';
   $('#binderDescInput').value='';
-  $('#binderPurposeInput').value='reference';
+  $('#binderPurposeInput').value='reference';$('#binderAllocationSummary').textContent='Collection View · no physical copies are reserved.';
   $('#binderDeleteBtn').classList.add('hidden');
   $('#binderEditorModal').classList.add('open');
   setTimeout(()=>$('#binderNameInput').focus(),80);
@@ -6898,7 +6910,7 @@ function openBinderEditor(id){
   $('#binderEditorTitle').textContent='Edit Binder';
   $('#binderNameInput').value=b.name;
   $('#binderDescInput').value=b.description||'';
-  $('#binderPurposeInput').value=b.purpose==='physical'?'physical':'reference';
+  $('#binderPurposeInput').value=b.purpose==='physical'?'physical':'reference';renderBinderAllocationSummary(b);
   $('#binderDeleteBtn').classList.remove('hidden');
   $('#binderEditorModal').classList.add('open');
 }
@@ -6995,26 +7007,27 @@ function renderYourArtists(){const b=$('#yourArtistsRail');if(!b)return;const a=
 function renderDiscoverySuggestions(){const b=$('#discoverySuggestions');if(!b)return;const a=collectionArtistStats().slice(0,3);b.innerHTML=a.length?a.map(x=>`<button class="discoverySuggestion" data-disc-artist="${escapeHtml(x.artist)}"><b>More by ${escapeHtml(x.artist)}</b><small>You already collect this illustrator.</small></button>`).join(''):'<div class="discoverySuggestion"><b>Discovery is learning your collection</b><small>Saved searches and artist data will create ideas here.</small></div>';$$('[data-disc-artist]').forEach(x=>x.onclick=()=>openArtistCollection(x.dataset.discArtist))}
 function openDiscovery(){if(!editingSmartBinderId&&$('#discoveryCreateSmartBinder'))$('#discoveryCreateSmartBinder').textContent='✨ Create Smart Binder';$('#discoveryModal').classList.add('open');renderDiscoveryRarities()}
 async function renderDiscoveryRarities(){const s=$('#discoveryRarity');if(!s||s.options.length>1)return;const f=['Common','Uncommon','Rare','Double Rare','Illustration Rare','Ultra Rare','Special Illustration Rare','Hyper Rare','One Star','Two Star','Three Star','Shiny Rare','Shiny Ultra Rare'];let v=f;try{const r=await fetch(`${API}/rarities`),x=await r.json();if(Array.isArray(x))v=[...new Set([...f,...x.map(y=>typeof y==='string'?y:y.name).filter(Boolean)])]}catch(e){}s.innerHTML='<option value="">Any rarity</option>'+v.map(x=>`<option>${escapeHtml(x)}</option>`).join('')}
-function discoveryUI(){return {id:`s-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,name:$('#discoveryName').value.trim(),query:$('#discoveryQuery').value.trim(),ownership:$('#discoveryOwnership').value,rarity:$('#discoveryRarity').value,artist:$('#discoveryArtist').value.trim(),maxPrice:$('#discoveryMaxPrice').value.trim(),createdAt:new Date().toISOString()}}
-async function runDiscoverySearch(){const f=discoveryUI(),q=f.query;if(q.length<2){$('#discoveryStatus').textContent='Enter at least 2 characters.';return}$('#discoveryStatus').textContent='Searching catalogue…';try{const rr=await fetch(`${API}/cards?name=${encodeURIComponent(q)}`);if(!rr.ok)throw 0;const cards=await rr.json(),out=[];for(const c0 of cards.slice(0,120)){let c=c0;try{c=await loadPriceFor(c0)||c0}catch(e){}const sid=c.set?.id||String(c.id).split('-').slice(0,-1).join('-');cacheDiscoveryCard(sid,c);const vs=c.variants?variantsFromDetail(c):[{id:'base',label:'Base'}];for(const v of vs){const k=key(sid,c.id,v.id),unit=tradeReferencePrice(c,v.id),o=owned.has(k),w=!!wishlist[k];if(f.ownership==='missing'&&o||f.ownership==='owned'&&!o||f.ownership==='wishlist'&&!w)continue;if(f.rarity&&String(c.rarity||'').toLowerCase()!==f.rarity.toLowerCase())continue;if(f.artist&&!String(c.illustrator||'').toLowerCase().includes(f.artist.toLowerCase()))continue;if(f.maxPrice&&(!Number.isFinite(unit)||unit>Number(f.maxPrice)))continue;out.push({sid,c,v,key:k,unit,owned:o,wanted:w})}}saveDiscoveryCardCache();discoveryResults=out;renderDiscoveryResults();$('#discoveryStatus').textContent=`${out.length} matching positions found`}catch(e){$('#discoveryStatus').textContent='Search could not complete.'}}
-function variantsFromDetail(d){const v=d?.variants||{},o=[];if(v.normal)o.push({id:'base',label:'Normal'});if(v.reverse)o.push({id:'reverse',label:'Reverse Holo'});if(v.holo)o.push({id:'holo',label:'Holo'});return o.length?o:[{id:'base',label:'Base'}]}
+function discoveryUI(){return {id:`s-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,name:$('#discoveryName').value.trim(),query:$('#discoveryQuery').value.trim(),ownership:$('#discoveryOwnership').value,rarity:$('#discoveryRarity').value,artist:$('#discoveryArtist').value.trim(),type:$('#discoveryType').value,era:$('#discoveryEra').value,set:$('#discoverySet').value.trim(),year:$('#discoveryYear').value.trim(),minPrice:$('#discoveryMinPrice').value.trim(),maxPrice:$('#discoveryMaxPrice').value.trim(),sort:$('#discoverySort').value,mySetsOnly:$('#discoveryMySetsOnly').checked,createdAt:new Date().toISOString()}}
+async function runDiscoverySearch(){const f=discoveryUI(),q=f.query;if(q.length<2){$('#discoveryStatus').textContent='Enter at least 2 characters.';return}$('#discoveryStatus').textContent='Searching catalogue…';try{const rr=await fetch(`${API}/cards?name=${encodeURIComponent(q)}`);if(!rr.ok)throw 0;const cards=await rr.json(),out=[];for(const c0 of cards.slice(0,180)){let c=c0;try{c=await loadPriceFor(c0)||c0}catch(e){}const sid=c.set?.id||String(c.id).split('-').slice(0,-1).join('-');cacheDiscoveryCard(sid,c);const setMeta=SETS[sid]||supportedResolved?.find?.(x=>x.id===sid)||c.set||{},release=String(setMeta.releaseDate||setMeta.release?.official||''),year=release.slice(0,4),era=setEraName({...setMeta,id:sid,name:setMeta.name||c.set?.name||sid});if(f.mySetsOnly&&!activeSetIds.has(sid))continue;if(f.era&&era!==f.era)continue;if(f.set&&!String(setMeta.name||c.set?.name||sid).toLowerCase().includes(f.set.toLowerCase()))continue;if(f.year&&year!==String(f.year))continue;if(f.type&&!(Array.isArray(c.types)&&c.types.some(t=>String(t).toLowerCase()===f.type.toLowerCase())))continue;const vs=c.variants?variantsFromDetail(c):[{id:'base',label:'Base'}];for(const v of vs){const k=key(sid,c.id,v.id),unit=tradeReferencePrice(c,v.id),o=owned.has(k),w=!!wishlist[k];if(f.ownership==='missing'&&o||f.ownership==='owned'&&!o||f.ownership==='wishlist'&&!w)continue;if(f.rarity&&String(c.rarity||'').toLowerCase()!==f.rarity.toLowerCase())continue;if(f.artist&&!String(c.illustrator||'').toLowerCase().includes(f.artist.toLowerCase()))continue;if(f.minPrice&&(!Number.isFinite(unit)||unit<Number(f.minPrice)))continue;if(f.maxPrice&&(!Number.isFinite(unit)||unit>Number(f.maxPrice)))continue;out.push({sid,c,v,key:k,unit,owned:o,wanted:w,release})}}const sort=f.sort||'newest';out.sort((a,b)=>sort==='oldest'?String(a.release).localeCompare(String(b.release)):sort==='priceHigh'?(b.unit??-1)-(a.unit??-1):sort==='priceLow'?(a.unit??Infinity)-(b.unit??Infinity):sort==='az'?String(a.c.name).localeCompare(String(b.c.name)):String(b.release).localeCompare(String(a.release))||String(a.c.name).localeCompare(String(b.c.name)));saveDiscoveryCardCache();discoveryResults=out;renderDiscoveryResults();$('#discoveryStatus').textContent=`${out.length} matching positions found`}catch(e){$('#discoveryStatus').textContent='Search could not complete.'}}
 function renderDiscoveryResults(){const b=$('#discoveryResults');b.innerHTML=discoveryResults.length?discoveryResults.map(r=>`<div class="discoveryResult">${cardArtworkOrPlaceholder(r.c,'low','discoveryResultArt')}<span><b>${escapeHtml(r.c.name)} · ${escapeHtml(r.v.label)}</b><small>${escapeHtml(r.c.set?.name||r.sid)} · #${escapeHtml(String(r.c.localId))}${r.c.illustrator?` · ${escapeHtml(r.c.illustrator)}`:''}</small><em>${r.owned?'Owned ✓':r.wanted?'Wishlist':'Missing'}${Number.isFinite(r.unit)?` · ${formatTradeMoney(r.unit)}`:''}</em></span></div>`).join(''):'<div class="tradeEmpty">No matches.</div>'}
 function saveCurrentDiscoverySearch(){const s=discoveryUI();if(s.query.length<2){toast('Add a search first');return}if(!s.name)s.name=`${s.ownership==='missing'?'Missing ':''}${s.query}`;savedSearches.unshift(s);savedSearches=savedSearches.slice(0,50);saveSavedSearches();renderSavedSearchRail();toast('Search saved ✓')}
-function openSavedSearch(id){const s=savedSearches.find(x=>x.id===id);if(!s)return;openDiscovery();$('#discoveryName').value=s.name||'';$('#discoveryQuery').value=s.query||'';$('#discoveryOwnership').value=s.ownership||'missing';$('#discoveryArtist').value=s.artist||'';$('#discoveryMaxPrice').value=s.maxPrice||'';renderDiscoveryRarities().then(()=>{$('#discoveryRarity').value=s.rarity||'';runDiscoverySearch()})}
+function openSavedSearch(id){const s=savedSearches.find(x=>x.id===id);if(!s)return;openDiscovery();$('#discoveryName').value=s.name||'';$('#discoveryQuery').value=s.query||'';$('#discoveryOwnership').value=s.ownership||'missing';$('#discoveryArtist').value=s.artist||'';$('#discoveryType').value=s.type||'';$('#discoveryEra').value=s.era||'';$('#discoverySet').value=s.set||'';$('#discoveryYear').value=s.year||'';$('#discoveryMinPrice').value=s.minPrice||'';$('#discoveryMaxPrice').value=s.maxPrice||'';$('#discoverySort').value=s.sort||'newest';$('#discoveryMySetsOnly').checked=!!s.mySetsOnly;renderDiscoveryRarities().then(()=>{$('#discoveryRarity').value=s.rarity||'';runDiscoverySearch()})}
 function createBinderFromDiscovery(){if(!discoveryResults.length){toast('Run a search first');return}const name=$('#discoveryName').value.trim()||`${$('#discoveryQuery').value.trim()} Collection`,cards=[...new Set(discoveryResults.map(r=>r.key))],b={id:`binder-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,description:'Created from Discovery.',purpose:'reference',coverKey:cards[0]||'',cards,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};customBinders.unshift(b);saveCustomBinders();renderCustomBinderRail();renderDashboardCustomBinders();toast('Binder created ✓')}
 
 function createSmartBinderFromDiscovery(){
  const s=discoveryUI();if(s.query.length<2){toast('Add a search first');return}
- const name=s.name||`${s.query} Smart Binder`,rules={query:s.query,ownership:s.ownership||'all',rarity:s.rarity||'',artist:s.artist||'',maxPrice:s.maxPrice||''};
+ const name=s.name||`${s.query} Smart Binder`,rules={query:s.query,ownership:s.ownership||'all',rarity:s.rarity||'',artist:s.artist||'',type:s.type||'',era:s.era||'',set:s.set||'',year:s.year||'',minPrice:s.minPrice||'',maxPrice:s.maxPrice||'',sort:s.sort||'newest',mySetsOnly:!!s.mySetsOnly};
  if(editingSmartBinderId){const b=smartBinderById(editingSmartBinderId);if(b){b.name=name;b.rules=rules;b.updatedAt=new Date().toISOString();editingSmartBinderId=null;saveSmartBinders();$('#discoveryCreateSmartBinder').textContent='✨ Create Smart Binder';$('#discoveryModal').classList.remove('open');openSmartBinder(b.id);toast('Smart Binder rules updated ✨');return}}
  smartBinders.unshift({id:`smart-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,name,description:'Live Discovery collection.',chaseKey:'',rules,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),lastOpenedAt:new Date().toISOString()});
  saveSmartBinders();renderDashboardCustomBinders();toast('Smart Binder created ✨');
 }
 async function smartSearchRows(b){
  const f=b.rules||{},q=String(f.query||'').trim();if(q.length<2)return [];
- const rr=await fetch(`${API}/cards?name=${encodeURIComponent(q)}`);if(!rr.ok)throw new Error('catalogue');const cards=await rr.json(),out=[];
- for(const c0 of cards.slice(0,160)){let c=c0;try{c=await loadPriceFor(c0)||c0}catch(e){}const sid=c.set?.id||String(c.id).split('-').slice(0,-1).join('-');cacheDiscoveryCard(sid,c);const vs=c.variants?variantsFromDetail(c):[{id:'base',label:'Base'}];for(const v of vs){const k=key(sid,c.id,v.id),unit=tradeReferencePrice(c,v.id),o=owned.has(k),w=!!wishlist[k];if(f.ownership==='missing'&&o||f.ownership==='owned'&&!o||f.ownership==='wishlist'&&!w)continue;if(f.rarity&&String(c.rarity||'').toLowerCase()!==String(f.rarity).toLowerCase())continue;if(f.artist&&!String(c.illustrator||'').toLowerCase().includes(String(f.artist).toLowerCase()))continue;if(f.maxPrice&&(!Number.isFinite(unit)||unit>Number(f.maxPrice)))continue;out.push({sid,c,v,key:k,unit,owned:o,wanted:w})}}
- saveDiscoveryCardCache();return out;
+ const rr=await fetch(`${API}/cards?name=${encodeURIComponent(q)}`);if(!rr.ok)throw new Error('search');const cards=await rr.json(),out=[];
+ for(const c0 of cards.slice(0,180)){let c=c0;try{c=await loadPriceFor(c0)||c0}catch(e){}const sid=c.set?.id||String(c.id).split('-').slice(0,-1).join('-');cacheDiscoveryCard(sid,c);const setMeta=SETS[sid]||supportedResolved?.find?.(x=>x.id===sid)||c.set||{};const release=String(setMeta.releaseDate||setMeta.release?.official||'');const year=release.slice(0,4);const era=setEraName({...setMeta,id:sid,name:setMeta.name||c.set?.name||sid});
+   if(f.mySetsOnly&&!activeSetIds.has(sid))continue;if(f.era&&era!==f.era)continue;if(f.set&&!String(setMeta.name||c.set?.name||sid).toLowerCase().includes(String(f.set).toLowerCase()))continue;if(f.year&&year!==String(f.year))continue;if(f.type&&!(Array.isArray(c.types)&&c.types.some(t=>String(t).toLowerCase()===String(f.type).toLowerCase())))continue;
+   const vs=c.variants?variantsFromDetail(c):[{id:'base',label:'Base'}];for(const v of vs){const k=key(sid,c.id,v.id),unit=tradeReferencePrice(c,v.id),o=owned.has(k),w=!!wishlist[k];if(f.ownership==='missing'&&o||f.ownership==='owned'&&!o||f.ownership==='wishlist'&&!w)continue;if(f.rarity&&String(c.rarity||'').toLowerCase()!==String(f.rarity).toLowerCase())continue;if(f.artist&&!String(c.illustrator||'').toLowerCase().includes(String(f.artist).toLowerCase()))continue;if(f.minPrice&&(!Number.isFinite(unit)||unit<Number(f.minPrice)))continue;if(f.maxPrice&&(!Number.isFinite(unit)||unit>Number(f.maxPrice)))continue;out.push({sid,c,v,key:k,unit,owned:o,wanted:w,release})}}
+ saveDiscoveryCardCache();const sort=f.sort||'newest';out.sort((a,b)=>sort==='oldest'?String(a.release).localeCompare(String(b.release)):sort==='priceHigh'?(b.unit??-1)-(a.unit??-1):sort==='priceLow'?(a.unit??Infinity)-(b.unit??Infinity):sort==='az'?String(a.c.name).localeCompare(String(b.c.name)):String(b.release).localeCompare(String(a.release))||String(a.c.name).localeCompare(String(b.c.name)));return out;
 }
 function renderSmartBinderView(){
  const b=smartBinderById(activeSmartBinderId);if(!b)return;let rows=smartBinderRows;if(smartBinderFilter==='owned')rows=rows.filter(r=>r.owned);else if(smartBinderFilter==='missing')rows=rows.filter(r=>!r.owned);else if(smartBinderFilter==='wishlist')rows=rows.filter(r=>r.wanted);
@@ -7030,7 +7043,7 @@ function renderSmartBinderView(){
 async function openSmartBinder(id){const b=smartBinderById(id);if(!b)return;smartBinderChasePicking=false;b.lastOpenedAt=new Date().toISOString();saveSmartBinders();activeSmartBinderId=id;smartBinderFilter='all';smartBinderViewPage=1;$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x.dataset.smartFilter==='all'));$('#smartBinderModal').classList.add('open');$('#smartBinderStatus').textContent='Refreshing live catalogue rules…';$('#smartBinderGrid').innerHTML='<div class="collectionEmpty">Loading binder…</div>';try{smartBinderRows=await smartSearchRows(b);renderSmartBinderView()}catch(e){$('#smartBinderStatus').textContent='This binder could not refresh. Check your connection and try again.'}}
 function openSmartBinderDetails(){const b=smartBinderById(activeSmartBinderId);if(!b)return;$('#smartBinderDetailsTitle').textContent=b.name;$('#smartBinderDetailsBody').innerHTML=`<b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules)||'Live custom collection')}</small><small>Binder type · Smart</small><small>Purpose · Collection View</small><small>${b.chaseKey?'Manual Chase Pick selected':'Chase Pick · Automatic'}</small>`;$('#smartBinderDetailsModal').classList.add('open')}
 
-function editActiveSmartBinder(){const b=smartBinderById(activeSmartBinderId);if(!b)return;editingSmartBinderId=b.id;$('#smartBinderModal').classList.remove('open');openDiscovery();$('#discoveryName').value=b.name;$('#discoveryQuery').value=b.rules.query||'';$('#discoveryOwnership').value=b.rules.ownership||'all';$('#discoveryArtist').value=b.rules.artist||'';$('#discoveryMaxPrice').value=b.rules.maxPrice||'';$('#discoveryCreateSmartBinder').textContent='✨ Save Smart Binder Rules';renderDiscoveryRarities().then(()=>{$('#discoveryRarity').value=b.rules.rarity||''})}
+function editActiveSmartBinder(){const b=smartBinderById(activeSmartBinderId);if(!b)return;editingSmartBinderId=b.id;$('#smartBinderModal').classList.remove('open');openDiscovery();$('#discoveryName').value=b.name;$('#discoveryQuery').value=b.rules.query||'';$('#discoveryOwnership').value=b.rules.ownership||'all';$('#discoveryArtist').value=b.rules.artist||'';$('#discoveryType').value=b.rules.type||'';$('#discoveryEra').value=b.rules.era||'';$('#discoverySet').value=b.rules.set||'';$('#discoveryYear').value=b.rules.year||'';$('#discoveryMinPrice').value=b.rules.minPrice||'';$('#discoveryMaxPrice').value=b.rules.maxPrice||'';$('#discoverySort').value=b.rules.sort||'newest';$('#discoveryMySetsOnly').checked=!!b.rules.mySetsOnly;$('#discoveryCreateSmartBinder').textContent='✨ Save Smart Binder Rules';renderDiscoveryRarities().then(()=>{$('#discoveryRarity').value=b.rules.rarity||''})}
 function deleteActiveSmartBinder(){const b=smartBinderById(activeSmartBinderId);if(!b||!confirm(`Delete Smart Binder "${b.name}"? No cards will be removed from your collection.`))return;smartBinders=smartBinders.filter(x=>x.id!==b.id);saveSmartBinders();activeSmartBinderId=null;$('#smartBinderModal').classList.remove('open');renderDashboardCustomBinders();toast('Smart Binder deleted')}
 
 function renderHuntHistory(){const b=$('#huntHistoryList');b.innerHTML=huntSessions.length?huntSessions.map(s=>`<article class="huntHistoryRow"><div><b>${escapeHtml(s.binderName||'Hunt')}</b><small>${new Date(s.startedAt).toLocaleDateString()} · ${s.found?.length||0} found</small></div><div><strong>${formatTradeMoney(s.spend||0)}</strong><small>${formatTradeMoney(s.referenceValue||0)} reference</small></div></article>`).join(''):'<div class="tradeEmpty">No saved Hunt Sessions yet.</div>'}
@@ -9921,11 +9934,11 @@ async function openCard(cid,forcedVariant){
  let c=(cardsBySet[currentSet]||[]).find(x=>x.id===cid);if(!c)return;
  selected=c;$('#detailImg').dataset.fallback=assetFallback(c,'high');$('#detailImg').onerror=function(){retryImage(this)};$('#detailImg').src=image(c,'high');$('#detailName').textContent=c.name;
  $('#detailMeta').textContent=`${SETS[currentSet].name} · #${c.localId}${forcedVariant?` · ${variantsFor(currentSet,c).find(v=>v.id===forcedVariant)?.label||''}`:''}`;
- const chaseBtn=$('#setAsChasePick'),resetChaseBtn=$('#resetCardChasePick'),smartContext=cardDetailOrigin==='smartBinder'?smartBinderById(cardDetailOriginState?.binderId):null,smartKey=smartContext?key(currentSet,c.id,forcedVariant||variantsFor(currentSet,c)[0]?.id||'base'):null,isCurrentChase=smartContext?smartContext.chaseKey===smartKey:chasePicks[currentSet]===c.id;
+ const chaseBtn=$('#setAsChasePick'),resetChaseBtn=$('#resetCardChasePick'),smartContext=cardDetailOrigin==='smartBinder'?smartBinderById(cardDetailOriginState?.binderId):null,manualContext=cardDetailOrigin==='customBinder'?binderById(cardDetailOriginState?.binderId):null,detailVariant=forcedVariant||variantsFor(currentSet,c)[0]?.id||'base',binderKey=(smartContext||manualContext)?key(currentSet,c.id,detailVariant):null,isCurrentChase=smartContext?smartContext.chaseKey===binderKey:manualContext?manualContext.coverKey===binderKey:chasePicks[currentSet]===c.id;
  chaseBtn.textContent=isCurrentChase?'★ Current Chase Pick':'★ Set as Chase Pick';
- chaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey=smartKey;smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast(`${c.name} is now this binder's Chase Pick`);openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,c.id);toast(`${c.name} is now the Chase Pick`);openCard(cid,forcedVariant)}};
+ chaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey=binderKey;smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast(`${c.name} is now this binder's Chase Pick`);openCard(cid,forcedVariant)}else if(manualContext){manualContext.coverKey=binderKey;manualContext.updatedAt=new Date().toISOString();saveCustomBinders();renderDashboardCustomBinders();toast(`${c.name} is now this binder's Chase Pick`);openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,c.id);toast(`${c.name} is now the Chase Pick`);openCard(cid,forcedVariant)}};
  resetChaseBtn.classList.toggle('hidden',!isCurrentChase);
- resetChaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey='';smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast('Binder Chase Pick reset to automatic');openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,null);toast('Chase Pick reset to automatic');openCard(cid,forcedVariant)}};
+ resetChaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey='';smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast('Binder Chase Pick reset to automatic');openCard(cid,forcedVariant)}else if(manualContext){manualContext.coverKey='';manualContext.updatedAt=new Date().toISOString();saveCustomBinders();renderDashboardCustomBinders();toast('Binder Chase Pick reset to automatic');openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,null);toast('Chase Pick reset to automatic');openCard(cid,forcedVariant)}};
  const favBtn=$('#toggleFavouriteCard'),favVariant=forcedVariant||variantsFor(currentSet,c).find(v=>owned.has(key(currentSet,c.id,v.id)))?.id||null;
  favBtn.classList.toggle('hidden',!favVariant);
  if(favVariant){const favOn=isFavourite(currentSet,c.id,favVariant);favBtn.textContent=favOn?'♥ Favourite':'♡ Favourite';favBtn.classList.toggle('on',favOn);favBtn.onclick=()=>{const on=toggleFavourite(currentSet,c.id,favVariant);toast(on?'Added to favourites':'Removed from favourites');openCard(cid,forcedVariant);if(!$('#myCollectionScreen').classList.contains('hidden'))renderMyCollection()}}
@@ -10271,7 +10284,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.17.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.17.3',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>{
   const m=b.closest('.modal');
   m.classList.remove('open');
@@ -10401,6 +10414,7 @@ $('#newBinderExplore').onclick=()=>{$('#newBinderModal').classList.remove('open'
 $('#collectionSelectBtn').onclick=()=>collectionSelectMode?endCollectionSelect():beginCollectionSelect();
 $('#collectionBulkCancel').onclick=endCollectionSelect;
 $('#collectionBulkAddBinder').onclick=()=>openBinderPicker([...collectionSelectedKeys]);
+$('#binderPurposeInput').onchange=()=>{const b=binderEditorId?binderById(binderEditorId):null;if(b){const old=b.purpose;b.purpose=$('#binderPurposeInput').value==='physical'?'physical':'reference';renderBinderAllocationSummary(b);b.purpose=old}else $('#binderAllocationSummary').textContent=$('#binderPurposeInput').value==='physical'?'Physical Collection · card positions will reserve copies after you save.':'Collection View · no physical copies are reserved.'};
 $('#binderSaveBtn').onclick=saveBinderEditor;
 $('#binderDeleteBtn').onclick=deleteBinderEditor;
 $('#binderPickerNew').onclick=()=>{ $('#binderPickerModal').classList.remove('open');openNewBinderEditor() };
@@ -10418,7 +10432,7 @@ $('#saveDiscoverySearch').onclick=saveCurrentDiscoverySearch;
 $('#discoveryCreateBinder').onclick=createBinderFromDiscovery;
 $('#discoveryCreateSmartBinder').onclick=createSmartBinderFromDiscovery;
 $('#smartBinderRefresh').onclick=()=>activeSmartBinderId&&openSmartBinder(activeSmartBinderId);
-$('#smartBinderChasePick').onclick=$('#smartBinderCover').onclick=()=>{if(!activeSmartBinderId||!smartBinderRows.length){toast('Refresh this binder first');return}smartBinderChasePicking=true;renderSmartBinderView();toast('Tap a card to make it the Chase Pick')};
+$('#smartBinderChasePick').onclick=()=>{if(!activeSmartBinderId||!smartBinderRows.length){toast('Refresh this binder first');return}smartBinderChasePicking=true;renderSmartBinderView();toast('Tap a card to make it the Chase Pick')};
 $('#smartBinderEditRules').onclick=editActiveSmartBinder;
 $('#smartBinderDetails').onclick=openSmartBinderDetails;
 $('#smartBinderDetailsEdit').onclick=()=>{$('#smartBinderDetailsModal').classList.remove('open');editActiveSmartBinder()};
@@ -10838,11 +10852,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0172',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0173',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0172_controller_reload';
+      const key='dexbinder_v0173_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
