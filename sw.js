@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v0181';
+const CACHE='dexbinder-shell-v0182';
 const APP_SHELL=[
   './',
   './index.html',
@@ -9,7 +9,8 @@ const APP_SHELL=[
   './apple-touch-icon.png',
   './assets/hero-espeon.png',
   './assets/hero-umbreon.png',
-  './assets/temporal-forces-logo.png'
+  './assets/temporal-forces-logo.png',
+  './trainer-scene-hannah.webp'
 ];
 
 self.addEventListener('install',event=>{
