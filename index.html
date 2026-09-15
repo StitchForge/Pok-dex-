@@ -3914,8 +3914,12 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 .dashboardBinderTopline{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px}.dashboardBinderTopline b{font-size:.66rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dashboardBinderMeta{display:block;color:var(--db-muted);font-size:.45rem;line-height:1.3}.dashboardBinderBadge{display:inline-flex;border:1px solid var(--db-line);border-radius:999px;padding:3px 6px;font-size:.36rem;font-weight:1000;letter-spacing:.07em;flex:none}.dashboardBinderBadge.smart{background:var(--db-purple);color:#111}.dashboardBinderSeeAll{flex:0 0 112px;min-height:176px;border:1px dashed var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:17px;padding:12px;text-align:center;scroll-snap-align:start}.dashboardBinderSeeAll b{display:block;font-size:.62rem}.dashboardBinderSeeAll small{display:block;color:var(--db-muted);font-size:.43rem;margin-top:4px}
 .newBinderChoices{display:grid;gap:8px;margin-top:10px}.newBinderChoice{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:14px;padding:10px;text-align:left}.newBinderChoice>span{font-size:1.15rem}.newBinderChoice b{display:block;font-size:.62rem}.newBinderChoice small{display:block;color:var(--db-muted);font-size:.45rem;line-height:1.3;margin-top:2px}.newBinderIdeas{margin-top:12px;padding-top:10px;border-top:1px solid var(--db-line)}.newBinderIdeas>small{display:block;color:var(--db-muted);font-size:.45rem;margin-bottom:7px}.newBinderIdeaRail{display:flex;gap:7px;overflow-x:auto}.newBinderIdea{flex:0 0 150px;border:1px solid var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:13px;padding:9px;text-align:left}.newBinderIdea b{display:block;font-size:.52rem}.newBinderIdea small{display:block;color:var(--db-muted);font-size:.41rem;margin-top:3px}.smartCoverHero{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center}.smartCoverHero img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:8px}.smartCoverHeroCopy{min-width:0}
 
+
+/* v0.18.0 — Collector Profile foundation */
+.profileHeaderBtn{border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:999px;padding:7px 10px;font-weight:900;font-size:.48rem;max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profileHero{display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--db-line);background:var(--db-panel-2);border-radius:16px;padding:11px;margin:8px 0 12px}.profileAvatar{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(145deg,var(--db-purple),var(--db-blue));font-size:1.35rem}.profileHero b{display:block;font-size:.72rem}.profileHero small{display:block;color:var(--db-muted);font-size:.44rem;margin-top:3px}.profileList{display:grid;gap:8px;margin-top:10px}.profileRow{display:grid;grid-template-columns:42px minmax(0,1fr) auto;gap:9px;align-items:center;border:1px solid var(--db-line);background:var(--db-panel);border-radius:14px;padding:9px}.profileRow.active{outline:2px solid var(--db-purple)}.profileRow .miniAvatar{width:42px;height:42px;border-radius:12px;background:var(--db-panel-2);display:grid;place-items:center;font-size:1.05rem}.profileRow b{display:block;font-size:.62rem}.profileRow small{display:block;color:var(--db-muted);font-size:.42rem;margin-top:2px}.profileBadge{display:inline-flex;border:1px solid var(--db-line);border-radius:999px;padding:3px 6px;font-size:.35rem;font-weight:1000;color:var(--db-muted);margin-left:4px}.profileActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}.profileDanger{border-color:#c36b63!important;color:#9b4039!important}.profileFootnote{font-size:.43rem;color:var(--db-muted);line-height:1.45;margin-top:10px}.profileNameInput{width:100%;border:1px solid var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:12px;padding:11px;font-size:16px;margin-top:8px}
 </style>
-<div class="version" id="buildVersion">v0.17.3e</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button">👤 My Collection</button><div class="version" id="buildVersion">v0.18.0</div>
 </div>
 
   <section id="homeScreen">
@@ -5009,6 +5013,23 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
   <div class="cacheNote">If iOS cannot create the image, this clean preview is intentionally screenshot-friendly.</div>
 </div></div>
 
+
+<div class="modal" id="profileModal"><div class="sheet">
+  <div class="grab"></div><div class="sheetHead"><div><span class="eyebrow">COLLECTOR PROFILES</span><h2>Who’s collecting?</h2><p>Each profile is an independent DexBinder save.</p></div><button class="btn close">Close</button></div>
+  <div id="profileCurrentHero" class="profileHero"></div>
+  <div id="profileList" class="profileList"></div>
+  <div class="profileActions">
+    <button class="btn dark" id="profileCreateBtn">＋ New Profile</button><button class="btn" id="profileRenameBtn">Rename</button>
+    <button class="btn" id="profileDuplicateBtn">Duplicate</button><button class="btn" id="profileArchiveBtn">Archive</button>
+    <button class="btn profileDanger" id="profileResetBtn">Reset Profile</button><button class="btn profileDanger" id="profileDeleteBtn">Delete Profile</button>
+  </div>
+  <p class="profileFootnote">Profiles are stored locally in this build. Cloud Sync remains on the existing account-level schema and is not expanded by v0.18.0. Switching profiles saves the current profile before loading the next one.</p>
+</div></div>
+<div class="modal" id="profileNameModal"><div class="sheet">
+  <div class="grab"></div><div class="sheetHead"><div><span class="eyebrow">PROFILE</span><h2 id="profileNameTitle">Create Profile</h2></div><button class="btn close">Close</button></div>
+  <label class="fieldLabel" for="profileNameInput">Trainer / profile name</label><input id="profileNameInput" class="profileNameInput" maxlength="32" autocomplete="off" placeholder="My Collection">
+  <button class="btn dark" id="profileNameSaveBtn" style="width:100%;margin-top:10px">Save</button>
+</div></div>
 <div class="modal" id="backupModal"><div class="sheet">
   <div class="grab"></div>
   <div class="detailTop"><div><h2>Backup & transfer</h2><p>Keep a portable copy of your Dex, or move it between Safari and the installed app.</p></div><button class="btn small close">Close</button></div>
@@ -5025,6 +5046,18 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 <div class="toast" id="toast"></div>
 <div class="netStatus" id="netStatus" role="status" aria-live="polite"></div>
 
+<script>
+/* v0.18.0 profile bootstrap — runs before DexBinder state is read */
+(function(){
+ const META='dexbinder_v018_profiles_meta', PREFIX='dexbinder_v018_profile_data_';
+ const USER_KEYS=['dexbinder_v04_owned','dexbinder_v05_active_sets','dexbinder_v07_collector_meta','dexbinder_v072_trade_history','dexbinder_v09_wishlist','dexbinder_v09_set_goals','dexbinder_v091_trade_targets','dexbinder_v102_chase_picks','dexbinder_v0133_collection_plans','dexbinder_v015_favourites','dexbinder_v015_price_history','dexbinder_v0155_saved_searches','dexbinder_v0155_hunt_sessions','dexbinder_v0151_custom_binders','dexbinder_v015_custom_binders','dexbinder_v017_smart_binders','dexbinder_v0152_trade_binder_order','dexbinder_custom_binder_page_size','dexbinder_smart_binder_page_size','dexbinder_page_size'];
+ function readMeta(){try{return JSON.parse(localStorage.getItem(META)||'null')}catch(e){return null}}
+ function snap(){const o={};USER_KEYS.forEach(k=>{const v=localStorage.getItem(k);if(v!==null)o[k]=v});return o}
+ function ensure(){let m=readMeta();if(m&&Array.isArray(m.profiles)&&m.profiles.length&&m.activeId)return m;const id='profile_'+Date.now().toString(36);m={schemaVersion:1,activeId:id,profiles:[{id,name:'My Collection',createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),archived:false}]};localStorage.setItem(META,JSON.stringify(m));localStorage.setItem(PREFIX+id,JSON.stringify(snap()));return m}
+ window.DexBinderProfiles={META,PREFIX,USER_KEYS,readMeta,snapshot:snap,ensure};
+ ensure();
+})();
+</script>
 <script>
 const API='https://api.tcgdex.net/v2/en';
 
@@ -10332,7 +10365,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.17.3d',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.18.0',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>{
   const m=b.closest('.modal');
   m.classList.remove('open');
@@ -10900,11 +10933,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0173e',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0180',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0173e_controller_reload';
+      const key='dexbinder_v0180_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
@@ -11077,8 +11110,32 @@ document.addEventListener('visibilitychange',()=>{
 window.addEventListener('pageshow',renderDashboardGreeting);
 window.addEventListener('focus',renderDashboardGreeting);
 
+
+/* v0.18.0 — Collector Profile management */
+const PROFILE_META_KEY='dexbinder_v018_profiles_meta';
+const PROFILE_DATA_PREFIX='dexbinder_v018_profile_data_';
+let profileNameMode='create';
+function profileMeta(){return window.DexBinderProfiles.ensure()}
+function saveProfileMeta(m){localStorage.setItem(PROFILE_META_KEY,JSON.stringify(m))}
+function currentProfile(){const m=profileMeta();return m.profiles.find(p=>p.id===m.activeId)||m.profiles[0]}
+function captureProfileSnapshot(){return window.DexBinderProfiles.snapshot()}
+function saveCurrentProfileSnapshot(){const m=profileMeta(),p=m.profiles.find(x=>x.id===m.activeId);if(!p)return;localStorage.setItem(PROFILE_DATA_PREFIX+p.id,JSON.stringify(captureProfileSnapshot()));p.updatedAt=new Date().toISOString();saveProfileMeta(m)}
+function restoreProfileSnapshot(id){let data={};try{data=JSON.parse(localStorage.getItem(PROFILE_DATA_PREFIX+id)||'{}')||{}}catch(e){}window.DexBinderProfiles.USER_KEYS.forEach(k=>localStorage.removeItem(k));Object.entries(data).forEach(([k,v])=>{if(window.DexBinderProfiles.USER_KEYS.includes(k))localStorage.setItem(k,String(v))})}
+function profileSummary(p){let d={};try{d=JSON.parse(localStorage.getItem(PROFILE_DATA_PREFIX+p.id)||'{}')||{}}catch(e){}let owned=0,binders=0;try{owned=JSON.parse(d.dexbinder_v04_owned||'[]').length||0}catch(e){}try{binders=(JSON.parse(d.dexbinder_v0151_custom_binders||d.dexbinder_v015_custom_binders||'[]').length||0)+(JSON.parse(d.dexbinder_v017_smart_binders||'[]').length||0)}catch(e){}return {owned,binders}}
+function renderProfiles(){const m=profileMeta(),cur=currentProfile(),hero=$('#profileCurrentHero'),list=$('#profileList'),head=$('#profileHeaderBtn');if(head)head.textContent=`👤 ${cur?.name||'Profile'}`;if(hero&&cur){const x=profileSummary(cur);hero.innerHTML=`<div class="profileAvatar">🧢</div><div><b>${escapeHtml(cur.name)}</b><small>Current profile · ${x.owned.toLocaleString()} owned positions · ${x.binders} binders</small></div><span class="profileBadge">ACTIVE</span>`}if(list){list.innerHTML=m.profiles.map(p=>{const x=profileSummary(p);return `<div class="profileRow ${p.id===m.activeId?'active':''}"><div class="miniAvatar">${p.archived?'📦':'🧢'}</div><div><b>${escapeHtml(p.name)}${p.archived?'<span class="profileBadge">ARCHIVED</span>':''}</b><small>${x.owned.toLocaleString()} owned positions · ${x.binders} binders</small></div>${p.id===m.activeId?'<span class="profileBadge">CURRENT</span>':`<button class="btn small" data-profile-switch="${p.id}">Switch</button>`}</div>`}).join('');$$('[data-profile-switch]',list).forEach(b=>b.onclick=()=>switchProfile(b.dataset.profileSwitch))}}
+function openProfiles(){saveCurrentProfileSnapshot();renderProfiles();$('#profileModal').classList.add('open')}
+function switchProfile(id){const m=profileMeta();if(id===m.activeId)return;saveCurrentProfileSnapshot();restoreProfileSnapshot(id);m.activeId=id;const p=m.profiles.find(x=>x.id===id);if(p)p.lastOpenedAt=new Date().toISOString();saveProfileMeta(m);location.reload()}
+function openProfileName(mode){profileNameMode=mode;const p=currentProfile();$('#profileNameTitle').textContent=mode==='create'?'Create Profile':'Rename Profile';$('#profileNameInput').value=mode==='rename'?(p?.name||''):'';$('#profileNameModal').classList.add('open');setTimeout(()=>$('#profileNameInput').focus(),50)}
+function saveProfileName(){const name=$('#profileNameInput').value.trim().slice(0,32);if(!name){toast('Enter a profile name');return}const m=profileMeta();if(profileNameMode==='rename'){const p=m.profiles.find(x=>x.id===m.activeId);if(p){p.name=name;p.updatedAt=new Date().toISOString()}saveProfileMeta(m);$('#profileNameModal').classList.remove('open');renderProfiles();toast('Profile renamed');return}saveCurrentProfileSnapshot();const id='profile_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);m.profiles.push({id,name,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),archived:false});localStorage.setItem(PROFILE_DATA_PREFIX+id,JSON.stringify({'dexbinder_v05_active_sets':'[]'}));saveProfileMeta(m);$('#profileNameModal').classList.remove('open');switchProfile(id)}
+function duplicateProfile(){saveCurrentProfileSnapshot();const m=profileMeta(),p=currentProfile();if(!p)return;const id='profile_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,6);let snap=localStorage.getItem(PROFILE_DATA_PREFIX+p.id)||'{}';m.profiles.push({id,name:`${p.name} Copy`.slice(0,32),createdAt:new Date().toISOString(),updatedAt:new Date().toISOString(),archived:false});localStorage.setItem(PROFILE_DATA_PREFIX+id,snap);saveProfileMeta(m);renderProfiles();toast('Profile duplicated')}
+function toggleArchiveProfile(){const m=profileMeta(),p=currentProfile();if(!p)return;p.archived=!p.archived;p.updatedAt=new Date().toISOString();saveProfileMeta(m);renderProfiles();$('#profileArchiveBtn').textContent=p.archived?'Unarchive':'Archive';toast(p.archived?'Profile archived':'Profile restored')}
+function resetProfile(){const p=currentProfile();if(!p||!confirm(`Reset “${p.name}”? This clears this profile’s collection data on this device. Other profiles are not affected.`))return;window.DexBinderProfiles.USER_KEYS.forEach(k=>localStorage.removeItem(k));localStorage.setItem('dexbinder_v05_active_sets','[]');localStorage.setItem(PROFILE_DATA_PREFIX+p.id,JSON.stringify({'dexbinder_v05_active_sets':'[]'}));location.reload()}
+function deleteProfile(){const m=profileMeta(),p=currentProfile();if(!p)return;if(m.profiles.length<=1){toast('Keep at least one profile');return}if(!confirm(`Delete “${p.name}” from this device? This cannot be undone unless you have a backup.`))return;const next=m.profiles.find(x=>x.id!==p.id);localStorage.removeItem(PROFILE_DATA_PREFIX+p.id);m.profiles=m.profiles.filter(x=>x.id!==p.id);m.activeId=next.id;saveProfileMeta(m);restoreProfileSnapshot(next.id);location.reload()}
+function bindProfileControls(){const h=$('#profileHeaderBtn');if(h)h.onclick=openProfiles;$('#profileCreateBtn').onclick=()=>openProfileName('create');$('#profileRenameBtn').onclick=()=>openProfileName('rename');$('#profileDuplicateBtn').onclick=duplicateProfile;$('#profileArchiveBtn').onclick=toggleArchiveProfile;$('#profileResetBtn').onclick=resetProfile;$('#profileDeleteBtn').onclick=deleteProfile;$('#profileNameSaveBtn').onclick=saveProfileName;$('#profileNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')saveProfileName()});window.addEventListener('pagehide',saveCurrentProfileSnapshot);renderProfiles()}
+
 function initDexBinder(){
   bindDexBinderTheme();
+  try{bindProfileControls()}catch(e){console.warn('Profile controls unavailable',e)}
   renderDashboardGreeting();
   registerDexBinderServiceWorker();
   // Stage 1: render the core UI first. Optional migration/cache work must never block it.
