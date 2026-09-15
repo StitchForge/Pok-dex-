@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v0155d';
+const CACHE='dexbinder-shell-v0156';
 const APP_SHELL=[
   './',
   './index.html',
@@ -99,7 +99,12 @@ self.addEventListener('fetch',event=>{
   }
 
   if(url.origin===self.location.origin){
-    event.respondWith(cacheFirst(req,CACHE,40));
+    event.respondWith(
+      fetch(req).then(res=>{
+        if(res && res.ok)caches.open(CACHE).then(c=>c.put(req,res.clone()));
+        return res;
+      }).catch(()=>caches.match(req))
+    );
     return;
   }
 
