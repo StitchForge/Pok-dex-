@@ -3980,6 +3980,30 @@ body[data-theme="umbreon"] .trainerStyleRow .stylePill.active{background:#342e58
 body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
 </style>
 
+
+<style id="v0182i-seated-trainer">
+/* Trainer V2: hip/bum anchor is mapped to the locked authored ledge. */
+.trainerRigSvg{
+  width:49%!important;
+  height:auto!important;
+  left:12%!important;
+  top:7.5%!important;
+  bottom:auto!important;
+  overflow:visible!important;
+  z-index:2!important;
+}
+/* Normal profile showcases the result; controls only appear while editing. */
+.trainerQuickBuilder#trainerCustomizer{display:none!important}
+.trainerQuickBuilder#trainerCustomizer.is-open{display:block!important}
+.trainerEditBar{display:flex!important;justify-content:flex-end;margin:10px 0 8px}
+.trainerEditButton{
+  appearance:none;border:1px solid var(--db-line);background:var(--db-panel);
+  color:var(--db-text);font:inherit;font-weight:800;border-radius:999px;
+  padding:10px 14px;box-shadow:0 3px 12px rgba(31,25,56,.06)
+}
+body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -4056,7 +4080,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2h</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2i</div>
 </div>
 
   <section id="homeScreen">
@@ -5191,23 +5215,37 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
     <path d="M282 414q18 13 36 0" fill="none"/>
   </g>
 
-  <!-- seated outfit / torso -->
-  <g stroke="#332945" stroke-width="13" stroke-linejoin="round">
-    <path fill="var(--trainer-outfit)" d="M225 505q75-38 150 0l35 145-78 17-16-78-5 91h-22l-5-91-16 78-78-17z"/>
-    <path fill="#fbf7ff" d="M264 496l36 49 36-49-18-14h-36z"/>
-    <path fill="#f1a6c8" d="M289 536h22l14 64-25 26-25-26z"/>
-    <!-- seated shorts/skirt block -->
-    <path fill="#34354f" d="M238 641q62-24 124 0l19 67-72 7-9-34-9 34-72-7z"/>
-    <!-- bent legs: thighs forward, shins down -->
-    <path fill="var(--trainer-skin)" d="M244 690q35-15 62 7l-12 61-82 34-23-45z"/>
-    <path fill="var(--trainer-skin)" d="M356 690q-35-15-62 7l12 61 82 34 23-45z"/>
-    <path fill="#34354f" d="M215 770l80-33 19 38-61 55-43 4z"/>
-    <path fill="#34354f" d="M385 770l-80-33-19 38 61 55 43 4z"/>
-    <path fill="#fff" d="M207 819h67l13 39h-96q-14-4-4-20z"/>
-    <path fill="#fff" d="M393 819h-67l-13 39h96q14-4 4-20z"/>
-    <!-- arms resting beside body -->
-    <path fill="var(--trainer-skin)" d="M217 531q-36 35-49 105l-8 73 42 5 23-79 31-58z"/>
-    <path fill="var(--trainer-skin)" d="M383 531q36 35 49 105l8 73-42 5-23-79-31-58z"/>
+  <!-- seated outfit / torso: v0.18.2i perspective rig -->
+  <g class="trainerBodyV2" stroke="#332945" stroke-width="12" stroke-linejoin="round" stroke-linecap="round">
+    <!-- torso, deliberately shorter so the pelvis lands on the authored seat -->
+    <path fill="var(--trainer-outfit)" d="M228 503 Q300 472 372 503 L390 625 Q350 646 318 640 L300 620 L282 640 Q250 646 210 625 Z"/>
+    <path fill="#fbf7ff" d="M264 495 L300 541 L336 495 L318 482 H282 Z"/>
+    <path fill="#f1a6c8" d="M289 533 H311 L322 584 L300 606 L278 584 Z"/>
+
+    <!-- pelvis / shorts: this is the bum/seat anchor area -->
+    <path fill="#34354f" d="M242 615 Q300 594 358 615 L371 660 Q334 676 300 667 Q266 676 229 660 Z"/>
+
+    <!-- left thigh comes TOWARD the viewer and crosses the ledge -->
+    <path fill="var(--trainer-skin)" d="M255 648 Q278 638 302 654 L286 708 Q265 735 226 744 L205 711 Q226 677 255 648 Z"/>
+    <!-- right thigh -->
+    <path fill="var(--trainer-skin)" d="M345 648 Q322 638 298 654 L314 708 Q335 735 374 744 L395 711 Q374 677 345 648 Z"/>
+
+    <!-- knees / hanging lower legs -->
+    <path fill="#34354f" d="M226 728 Q252 716 282 704 L300 733 L270 812 Q258 838 232 830 L211 806 Z"/>
+    <path fill="#34354f" d="M374 728 Q348 716 318 704 L300 733 L330 812 Q342 838 368 830 L389 806 Z"/>
+
+    <!-- socks and shoes, clearly below the seat -->
+    <path fill="#f8f6fb" d="M225 809 L271 809 L266 849 L218 849 Z"/>
+    <path fill="#f8f6fb" d="M329 809 L375 809 L382 849 L334 849 Z"/>
+    <path fill="var(--trainer-outfit)" d="M211 842 Q242 832 270 844 L281 870 H205 Q190 865 198 852 Z"/>
+    <path fill="var(--trainer-outfit)" d="M389 842 Q358 832 330 844 L319 870 H395 Q410 865 402 852 Z"/>
+
+    <!-- arms relaxed beside the seated body -->
+    <path fill="var(--trainer-skin)" d="M222 526 Q190 558 179 623 L174 682 Q184 696 204 687 L222 628 L251 574 Z"/>
+    <path fill="var(--trainer-skin)" d="M378 526 Q410 558 421 623 L426 682 Q416 696 396 687 L378 628 L349 574 Z"/>
+    <!-- hands resting close to thighs -->
+    <ellipse fill="var(--trainer-skin)" cx="190" cy="690" rx="18" ry="15"/>
+    <ellipse fill="var(--trainer-skin)" cx="410" cy="690" rx="18" ry="15"/>
   </g>
 
   <!-- front hair -->
@@ -5237,7 +5275,10 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
 <div class="trainerPartnerSlot" aria-hidden="true"></div>
 
 </div></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
-    <div class="trainerQuickBuilder">
+    <div class="trainerEditBar">
+<button class="trainerEditButton" id="trainerEditButton" type="button" aria-expanded="false" onclick="toggleTrainerEditor()">✏️ Edit Trainer</button>
+</div>
+<div class="trainerQuickBuilder" id="trainerCustomizer">
  <div class="trainerScenePickerHead"><b>TRAINER</b><span>Seated rig · saved to this profile</span></div>
  <div class="trainerBuildRow trainerStyleRow"><span>Hair style</span>
    <button class="stylePill" data-hairstyle="short">Short</button>
