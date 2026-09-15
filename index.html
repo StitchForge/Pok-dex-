@@ -3646,7 +3646,7 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 @media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
 
-/* v0.16.0d — universal catalogue polish */
+/* v0.16.0e — universal catalogue polish */
 .card>.universalNoArtwork{inset:0 0 27px;position:absolute;border-radius:10px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 5%,var(--db-panel)),var(--db-panel))}
 .card.noArtwork{background:var(--db-panel)}
 .card.noArtwork>.tag{z-index:3}
@@ -3706,7 +3706,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.0d</div>
+  <div class="version" id="buildVersion">v0.16.0e</div>
 </div>
 
   <section id="homeScreen">
@@ -5648,7 +5648,7 @@ function setEraName(s){
  if(/promo/i.test(name))return raw&&raw!=='Pokémon TCG'?raw:'Promos & Special Sets';
  return raw&&raw!=='Pokémon TCG'?raw:'Other / Special Sets';
 }
-function eraFallbackRank(era){return ({'Mega Evolution':700,'Scarlet & Violet':600,'Sword & Shield':500,'Sun & Moon':400,'XY':300,'Black & White':200})[era]||100}
+function eraFallbackRank(era){return ({'Mega Evolution':1500,'Scarlet & Violet':1400,'Sword & Shield':1300,'Sun & Moon':1200,'XY':1100,'Black & White':1000,'HeartGold & SoulSilver':900,'Platinum':800,'Diamond & Pearl':700,'EX':600,'e-Card':500,'Neo':400,'Gym':300,'Original Series':200,'POP Series':150,'Promos & Special Sets':125,'Other / Special Sets':100})[era]||100}
 function setReleaseTime(s){const d=Date.parse(s?.releaseDate||'');return Number.isFinite(d)?d:0}
 function setNewestFirst(a,b){
  const ta=setReleaseTime(a),tb=setReleaseTime(b);
@@ -5928,7 +5928,7 @@ function migrateV1(){
  }catch(e){console.warn('v0.1 migration skipped',e)}
 }
 async function openSet(sid,target='binder'){
- currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#myCollectionScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#tradeListScreen').classList.add('hidden');$('#tradeCompareScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');
+ currentSet=sid;view=target;page=1;$('#homeScreen').classList.add('hidden');$('#myCollectionScreen').classList.add('hidden');$('#globalHuntScreen').classList.add('hidden');$('#tradeListScreen').classList.add('hidden');$('#tradeCompareScreen').classList.add('hidden');$('#setScreen').classList.remove('hidden');$('#bottomNav').classList.remove('hidden');requestAnimationFrame(()=>document.getElementById('setScreen')?.scrollIntoView({behavior:'smooth',block:'start'}));
  let s=SETS[sid];$('#setSeries').textContent=s.series;$('#setTitle').textContent=s.name;$('#setDesc').textContent=s.desc;renderSetBranding(sid);$('#content').innerHTML='<div class="notice">Loading cards…</div>';
  try{
    await loadSet(sid);
@@ -10472,8 +10472,10 @@ function renderLibrary(){
   rows=rows.filter(x=>!q||`${x.name} ${x.era} ${SETS[x.id]?.series||''}`.toLowerCase().includes(q));
   rows.sort((a,b)=>(Date.parse(b.releaseDate||'')||0)-(Date.parse(a.releaseDate||'')||0)||a.name.localeCompare(b.name));
   const eras=[...new Set(rows.map(x=>x.era||'Pokémon TCG'))].sort((a,b)=>{
+    const rankDiff=eraFallbackRank(b)-eraFallbackRank(a);
+    if(rankDiff)return rankDiff;
     const newest=era=>Math.max(0,...rows.filter(x=>(x.era||'Pokémon TCG')===era).map(x=>Date.parse(x.releaseDate||SETS[x.id]?.releaseDate||'')||0));
-    return newest(b)-newest(a)||eraFallbackRank(b)-eraFallbackRank(a)||a.localeCompare(b);
+    return newest(b)-newest(a)||a.localeCompare(b);
   });
   $('#libraryList').innerHTML=eras.map(era=>{
     const cards=rows.filter(x=>(x.era||'Pokémon TCG')===era).sort((a,b)=>setNewestFirst(SETS[a.id]||a,SETS[b.id]||b)).map(x=>{
