@@ -3898,7 +3898,7 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 .trainerRig{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;--trainer-skin:#e9ae88;--trainer-hair:#49323c;--trainer-eyes:#6b4638;--trainer-outfit:#8b79eb}
 .trainerRigSvg{position:absolute;width:58%;height:103%;left:4%;bottom:-11%;overflow:visible;filter:drop-shadow(0 5px 4px rgba(24,20,42,.20))}
 .trainerPerchFront{position:absolute;z-index:4;left:0;right:0;bottom:0;height:19%;background:linear-gradient(180deg,rgba(65,55,67,0) 0%,rgba(55,47,55,.10) 10%,rgba(48,42,50,.20) 100%);clip-path:polygon(0 45%,100% 28%,100% 100%,0 100%);mix-blend-mode:multiply;opacity:.24}
-.hairStyle{display:none}.trainerRig[data-hair-style="long"] .hair-long,.trainerRig[data-hair-style="short"] .hair-short,.trainerRig[data-hair-style="pony"] .hair-pony{display:block}
+.hairStyle{display:none}.trainerRig[data-hair-style="long"] .hair-long,.trainerRig[data-hair-style="short"] .hair-short,.trainerRig[data-hair-style="medium"] .hair-medium,.trainerRig[data-hair-style="pony"] .hair-pony{display:block}
 .trainerQuickBuilder .trainerBuildRow button:not(.stylePill){width:25px;height:25px;min-width:25px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(65,54,94,.18)}
 .trainerQuickBuilder .trainerBuildRow button.active{box-shadow:0 0 0 3px #806be6}
 .trainerStyleRow{flex-wrap:wrap}.trainerStyleRow span{width:42px}.trainerStyleRow .stylePill{width:auto;height:29px;padding:0 10px;border-radius:999px;border:1px solid rgba(98,77,151,.18);background:rgba(255,255,255,.75);font-size:.38rem;font-weight:900;color:#4f4668}
@@ -3906,6 +3906,36 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 body[data-theme="umbreon"] .trainerStyleRow .stylePill{background:#242a39;color:#e8e9f3;border-color:rgba(238,240,255,.12)}
 body[data-theme="umbreon"] .trainerStyleRow .stylePill.active{background:#342e58;border-color:#9e95ff}
 </style>
+
+<style id="v0182e-production-stage">
+/* Stable stage geometry: shared across all current/future Trainer Scenes. */
+.trainerArt{
+  --db-seat-y:66%;
+  --db-trainer-x:31%;
+  --db-partner-x:70%;
+  --db-partner-y:64%;
+}
+.trainerRig{overflow:hidden}
+.trainerRigSvg{
+  width:48%;
+  height:91%;
+  left:7%;
+  bottom:-13%;
+  transform-origin:center bottom;
+  filter:drop-shadow(0 4px 3px rgba(24,20,42,.18));
+}
+.trainerPartnerAnchor{
+  position:absolute;left:var(--db-partner-x);top:var(--db-partner-y);
+  width:1px;height:1px;pointer-events:none
+}
+/* Scene-specific framing keeps the authored perch beneath the same seat anchor. */
+.trainerArt[data-scene="sunset-lake"]{background-position:50% 53%!important}
+.trainerArt[data-scene="cozy-town"]{background-position:50% 56%!important}
+.trainerArt[data-scene="forest-trail"]{background-position:50% 55%!important}
+/* v0.18.2d's synthetic wedge is intentionally disabled: depth will come from authored foreground assets. */
+.trainerPerchFront{display:none!important}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -3982,7 +4012,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2d</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2e</div>
 </div>
 
   <section id="homeScreen">
@@ -5094,6 +5124,10 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
     <path d="M204 264c18-88 174-104 205-7 10 30 8 67-3 98l-43 13-121 4-38 17c-26-34-31-83-20-125z"/>
     <path d="M401 293c76 14 91 81 50 142-12-49-39-55-77-58z"/>
   </g>
+  <g class="hairStyle hair-medium" fill="var(--trainer-hair)">
+    <path d="M202 262c20-88 176-101 207-5 13 41 7 96-15 137l-37-18-114 2-39 18c-24-40-29-91-18-134z"/>
+    <path d="M213 354c-4 61 8 104 34 132l26-26-10-100zM387 354c4 61-8 104-34 132l-26-26 10-100z"/>
+  </g>
 
   <!-- head / neck -->
   <g fill="var(--trainer-skin)" stroke="#332945" stroke-width="13" stroke-linejoin="round">
@@ -5144,6 +5178,10 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
     <path d="M204 307q16-107 96-111 80 4 96 111l-34 7-22-53-24 45-24-49-30 52-25-44-11 47z"/>
     <path d="M388 274q50 3 65 36-36 14-67 2z"/>
   </g>
+  <g class="hairStyle hair-medium" fill="var(--trainer-hair)" stroke="#332945" stroke-width="11" stroke-linejoin="round">
+    <path d="M204 307q16-107 96-111 80 4 96 111l-34 7-22-53-24 45-24-49-30 52-25-44-11 47z"/>
+    <path d="M211 311q-10 65 13 112l27-17-6-91zM389 311q10 65-13 112l-27-17 6-91z"/>
+  </g>
 
   <!-- optional cap -->
   <g class="trainerCap" stroke="#332945" stroke-width="11" stroke-linejoin="round">
@@ -5153,12 +5191,13 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
   </g>
 </svg>
 <!-- foreground occlusion: the scene's shared perch edge -->
-<div class="trainerPerchFront"></div>
+
 </div></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
     <div class="trainerQuickBuilder">
  <div class="trainerScenePickerHead"><b>TRAINER</b><span>Seated rig · saved to this profile</span></div>
  <div class="trainerBuildRow trainerStyleRow"><span>Hair style</span>
    <button class="stylePill" data-hairstyle="short">Short</button>
+   <button class="stylePill" data-hairstyle="medium">Medium</button>
    <button class="stylePill" data-hairstyle="long">Long</button>
    <button class="stylePill" data-hairstyle="pony">Ponytail</button>
  </div>
