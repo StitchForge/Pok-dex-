@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v0182b';
+const CACHE='dexbinder-shell-v0182c';
 const APP_SHELL=[
   './',
   './index.html',
@@ -12,7 +12,13 @@ const APP_SHELL=[
   './assets/temporal-forces-logo.png',
   './trainer-bg-sunset-lake.webp',
   './trainer-bg-cozy-town.webp',
-  './trainer-bg-forest-trail.webp'
+  './trainer-bg-forest-trail.webp',
+  './trainer-base.svg',
+  './trainer-hair-back.svg',
+  './trainer-eyes.svg',
+  './trainer-outfit.svg',
+  './trainer-hair-front.svg',
+  './trainer-accessory-cap.svg'
 ];
 
 self.addEventListener('install',event=>{
