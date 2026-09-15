@@ -3951,6 +3951,35 @@ body[data-theme="umbreon"] .trainerStyleRow .stylePill.active{background:#342e58
 .trainerSceneForeground{display:none!important}
 .trainerPartnerSlot{position:absolute;left:60%;top:31%;width:34%;height:42%;z-index:2;pointer-events:none}
 </style>
+
+<style id="v0182h-production-trainer-stage">
+/* v0.18.2h: production Trainer Stage. Backgrounds are authored to the same seat geometry. */
+.trainerArt{
+  --db-seat-x:24%;
+  --db-seat-y:68%;
+  --db-partner-x:70%;
+  --db-partner-y:62%;
+  background-position:center!important;
+}
+.trainerRigSvg{
+  width:50%;
+  height:101%;
+  left:8%;
+  bottom:-11%;
+  transform:none;
+  transform-origin:center bottom;
+}
+.trainerEditBar{display:flex;justify-content:flex-end;margin:10px 0 8px}
+.trainerEditButton{
+  appearance:none;border:1px solid var(--db-line);background:var(--db-panel);
+  color:var(--db-text);font:inherit;font-weight:800;border-radius:999px;
+  padding:10px 14px;box-shadow:0 3px 12px rgba(31,25,56,.06)
+}
+.trainerCustomizer{display:none}
+.trainerCustomizer.is-open{display:block}
+body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -4027,7 +4056,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2g</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2h</div>
 </div>
 
   <section id="homeScreen">
@@ -11463,5 +11492,18 @@ const dbContrastObserver=new MutationObserver(muts=>{
 dbContrastObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','style']});
 
 </script>
+
+<script id="v0182h-trainer-editor">
+function toggleTrainerEditor(force){
+  const panel=document.getElementById('trainerCustomizer');
+  const btn=document.getElementById('trainerEditButton');
+  if(!panel||!btn)return;
+  const open=(typeof force==='boolean')?force:!panel.classList.contains('is-open');
+  panel.classList.toggle('is-open',open);
+  btn.textContent=open?'✓ Done':'✏️ Edit Trainer';
+  btn.setAttribute('aria-expanded',open?'true':'false');
+}
+</script>
+
 </body>
 </html>
