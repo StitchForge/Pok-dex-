@@ -3724,6 +3724,64 @@ body[data-theme="umbreon"] .themeAtmosphere .cloud,body[data-theme="umbreon"] .t
 body[data-theme="umbreon"] .themeAtmosphere .star{display:block!important;opacity:.62!important;animation:pageStarPulse 4.8s ease-in-out infinite!important}
 body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!important}
 </style>
+<style>
+/* v0.16.1a — dark-mode card + Fast Add surface polish */
+body[data-theme="umbreon"] .collectorPanel,
+body[data-theme="umbreon"] .collectorBody,
+body[data-theme="umbreon"] .copyGroup,
+body[data-theme="umbreon"] .fastAddCard,
+body[data-theme="umbreon"] .fastAddSelected,
+body[data-theme="umbreon"] .fastAddRecentItem{
+  background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important
+}
+body[data-theme="umbreon"] .collectorHead{background:var(--db-panel-2)!important;border-color:var(--db-line)!important;color:var(--db-text)!important}
+body[data-theme="umbreon"] .collectorHead b,
+body[data-theme="umbreon"] .copyGroupHead b,
+body[data-theme="umbreon"] .fastAddCard b,
+body[data-theme="umbreon"] .fastAddSelected h3{color:var(--db-text)!important}
+body[data-theme="umbreon"] .collectorHead small,
+body[data-theme="umbreon"] .copyGroupHead small,
+body[data-theme="umbreon"] .copyGroupActions small,
+body[data-theme="umbreon"] .inventoryHint,
+body[data-theme="umbreon"] .fastAddCard small,
+body[data-theme="umbreon"] .fastAddSelected p,
+body[data-theme="umbreon"] .fastAddRecentItem small{color:var(--db-muted)!important}
+body[data-theme="umbreon"] .collectorField label{color:var(--db-muted)!important}
+body[data-theme="umbreon"] .lotTag,
+body[data-theme="umbreon"] .qtyValue,
+body[data-theme="umbreon"] .tradeQtyValue,
+body[data-theme="umbreon"] .qtyControl button,
+body[data-theme="umbreon"] .tradeQtyControl button,
+body[data-theme="umbreon"] .copyTypeTabs button,
+body[data-theme="umbreon"] .fastAddVariants button,
+body[data-theme="umbreon"] .fastAddModeTabs button,
+body[data-theme="umbreon"] .fastAddScopeTabs button{
+  background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important
+}
+body[data-theme="umbreon"] .copyTypeTabs button.on,
+body[data-theme="umbreon"] .fastAddModeTabs button.on,
+body[data-theme="umbreon"] .fastAddScopeTabs button.on{
+  background:var(--db-purple)!important;color:#10131d!important;border-color:var(--db-purple)!important
+}
+body[data-theme="umbreon"] .collectorNotes{color:var(--db-text)!important;background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
+body[data-theme="umbreon"] .collectorNotes::placeholder{color:#858ca2!important}
+
+@media(prefers-color-scheme:dark){
+ body[data-theme="system"] .collectorPanel,
+ body[data-theme="system"] .collectorBody,
+ body[data-theme="system"] .copyGroup,
+ body[data-theme="system"] .fastAddCard,
+ body[data-theme="system"] .fastAddSelected,
+ body[data-theme="system"] .fastAddRecentItem{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+ body[data-theme="system"] .collectorHead{background:var(--db-panel-2)!important;border-color:var(--db-line)!important;color:var(--db-text)!important}
+ body[data-theme="system"] .collectorHead b,body[data-theme="system"] .copyGroupHead b,body[data-theme="system"] .fastAddCard b,body[data-theme="system"] .fastAddSelected h3{color:var(--db-text)!important}
+ body[data-theme="system"] .collectorHead small,body[data-theme="system"] .copyGroupHead small,body[data-theme="system"] .copyGroupActions small,body[data-theme="system"] .inventoryHint,body[data-theme="system"] .fastAddCard small,body[data-theme="system"] .fastAddSelected p,body[data-theme="system"] .fastAddRecentItem small,body[data-theme="system"] .collectorField label{color:var(--db-muted)!important}
+ body[data-theme="system"] .lotTag,body[data-theme="system"] .qtyValue,body[data-theme="system"] .tradeQtyValue,body[data-theme="system"] .qtyControl button,body[data-theme="system"] .tradeQtyControl button,body[data-theme="system"] .copyTypeTabs button,body[data-theme="system"] .fastAddVariants button,body[data-theme="system"] .fastAddModeTabs button,body[data-theme="system"] .fastAddScopeTabs button{background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+ body[data-theme="system"] .copyTypeTabs button.on,body[data-theme="system"] .fastAddModeTabs button.on,body[data-theme="system"] .fastAddScopeTabs button.on{background:var(--db-purple)!important;color:#10131d!important;border-color:var(--db-purple)!important}
+ body[data-theme="system"] .collectorNotes{color:var(--db-text)!important;background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
+ body[data-theme="system"] .collectorNotes::placeholder{color:#858ca2!important}
+}
+</style>
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -3745,7 +3803,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.1</div>
+  <div class="version" id="buildVersion">v0.16.1a</div>
 </div>
 
   <section id="homeScreen">
@@ -10611,11 +10669,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0161',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0161a',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0161_controller_reload';
+      const key='dexbinder_v0161a_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
