@@ -3617,7 +3617,7 @@ body[data-theme="umbreon"] .huntSessionHero small,body[data-theme="umbreon"] .hu
 .dashboardBinderArtwork{width:100%;height:100%;border-radius:inherit}
 
 
-/* v0.15.5c — Custom Binder artwork states */
+/* v0.15.5d — Custom Binder artwork states */
 .binderPocket.noArtwork{background:linear-gradient(145deg,color-mix(in srgb,var(--db-panel-2) 92%,var(--db-purple)),var(--db-panel));border-style:solid}
 .binderNoArtwork{position:absolute;inset:0 0 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px;text-align:center;color:var(--db-muted)}
 .binderNoArtworkMark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--db-purple) 13%,var(--db-panel));border:1px solid color-mix(in srgb,var(--db-purple) 25%,var(--db-line));color:var(--db-purple);font-size:.43rem;font-weight:1000;margin-bottom:7px}
@@ -3628,6 +3628,7 @@ body[data-theme="umbreon"] .huntSessionHero small,body[data-theme="umbreon"] .hu
 .binderPocket.noArtwork .tag{background:color-mix(in srgb,var(--db-text) 88%,transparent)}
 body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 
+.cardExploreLinks{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px}.detailSetLink,.detailArtistLink{border:0;background:none;padding:0;color:var(--db-purple);font:inherit;font-size:.48rem;font-weight:900;text-decoration:underline;text-underline-offset:2px;text-align:left}.setBackRow{display:flex;gap:7px;align-items:center}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -3771,7 +3772,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 </section>
 
   <section id="setScreen" class="hidden">
-    <button class="btn small" id="backBtn">← My Dex</button>
+    <div class="setBackRow"><button class="btn small" id="backBtn">← My Dex</button><button class="btn small hidden" id="returnFromSetBtn">← Return</button></div>
     <div class="hero setHero" style="margin-top:10px"><div class="heroRow"><div class="setHeroIdentity"><img id="setLogo" class="setHeroLogo hidden" alt=""><div class="eyebrow" id="setSeries"></div><h1 id="setTitle"></h1><p id="setDesc"></p><button class="btn small setValueInsightsBtn" id="setMarketBtn">📈 Values &amp; Trends</button></div><div class="stats"><b id="setOwned">0 / 0</b><span id="setPct">0% complete</span></div></div><div class="progress"><i id="setProgress"></i></div></div>
     <div class="toolbar"><input class="search" id="search" placeholder="Search name or card #…"/><select class="select" id="pageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="all">All</option></select></div>
     <div class="chips" id="chips">
@@ -3944,7 +3945,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
   </div>
 </div></div>
 
-<div class="modal" id="cardModal"><div class="sheet cardDetailSheet" id="cardDetailSheet"><div class="grab cardDetailGrab" id="cardDetailGrab" aria-label="Drag to resize card details"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p><button class="detailArtistLink hidden" id="detailArtistLink"></button></div><button class="btn small" id="cardModalBack">Close</button></div><div class="cardHeroActions"><button class="btn small" id="setAsChasePick">★ Set as Chase Pick</button><button class="btn small hidden" id="resetCardChasePick">Reset to automatic</button><button class="btn small hidden" id="toggleFavouriteCard">♡ Favourite</button><button class="btn small hidden" id="cardBinderBtn">＋ Binder</button></div><div class="cardContextActions hidden" id="cardContextActions"><button class="btn small" id="openCardInBinder">Open in Binder</button></div><div class="variants" id="detailVariants"></div><div class="cardPriceIntelligence" id="cardPriceIntelligence"></div></div></div>
+<div class="modal" id="cardModal"><div class="sheet cardDetailSheet" id="cardDetailSheet"><div class="grab cardDetailGrab" id="cardDetailGrab" aria-label="Drag to resize card details"></div><img id="detailImg" class="detailImg"/><div class="detailTop"><div><h2 id="detailName"></h2><p id="detailMeta"></p><div class="cardExploreLinks"><button class="detailArtistLink hidden" id="detailArtistLink"></button><button class="detailSetLink" id="detailSetLink">View full set →</button></div></div><button class="btn small" id="cardModalBack">Close</button></div><div class="cardHeroActions"><button class="btn small" id="setAsChasePick">★ Set as Chase Pick</button><button class="btn small hidden" id="resetCardChasePick">Reset to automatic</button><button class="btn small hidden" id="toggleFavouriteCard">♡ Favourite</button><button class="btn small hidden" id="cardBinderBtn">＋ Binder</button></div><div class="cardContextActions hidden" id="cardContextActions"><button class="btn small" id="openCardInBinder">Open in Binder</button></div><div class="variants" id="detailVariants"></div><div class="cardPriceIntelligence" id="cardPriceIntelligence"></div></div></div>
 
 
 <div class="modal" id="binderEditorModal"><div class="sheet">
@@ -5832,7 +5833,13 @@ async function openSet(sid,target='binder'){
    }
  }catch(e){
    console.error(e);
-   $('#content').innerHTML='<div class="notice error">Could not load card data. Check your connection and try again.</div>';
+   const cached=Object.entries(discoveryCardCache).filter(([k])=>k.startsWith(`${sid}|`)).map(([,c])=>c);
+   if(cached.length){
+     cardsBySet[sid]=cached;
+     if(!SETS[sid])SETS[sid]={id:sid,name:cached[0]?.set?.name||sid,series:cached[0]?.set?.serie?.name||'Pokémon TCG',desc:'Catalogue set',baseTotal:cached.length,masterTotal:cached.length,variantStrategy:'detail'};
+     $('#setSeries').textContent=SETS[sid].series||'Pokémon TCG';$('#setTitle').textContent=SETS[sid].name||sid;
+     renderStats();renderSet();toast('Showing cached catalogue cards for this set');
+   }else $('#content').innerHTML='<div class="notice error">Could not load card data. Check your connection and try again.</div>';
  }
  setNav();
 }
@@ -9254,6 +9261,7 @@ function rememberAllScroll(){
 
 let cardDetailOrigin=null;
 let cardDetailOriginState=null;
+let setBrowseReturnContext=null;
 
 function setCardDetailContext(origin,state=null){
  cardDetailOrigin=origin||null;
@@ -9436,6 +9444,33 @@ function bindCardDetailGestures(){
  sheet.addEventListener('pointercancel',finishPage);
 }
 
+
+async function viewFullSetFromCard(){
+ const sid=currentSet;if(!sid)return;
+ const origin=cardDetailOrigin,state=cardDetailOriginState;
+ setBrowseReturnContext=origin?{origin,state}:{origin:'card',state:null};
+ $('#cardModal').classList.remove('open');
+ if(!SETS[sid]){
+   const c=selected;
+   SETS[sid]={id:sid,name:c?.set?.name||sid,series:c?.set?.serie?.name||'Pokémon TCG',desc:'Catalogue set',baseTotal:0,masterTotal:0,variantStrategy:'detail'};
+ }
+ await openSet(sid,'binder');
+ const ret=$('#returnFromSetBtn');
+ if(ret){ret.textContent=origin==='customBinder'?'← Binder':origin==='artist'?'← Artist':origin==='tradeBinder'?'← Trade Binder':origin==='setMarket'?'← Set Market':'← Card';ret.classList.remove('hidden')}
+}
+function returnFromFullSet(){
+ const ctx=setBrowseReturnContext;setBrowseReturnContext=null;
+ $('#returnFromSetBtn')?.classList.add('hidden');
+ if(!ctx){goHome();return}
+ const {origin,state}=ctx;
+ $('#setScreen').classList.add('hidden');
+ if(origin==='customBinder'){if(state?.binderId)activeCustomBinderId=state.binderId;$('#binderViewModal').classList.add('open');renderCustomBinderView()}
+ else if(origin==='artist'){$('#artistModal').classList.add('open');renderArtistCollection()}
+ else if(origin==='tradeBinder'){$('#tradeBinderModal').classList.add('open');renderTradeBinder()}
+ else if(origin==='setMarket'){if(state?.sid)currentSet=state.sid;$('#setMarketModal').classList.add('open');renderSetMarketSummary()}
+ else goHome();
+}
+
 async function openCard(cid,forcedVariant){
  rememberAllScroll();
  let c=(cardsBySet[currentSet]||[]).find(x=>x.id===cid);if(!c)return;
@@ -9457,6 +9492,7 @@ async function openCard(cid,forcedVariant){
  $('#detailVariants').innerHTML='<div class="notice">Loading variants & prices…</div>';$('#cardModal').classList.add('open');bindCardDetailGestures();if(!$('#cardDetailSheet').classList.contains('expanded'))setCardDetailDetent('compact');
  await loadPriceFor(c);
  const fullDetail=detailCache[c.id]||c,artist=String(fullDetail?.illustrator||'').trim(),artistBtn=$('#detailArtistLink');
+ const setBtn=$('#detailSetLink');setBtn.textContent=`View full ${SETS[currentSet]?.name||fullDetail?.set?.name||'set'} →`;setBtn.onclick=viewFullSetFromCard;
  const detailBits=[SETS[currentSet]?.name,`#${c.localId}`];
  const forcedLabel=forcedVariant?variantsFor(currentSet,c).find(v=>v.id===forcedVariant)?.label:'';
  if(forcedLabel)detailBits.push(forcedLabel);
@@ -9826,7 +9862,8 @@ $('#openCardInBinder').onclick=()=>{
 };
 
 $$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m){if(m.id==='cardModal')closeCardDetail();else{m.classList.remove('open');if(m.id==='tradeBinderModal'){tradeBinderView.showcase=false;tradeBinderView.unlocked=false;tradeBinderInterested.clear();document.body.classList.remove('trade-showcase')}}}});
-$('#backBtn').onclick=goHome;$('#huntBack').onclick=goHome;
+$('#backBtn').onclick=goHome;
+$('#returnFromSetBtn').onclick=returnFromFullSet;$('#huntBack').onclick=goHome;
 $('#libraryBack').onclick=goHome;
 $('#librarySearch').oninput=renderLibrary;
 
