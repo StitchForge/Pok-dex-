@@ -3765,6 +3765,12 @@ body[data-theme="umbreon"] .fastAddScopeTabs button.on{
 }
 body[data-theme="umbreon"] .collectorNotes{color:var(--db-text)!important;background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
 body[data-theme="umbreon"] .collectorNotes::placeholder{color:#858ca2!important}
+/* v0.16.1c — Fast Add > All Sets catalogue surfaces */
+body[data-theme="umbreon"] .catalogueSetCard{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+body[data-theme="umbreon"] .catalogueSetCard b{color:var(--db-text)!important}
+body[data-theme="umbreon"] .catalogueSetCard small{color:var(--db-muted)!important}
+body[data-theme="umbreon"] .catalogueSetCard .btn{background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+body[data-theme="umbreon"] .catalogueSetCard .btn.dark{background:var(--db-purple)!important;color:#10131d!important;border-color:var(--db-purple)!important}
 
 @media(prefers-color-scheme:dark){
  body[data-theme="system"] .collectorPanel,
@@ -3780,8 +3786,94 @@ body[data-theme="umbreon"] .collectorNotes::placeholder{color:#858ca2!important}
  body[data-theme="system"] .copyTypeTabs button.on,body[data-theme="system"] .fastAddModeTabs button.on,body[data-theme="system"] .fastAddScopeTabs button.on{background:var(--db-purple)!important;color:#10131d!important;border-color:var(--db-purple)!important}
  body[data-theme="system"] .collectorNotes{color:var(--db-text)!important;background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
  body[data-theme="system"] .collectorNotes::placeholder{color:#858ca2!important}
+ body[data-theme="system"] .catalogueSetCard{background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+ body[data-theme="system"] .catalogueSetCard b{color:var(--db-text)!important}
+ body[data-theme="system"] .catalogueSetCard small{color:var(--db-muted)!important}
+ body[data-theme="system"] .catalogueSetCard .btn{background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+ body[data-theme="system"] .catalogueSetCard .btn.dark{background:var(--db-purple)!important;color:#10131d!important;border-color:var(--db-purple)!important}
 }
 </style>
+
+<style id="v0161c-dark-surface-audit">
+/* v0.16.1c — full legacy-surface dark-mode audit.
+   Older feature modules used literal light backgrounds rather than theme tokens. */
+body[data-theme="umbreon"] :is(
+  .snapshotPreview,.backupExplain,.offlineBadge,.cloudStatus,.cloudExplain,.cloudEmail,
+  .collectorPanel,.collectorInput,.collectorSelect,.collectorNotes,.qtyControl button,.qtyValue,.tradeRow,
+  .tradeStat,.tradeItem,.tradeBasketBar button,.tradeQtyControl button,.tradeQtyValue,.compareSide,.compareItem,
+  .compareQty button,.tradeSearchCard,.tradeVariantButtons button,.historyItem,.collectorHubCard,.metricCard,
+  .searchResult,.duplicateItem,.dataHealthBox,.copyGroup,.copyTypeTabs button,.fastAddCard,.fastAddVariants button,
+  .fastAddSelected,.fastAddRecentItem,.fastAddModeTabs button,.fastAddScopeTabs button,.catalogueSetCard,.catalogueEraChip,
+  .dataSyncCard,.scanStatus,.scanCandidate,.goalCard,.wishRow,.tradeHuntTabs button,.tradeHuntStat,.tradeHuntRow,
+  .tradeTargetPill.off,.wishTargetButton.off,.tradeLaunchCard,.acqMetric,.acqRow,.acqBadge,.achievementMetric,
+  .achievementFilters button,.achievementCard,.achievementTier,.dashboardMilestone,.cabinetCard,.tierPill,
+  .cabinetDetailHero,.tierStep,.cabinetDetailRow,.addCardsChoice
+){background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+body[data-theme="umbreon"] :is(
+  .collectorInput,.collectorSelect,.collectorNotes,.cloudEmail,.qtyControl button,.qtyValue,.tradeQtyControl button,
+  .tradeQtyValue,.compareQty button,.copyTypeTabs button,.fastAddVariants button,.fastAddModeTabs button,
+  .fastAddScopeTabs button,.tradeVariantButtons button,.catalogueEraChip,.achievementTier,.tierPill
+){background:var(--db-panel-2)!important}
+body[data-theme="umbreon"] :is(
+  .tradeItem,.compareItem,.tradeSearchCard,.historyItem,.collectorHubCard,.metricCard,.searchResult,.duplicateItem,
+  .fastAddCard,.fastAddSelected,.fastAddRecentItem,.catalogueSetCard,.dataSyncCard,.scanCandidate,.goalCard,.wishRow,
+  .tradeHuntStat,.tradeHuntRow,.tradeLaunchCard,.acqMetric,.acqRow,.achievementMetric,.achievementCard,
+  .dashboardMilestone,.cabinetCard,.cabinetDetailHero,.tierStep,.cabinetDetailRow
+) :is(b,h1,h2,h3,h4,strong){color:var(--db-text)!important}
+body[data-theme="umbreon"] :is(
+  .tradeItem,.compareItem,.tradeSearchCard,.historyItem,.collectorHubCard,.metricCard,.searchResult,.duplicateItem,
+  .fastAddCard,.fastAddSelected,.fastAddRecentItem,.catalogueSetCard,.dataSyncCard,.scanCandidate,.goalCard,.wishRow,
+  .tradeHuntStat,.tradeHuntRow,.tradeLaunchCard,.acqMetric,.acqRow,.achievementMetric,.achievementCard,
+  .dashboardMilestone,.cabinetCard,.cabinetDetailHero,.tierStep,.cabinetDetailRow
+) :is(p,small){color:var(--db-muted)!important}
+body[data-theme="umbreon"] :is(input,textarea,select)::placeholder{color:#858ca2!important}
+body[data-theme="umbreon"] .setCardProgress,
+body[data-theme="umbreon"] .goalProgress{background:var(--db-panel-2)!important}
+body[data-theme="umbreon"] .scanPreview img{background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
+body[data-theme="umbreon"] :is(.wishPriority.high,.wishPriority.medium,.wishPriority.low,.tradeTargetBadge,.tradeTargetPill,.acqBadge){
+  background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important
+}
+body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver,.cabinetCard.tier-gold,.cabinetCard.tier-diamond){
+  background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important
+}
+@media(prefers-color-scheme:dark){
+  body[data-theme="system"] :is(
+    .snapshotPreview,.backupExplain,.offlineBadge,.cloudStatus,.cloudExplain,.cloudEmail,
+    .collectorPanel,.collectorInput,.collectorSelect,.collectorNotes,.qtyControl button,.qtyValue,.tradeRow,
+    .tradeStat,.tradeItem,.tradeBasketBar button,.tradeQtyControl button,.tradeQtyValue,.compareSide,.compareItem,
+    .compareQty button,.tradeSearchCard,.tradeVariantButtons button,.historyItem,.collectorHubCard,.metricCard,
+    .searchResult,.duplicateItem,.dataHealthBox,.copyGroup,.copyTypeTabs button,.fastAddCard,.fastAddVariants button,
+    .fastAddSelected,.fastAddRecentItem,.fastAddModeTabs button,.fastAddScopeTabs button,.catalogueSetCard,.catalogueEraChip,
+    .dataSyncCard,.scanStatus,.scanCandidate,.goalCard,.wishRow,.tradeHuntTabs button,.tradeHuntStat,.tradeHuntRow,
+    .tradeTargetPill.off,.wishTargetButton.off,.tradeLaunchCard,.acqMetric,.acqRow,.acqBadge,.achievementMetric,
+    .achievementFilters button,.achievementCard,.achievementTier,.dashboardMilestone,.cabinetCard,.tierPill,
+    .cabinetDetailHero,.tierStep,.cabinetDetailRow,.addCardsChoice
+  ){background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+  body[data-theme="system"] :is(
+    .collectorInput,.collectorSelect,.collectorNotes,.cloudEmail,.qtyControl button,.qtyValue,.tradeQtyControl button,
+    .tradeQtyValue,.compareQty button,.copyTypeTabs button,.fastAddVariants button,.fastAddModeTabs button,
+    .fastAddScopeTabs button,.tradeVariantButtons button,.catalogueEraChip,.achievementTier,.tierPill
+  ){background:var(--db-panel-2)!important}
+  body[data-theme="system"] :is(
+    .tradeItem,.compareItem,.tradeSearchCard,.historyItem,.collectorHubCard,.metricCard,.searchResult,.duplicateItem,
+    .fastAddCard,.fastAddSelected,.fastAddRecentItem,.catalogueSetCard,.dataSyncCard,.scanCandidate,.goalCard,.wishRow,
+    .tradeHuntStat,.tradeHuntRow,.tradeLaunchCard,.acqMetric,.acqRow,.achievementMetric,.achievementCard,
+    .dashboardMilestone,.cabinetCard,.cabinetDetailHero,.tierStep,.cabinetDetailRow
+  ) :is(b,h1,h2,h3,h4,strong){color:var(--db-text)!important}
+  body[data-theme="system"] :is(
+    .tradeItem,.compareItem,.tradeSearchCard,.historyItem,.collectorHubCard,.metricCard,.searchResult,.duplicateItem,
+    .fastAddCard,.fastAddSelected,.fastAddRecentItem,.catalogueSetCard,.dataSyncCard,.scanCandidate,.goalCard,.wishRow,
+    .tradeHuntStat,.tradeHuntRow,.tradeLaunchCard,.acqMetric,.acqRow,.achievementMetric,.achievementCard,
+    .dashboardMilestone,.cabinetCard,.cabinetDetailHero,.tierStep,.cabinetDetailRow
+  ) :is(p,small){color:var(--db-muted)!important}
+  body[data-theme="system"] :is(input,textarea,select)::placeholder{color:#858ca2!important}
+  body[data-theme="system"] .setCardProgress,body[data-theme="system"] .goalProgress{background:var(--db-panel-2)!important}
+  body[data-theme="system"] .scanPreview img{background:var(--db-panel-2)!important;border-color:var(--db-line)!important}
+  body[data-theme="system"] :is(.wishPriority.high,.wishPriority.medium,.wishPriority.low,.tradeTargetBadge,.tradeTargetPill,.acqBadge){background:var(--db-panel-2)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+  body[data-theme="system"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver,.cabinetCard.tier-gold,.cabinetCard.tier-diamond){background:var(--db-panel)!important;color:var(--db-text)!important;border-color:var(--db-line)!important}
+}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -3803,7 +3895,7 @@ body[data-theme="umbreon"] .collectorNotes::placeholder{color:#858ca2!important}
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.1a</div>
+  <div class="version" id="buildVersion">v0.16.1c</div>
 </div>
 
   <section id="homeScreen">
@@ -10669,11 +10761,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0161a',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0161c',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0161a_controller_reload';
+      const key='dexbinder_v0161c_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
