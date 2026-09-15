@@ -3655,6 +3655,16 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 .notice.catalogueOnly{border-color:color-mix(in srgb,var(--db-purple) 28%,transparent);background:color-mix(in srgb,var(--db-panel) 90%,var(--db-purple));}
 .notice.catalogueOnly b{display:block;margin-bottom:5px}
 
+/* v0.16.1 — Universal Catalogue Stabilisation */
+.universalLibraryCard{min-width:0}
+.librarySetIdentity{min-width:0}
+.libraryCard h3{overflow-wrap:anywhere}
+.universalLibraryActions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:7px}
+@media(max-width:520px){
+ .universalLibraryCard{grid-template-columns:1fr}
+ .universalLibraryActions{justify-content:flex-start}
+ .universalLibraryActions .btn{flex:1 1 132px}
+}
 /* v0.16.0f — dark-mode compatibility for legacy/library surfaces */
 body[data-theme="umbreon"]{
   --bg:var(--db-bg);--paper:var(--db-panel);--ink:var(--db-text);
@@ -3735,7 +3745,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.0e</div>
+  <div class="version" id="buildVersion">v0.16.1</div>
 </div>
 
   <section id="homeScreen">
@@ -5835,6 +5845,20 @@ async function fetchCatalogueCardsForSet(sid){
 function cachedDiscoveryCardsForSet(sid){
  return Object.entries(discoveryCardCache||{}).filter(([k,c])=>k.startsWith(`${sid}|`)||String(c?.id||'').startsWith(`${sid}-`)).map(([,c])=>({...c}));
 }
+function catalogueBriefForSet(sid){
+ return (allSetBriefs||[]).find(x=>x.id===sid)||supportedResolved.find(x=>x.id===sid)||null;
+}
+function catalogueCountForSet(sid){
+ const brief=catalogueBriefForSet(sid);
+ return Number(brief?.cardCount?.total||SETS[sid]?.baseTotal||SETS[sid]?.masterTotal||0)||0;
+}
+function markCatalogueOnlySet(sid){
+ const brief=catalogueBriefForSet(sid)||{};
+ const total=Number(brief?.cardCount?.total||SETS[sid]?.baseTotal||SETS[sid]?.masterTotal||0)||0;
+ SETS[sid]={...(SETS[sid]||{}),id:sid,name:brief.name||SETS[sid]?.name||sid,releaseDate:brief.releaseDate||SETS[sid]?.releaseDate||'',logo:brief.logo||SETS[sid]?.logo||'',baseTotal:total,masterTotal:total,_catalogueOnly:true};
+ cardsBySet[sid]=[];
+ return cardsBySet[sid];
+}
 async function loadSet(sid){
  if(cardsBySet[sid]?.length)return cardsBySet[sid];
  let main=null,cs=[],detailError=null,fallbackError=null;
@@ -5846,12 +5870,16 @@ async function loadSet(sid){
    detailError=e;console.warn(`Universal set detail failed for ${sid}; trying catalogue fallback`,e);
    try{cs=await fetchCatalogueCardsForSet(sid)}catch(err){fallbackError=err;console.warn(`Universal card fallback failed for ${sid}`,err)}
    if(!cs.length)cs=cachedDiscoveryCardsForSet(sid);
-   if(!cs.length)throw new Error(`No card data available for ${SETS[sid]?.name||sid}`);
+   if(!cs.length){
+     console.info(`Catalogue-only set ${sid}: preserving announced set count until card data is published`,detailError,fallbackError);
+     return markCatalogueOnlySet(sid);
+   }
    // Reconstruct enough set metadata to make the set a first-class DexBinder set.
    const brief=(allSetBriefs||[]).find(x=>x.id===sid)||{};
    main={id:sid,name:brief.name||SETS[sid]?.name||sid,logo:brief.logo||SETS[sid]?.logo||'',symbol:brief.symbol||'',cardCount:brief.cardCount||{total:cs.length,official:cs.length},releaseDate:brief.releaseDate||SETS[sid]?.releaseDate||'',cards:cs,_dexbinderFallback:true};
  }
  const apiSeries=(typeof main.serie==='string'?main.serie:(main.serie?.name||main.series?.name||main.series||''));
+ if(SETS[sid])delete SETS[sid]._catalogueOnly;
  if(!SETS[sid]){
    SETS[sid]={id:sid,name:main.name||sid,series:apiSeries||'Pokémon TCG',desc:'Master set',baseTotal:main.cardCount?.total||cs.length,masterTotal:main.cardCount?.total||cs.length,variantStrategy:'detail',releaseDate:main.releaseDate||'',logo:main.logo||''};
  }else{
@@ -10030,7 +10058,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.15.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.16.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>{
   const m=b.closest('.modal');
   m.classList.remove('open');
@@ -10583,11 +10611,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0160b',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0161',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0160b_controller_reload';
+      const key='dexbinder_v0161_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
