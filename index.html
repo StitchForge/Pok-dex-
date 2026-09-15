@@ -3645,6 +3645,12 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 .libraryTabs{display:flex;gap:6px;margin-top:8px}.universalLibraryCard{align-items:center}.universalLibraryActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.librarySetIdentity{min-width:0}.universalLibraryCard h3{margin-bottom:3px}.universalLibraryCard p{line-height:1.35}
 @media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
+
+/* v0.16.0a — universal catalogue polish */
+.card>.universalNoArtwork{inset:0 0 27px;position:absolute;border-radius:10px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 5%,var(--db-panel)),var(--db-panel))}
+.card.noArtwork{background:var(--db-panel)}
+.card.noArtwork>.tag{z-index:3}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -3697,7 +3703,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version">v0.15.5b</div>
+  <div class="version" id="buildVersion">v0.16.0a</div>
 </div>
 
   <section id="homeScreen">
@@ -5478,6 +5484,23 @@ function retryImage(img){
  }
  img.style.display='none';
 }
+function retryUniversalBinderImage(img){
+ const fallback=img.dataset.fallback;
+ if(fallback && img.src!==fallback){
+   img.src=fallback;img.dataset.fallback='';return;
+ }
+ const card=img.closest('.card');
+ if(!card){img.style.display='none';return}
+ const noArt=document.createElement('div');
+ noArt.className='binderNoArtwork universalNoArtwork';
+ noArt.innerHTML=`<div class="binderNoArtworkMark">TCG</div>
+   <small>ARTWORK UNAVAILABLE</small>
+   <b>${escapeHtml(img.dataset.cardName||'Card')}</b>
+   <span>${escapeHtml(img.dataset.setName||SETS[currentSet]?.name||'Pokémon TCG')}</span>
+   <em>#${escapeHtml(img.dataset.cardNumber||'—')}${img.dataset.variantLabel?` · ${escapeHtml(img.dataset.variantLabel)}`:''}</em>`;
+ img.replaceWith(noArt);
+ card.classList.add('noArtwork');
+}
 function numSort(a,b){let aa=String(a.localId),bb=String(b.localId); if(aa.startsWith('GG')||bb.startsWith('GG')) return aa.localeCompare(bb,undefined,{numeric:true}); return (+aa||9999)-(+bb||9999)}
 function variantsFor(sid,c){
   const d=detailCache[c.id];
@@ -5602,8 +5625,25 @@ let openSetEras=loadOpenEras();
 function setCustomChasePick(sid,cid){if(cid)chasePicks[sid]=cid;else delete chasePicks[sid];saveChasePicks();renderSetCards()}
 function customChaseCard(sid){const cid=chasePicks[sid];return cid?(cardsBySet[sid]||[]).find(c=>c.id===cid):null}
 function setEraName(s){
- const raw=String(s?.series||'Pokémon TCG');
- if(/mega/i.test(raw))return 'Mega Evolution';if(/scarlet.*violet/i.test(raw))return 'Scarlet & Violet';if(/sword.*shield/i.test(raw))return 'Sword & Shield';if(/sun.*moon/i.test(raw))return 'Sun & Moon';if(/\bxy\b/i.test(raw))return 'XY';if(/black.*white/i.test(raw))return 'Black & White';return raw;
+ const raw=String(s?.series||s?.serie||'').trim(),id=String(s?.id||'').toLowerCase(),name=String(s?.name||'');
+ const text=`${raw} ${name}`;
+ if(/mega evolution|mega/i.test(raw)||/^(me|meg)/.test(id))return 'Mega Evolution';
+ if(/scarlet.*violet/i.test(text)||/^sv/.test(id))return 'Scarlet & Violet';
+ if(/sword.*shield/i.test(text)||/^swsh/.test(id))return 'Sword & Shield';
+ if(/sun.*moon/i.test(text)||/^sm/.test(id))return 'Sun & Moon';
+ if(/\bxy\b/i.test(text)||/^xy/.test(id))return 'XY';
+ if(/black.*white/i.test(text)||/^bw/.test(id))return 'Black & White';
+ if(/heartgold|soulsilver/i.test(text)||/^hgss/.test(id))return 'HeartGold & SoulSilver';
+ if(/\bplatinum\b/i.test(text)||/^pl\d/.test(id))return 'Platinum';
+ if(/diamond.*pearl/i.test(text)||/^dp/.test(id))return 'Diamond & Pearl';
+ if(/\bex\b/i.test(raw)||/^ex\d/.test(id))return 'EX';
+ if(/e-?card/i.test(text)||/^ecard/.test(id)||/expedition|aquapolis|skyridge/i.test(name))return 'e-Card';
+ if(/\bneo\b/i.test(text)||/^neo/.test(id))return 'Neo';
+ if(/\bgym\b/i.test(text)||/^gym/.test(id))return 'Gym';
+ if(/team rocket/i.test(name)||/^base/.test(id)||/base set|jungle|fossil/i.test(name))return 'Original Series';
+ if(/pop series/i.test(name)||/^pop/.test(id))return 'POP Series';
+ if(/promo/i.test(name))return raw&&raw!=='Pokémon TCG'?raw:'Promos & Special Sets';
+ return raw&&raw!=='Pokémon TCG'?raw:'Other / Special Sets';
 }
 function eraFallbackRank(era){return ({'Mega Evolution':700,'Scarlet & Violet':600,'Sword & Shield':500,'Sun & Moon':400,'XY':300,'Black & White':200})[era]||100}
 function setReleaseTime(s){const d=Date.parse(s?.releaseDate||'');return Number.isFinite(d)?d:0}
@@ -5767,6 +5807,9 @@ async function loadSet(sid){
  SETS[sid].baseTotal=main.cardCount?.total||cardsBySet[sid].length;
  SETS[sid].masterTotal=variantReadyBySet[sid]?masterItems(sid).length:(SETS[sid].masterTotal||SETS[sid].baseTotal);
  SETS[sid].desc=`${setEraName(SETS[sid])} · ${cardsBySet[sid].length} catalogue cards`;
+ const catalogueRow=supportedResolved.find(x=>x.id===sid);
+ if(catalogueRow)catalogueRow.era=setEraName({...SETS[sid],id:sid});
+
 
 
  if(sid!=='sv03.5'){
@@ -5967,7 +6010,7 @@ function cardHTML(x){
  let summary=cardCollectorSummary(currentSet,c);
  let quantityBadge=summary.quantity>ownedCount?`<div class="collectBadge">×${summary.quantity}</div>`:'';
  let tradeBadge=summary.forTrade?`<div class="tradeBadge">Trade</div>`:'';
- return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" alt="${c.name}" onload="this.classList.add('loaded')" onerror="retryImage(this)"><div class="fallback">#${c.localId}<br>${c.name}</div>${quantityBadge}${tradeBadge}${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
+ return `<article class="card ${stateClass}" data-cid="${c.id}" data-variant="${variant?.id||''}"><img src="${image(c)}" data-fallback="${assetFallback(c)}" data-card-name="${escapeHtml(c.name)}" data-card-number="${escapeHtml(String(c.localId||'—'))}" data-set-name="${escapeHtml(SETS[currentSet]?.name||c.set?.name||'Pokémon TCG')}" data-variant-label="${escapeHtml(variant?variant.label:'')}" alt="${escapeHtml(c.name)}" onload="this.classList.add('loaded')" onerror="retryUniversalBinderImage(this)">${quantityBadge}${tradeBadge}${!variant&&vs.length>1?`<div class="variantCount">${label}</div>`:''}<div class="tag">#${c.localId} · ${variant?variant.label:c.name}</div><div class="tick">✓</div>${pk?`<div class="price">${pk}</div>`:''}</article>`
 }
 
 const GG_PRICE_CACHE_KEY='dexbinder_v085_gg_tcgplayer_prices';
@@ -10353,7 +10396,7 @@ async function resolveSupportedLibrary(force=false){
       logo:brief.logo||existing?.logo||''
     };
     if(!Object.prototype.hasOwnProperty.call(variantReadyBySet,brief.id))variantReadyBySet[brief.id]=(brief.id==='sv03.5');
-    return {id:brief.id,name:brief.name||brief.id,era:setEraName(SETS[brief.id]),cardCount:brief.cardCount,releaseDate:brief.releaseDate||'',logo:brief.logo||''};
+    return {id:brief.id,name:brief.name||brief.id,era:setEraName({...SETS[brief.id],id:brief.id,name:brief.name}),cardCount:brief.cardCount,releaseDate:brief.releaseDate||'',logo:brief.logo||''};
   }).filter(x=>x.id);
   saveActiveSets();
   return supportedResolved;
@@ -10458,11 +10501,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0160',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0160a',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0160_controller_reload';
+      const key='dexbinder_v0160a_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
