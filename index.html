@@ -3936,6 +3936,13 @@ body[data-theme="umbreon"] .trainerStyleRow .stylePill.active{background:#342e58
 .trainerPerchFront{display:none!important}
 </style>
 
+<style id="v0182f-authored-scenes">
+.trainerArt{--db-seat-y:64.2%;--db-partner-x:69%;--db-partner-y:61%;background-position:center!important}
+.trainerRigSvg{width:47%;height:96%;left:13%;bottom:-9%;transform:none;z-index:2}
+.trainerSceneForeground{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:3;pointer-events:none}
+.trainerPartnerSlot{position:absolute;z-index:2;left:62%;top:38%;width:30%;height:48%;pointer-events:none}
+.trainerArt:after{z-index:5}
+</style>
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -4012,7 +4019,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2e</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2f</div>
 </div>
 
   <section id="homeScreen">
@@ -5190,8 +5197,8 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
     <circle cx="300" cy="232" r="20" fill="#fff7fd"/><path d="M291 232h18M300 223v18" stroke="#806be6" stroke-width="6"/>
   </g>
 </svg>
-<!-- foreground occlusion: the scene's shared perch edge -->
-
+<div class="trainerPartnerSlot" aria-hidden="true"></div>
+<img class="trainerSceneForeground" alt="" aria-hidden="true">
 </div></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
     <div class="trainerQuickBuilder">
  <div class="trainerScenePickerHead"><b>TRAINER</b><span>Seated rig · saved to this profile</span></div>
@@ -11361,6 +11368,7 @@ function renderTrainerScenePrefs(){
  const pref=trainerPrefsForCurrent(),scene=TRAINER_SCENES[pref.scene]?pref.scene:'sunset-lake';
  art.style.setProperty('--trainer-bg',`url("${TRAINER_SCENES[scene]}")`);
  art.setAttribute('aria-label',`${scene.replaceAll('-',' ')} trainer background preview`);
+ const fg=$('.trainerSceneForeground');if(fg)fg.src=`./trainer-fg-${scene}.webp`;art.dataset.scene=scene;
  $$('[data-trainer-scene]').forEach(b=>b.classList.toggle('active',b.dataset.trainerScene===scene));
 }
 function applyTrainerAppearance(){
