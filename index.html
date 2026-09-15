@@ -3617,7 +3617,7 @@ body[data-theme="umbreon"] .huntSessionHero small,body[data-theme="umbreon"] .hu
 .dashboardBinderArtwork{width:100%;height:100%;border-radius:inherit}
 
 
-/* v0.15.6 — Custom Binder artwork states */
+/* v0.16.0 — Custom Binder artwork states */
 .binderPocket.noArtwork{background:linear-gradient(145deg,color-mix(in srgb,var(--db-panel-2) 92%,var(--db-purple)),var(--db-panel));border-style:solid}
 .binderNoArtwork{position:absolute;inset:0 0 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px;text-align:center;color:var(--db-muted)}
 .binderNoArtworkMark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--db-purple) 13%,var(--db-panel));border:1px solid color-mix(in srgb,var(--db-purple) 25%,var(--db-line));color:var(--db-purple);font-size:.43rem;font-weight:1000;margin-bottom:7px}
@@ -3630,7 +3630,7 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 
 .cardExploreLinks{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px}.detailSetLink,.detailArtistLink{border:0;background:none;padding:0;color:var(--db-purple);font:inherit;font-size:.48rem;font-weight:900;text-decoration:underline;text-underline-offset:2px;text-align:left}.setBackRow{display:flex;gap:7px;align-items:center}
 
-/* v0.15.6 — Custom Binder Discovery prompts */
+/* v0.16.0 — Custom Binder Discovery prompts */
 .dashboardBinderDiscovery{margin-top:11px;padding-top:10px;border-top:1px solid var(--db-line)}
 .dashboardBinderDiscoveryHead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
 .dashboardBinderDiscoveryHead b{display:block;font-size:.61rem;color:var(--db-text)}
@@ -3639,6 +3639,11 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 .dashboardBinderPrompt{flex:0 0 170px;min-height:112px;border:1px solid var(--db-line);border-radius:15px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 8%,var(--db-panel)),var(--db-panel));color:var(--db-text);padding:11px;text-align:left;scroll-snap-align:start;box-shadow:var(--db-shadow-soft)}
 .dashboardBinderPrompt>span{font-size:1rem;display:block;margin-bottom:5px}.dashboardBinderPrompt b{display:block;font-size:.58rem;line-height:1.2}.dashboardBinderPrompt small{display:block;font-size:.43rem;line-height:1.35;color:var(--db-muted);margin-top:4px}.dashboardBinderPrompt em{display:block;font-size:.41rem;font-style:normal;font-weight:900;color:var(--db-purple);margin-top:8px}
 @media(max-width:430px){.dashboardBinderDiscoveryHead{align-items:flex-start}.dashboardBinderDiscoveryHead .btn{white-space:nowrap}}
+
+
+/* v0.16.0 — Universal Set Support */
+.libraryTabs{display:flex;gap:6px;margin-top:8px}.universalLibraryCard{align-items:center}.universalLibraryActions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}.librarySetIdentity{min-width:0}.universalLibraryCard h3{margin-bottom:3px}.universalLibraryCard p{line-height:1.35}
+@media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3813,12 +3818,13 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
   <section id="libraryScreen" class="hidden">
     <button class="btn small" id="libraryBack">← My Dex</button>
     <div class="hero" style="margin-top:10px">
-      <div class="eyebrow">Collection library</div>
+      <div class="eyebrow">Universal catalogue</div>
       <h1>Set Library</h1>
-      <p>Add the master sets you actively collect. Only active sets count toward My Dex and Global Hunt.</p>
+      <p>Browse the full Pokémon TCG set catalogue. Open any set without adding it to My Active Sets.</p>
     </div>
     <div class="libraryControls">
-      <input class="search librarySearch" id="librarySearch" placeholder="Search sets or Pokémon…">
+      <input class="search librarySearch" id="librarySearch" placeholder="Search every set or era…">
+      <div class="libraryTabs"><button class="chip active" data-library-scope="all">All Sets</button><button class="chip" data-library-scope="mine">My Active Sets</button></div>
     </div>
     <div id="libraryStatus" class="statusLine"></div>
     <div id="libraryList" class="libraryGrid"></div>
@@ -4807,6 +4813,13 @@ const SUPPORTED_LIBRARY=[
 
 let allSetBriefs=[];
 let supportedResolved=[];
+let libraryScope='all';
+const UNIVERSAL_SET_CACHE_KEY='dexbinder_v016_set_catalogue';
+function loadUniversalSetCatalogue(){
+ try{const x=JSON.parse(localStorage.getItem(UNIVERSAL_SET_CACHE_KEY)||'[]');return Array.isArray(x)?x:[]}catch(e){return []}
+}
+function saveUniversalSetCatalogue(){try{localStorage.setItem(UNIVERSAL_SET_CACHE_KEY,JSON.stringify(allSetBriefs))}catch(e){}}
+
 let activeSetIds=new Set();
 try{
   const savedActive=JSON.parse(localStorage.getItem('dexbinder_v05_active_sets')||'null');
@@ -5662,11 +5675,14 @@ function dashboardChaseCard(sid){
  if(!cards.length)return null;
  const scored=cards.map(c=>{
    const name=String(c.name||'');
+   const detail=detailCache[c.id]||c;
+   const prices=variantsFor(sid,c).map(v=>tradeReferencePrice(detail,v.id)).filter(Number.isFinite);
+   const market=prices.length?Math.max(...prices):0;
    const local=String(c.localId||c.id||'');
    const nums=local.match(/\d+/g)||['0'];
    const number=Number(nums[nums.length-1])||0;
    const lower=name.toLowerCase();
-   let score=number;
+   let score=number+(market*250);
    if(/\b(ex|vstar|vmax|gx|v)\b/i.test(name))score+=900;
    if(/^gg/i.test(local))score+=1100;
    if(c.category==='Pokemon'||c.category==='Pokémon')score+=500;
@@ -5724,6 +5740,10 @@ async function loadSet(sid){
  if(!r.ok) throw new Error(`Set ${sid} HTTP ${r.status}`);
  const main=await r.json();
  let cs=(main.cards||[]).map(x=>({...x}));
+ // Universal sets become first-class as soon as they are opened.
+ for(const c of cs)cacheDiscoveryCard(sid,c);
+ saveDiscoveryCardCache();
+
 
  const apiSeries=(typeof main.serie==='string'?main.serie:(main.serie?.name||main.series?.name||main.series||''));
  if(!SETS[sid]){
@@ -5744,6 +5764,10 @@ async function loadSet(sid){
  }
  const map=new Map();cs.forEach(c=>map.set(c.id||c.localId,c));
  cardsBySet[sid]=[...map.values()].sort(numSort);
+ SETS[sid].baseTotal=main.cardCount?.total||cardsBySet[sid].length;
+ SETS[sid].masterTotal=variantReadyBySet[sid]?masterItems(sid).length:(SETS[sid].masterTotal||SETS[sid].baseTotal);
+ SETS[sid].desc=`${setEraName(SETS[sid])} · ${cardsBySet[sid].length} catalogue cards`;
+
 
  if(sid!=='sv03.5'){
    const targets=cardsBySet[sid].filter(c=>!(sid==='swsh12.5' && String(c.localId).startsWith('GG')));
@@ -9513,6 +9537,7 @@ async function viewFullSetFromCard(){
    const c=selected;
    SETS[sid]={id:sid,name:c?.set?.name||sid,series:c?.set?.serie?.name||'Pokémon TCG',desc:'Catalogue set',baseTotal:0,masterTotal:0,variantStrategy:'detail'};
  }
+ try{await resolveSupportedLibrary()}catch(e){}
  await openSet(sid,'binder');
  const ret=$('#returnFromSetBtn');
  if(ret){ret.textContent=origin==='customBinder'?'← Binder':origin==='artist'?'← Artist':origin==='tradeBinder'?'← Trade Binder':origin==='setMarket'?'← Set Market':'← Card';ret.classList.remove('hidden')}
@@ -9925,6 +9950,12 @@ $('#backBtn').onclick=goHome;
 $('#returnFromSetBtn').onclick=returnFromFullSet;$('#huntBack').onclick=goHome;
 $('#libraryBack').onclick=goHome;
 $('#librarySearch').oninput=renderLibrary;
+$$('[data-library-scope]').forEach(b=>b.onclick=()=>{
+ libraryScope=b.dataset.libraryScope;
+ $$('[data-library-scope]').forEach(x=>x.classList.toggle('active',x===b));
+ renderLibrary();
+});
+
 
 $('#search').oninput=()=>{rememberAllScroll();page=1;renderSet()};
 configurePageSizeOptions();
@@ -10294,35 +10325,36 @@ $$('[data-price]').forEach(b=>b.onclick=()=>{
 });
 document.addEventListener('click',e=>{if(e.target.closest('.huntSet')&&e.target.closest('.huntSet').dataset.set==='all')openGlobalHunt()});
 
-async function resolveSupportedLibrary(){
-  if(supportedResolved.length)return supportedResolved;
-  const r=await fetch(`${API}/sets`);
-  if(!r.ok)throw new Error(`Set library HTTP ${r.status}`);
-  allSetBriefs=await r.json();
-
-  supportedResolved=SUPPORTED_LIBRARY.map(spec=>{
-    const brief=allSetBriefs.find(x=>String(x.name).toLowerCase()===spec.name.toLowerCase());
-    if(!brief)return null;
-    if(!SETS[brief.id]){
-      SETS[brief.id]={
-        id:brief.id,name:brief.name,series:spec.era,desc:'Master set',
-        baseTotal:brief.cardCount?.total||0,
-        masterTotal:brief.cardCount?.total||0,
-        variantStrategy:brief.id==='sv03.5'?'known-151':'detail'
-      };
-    }else{
-      SETS[brief.id].series=spec.era;
-      SETS[brief.id].baseTotal=brief.cardCount?.total||SETS[brief.id].baseTotal;
-    }
-    if(!variantReadyBySet.hasOwnProperty(brief.id))variantReadyBySet[brief.id]=(brief.id==='sv03.5');
-    return {...spec,id:brief.id,cardCount:brief.cardCount};
-  }).filter(Boolean);
-
-  // migrate default IDs by resolved names if API naming differs
-  const crown=supportedResolved.find(x=>x.name==='Crown Zenith');
-  const one51=supportedResolved.find(x=>x.name==='151');
-  if(one51 && activeSetIds.has('sv03.5') && one51.id!=='sv03.5'){activeSetIds.delete('sv03.5');activeSetIds.add(one51.id)}
-  if(crown && activeSetIds.has('swsh12.5') && crown.id!=='swsh12.5'){activeSetIds.delete('swsh12.5');activeSetIds.add(crown.id)}
+async function resolveSupportedLibrary(force=false){
+  if(allSetBriefs.length&&!force)return supportedResolved;
+  let briefs=[];
+  try{
+    const r=await fetch(`${API}/sets`);
+    if(!r.ok)throw new Error(`Set library HTTP ${r.status}`);
+    briefs=await r.json();
+    if(!Array.isArray(briefs))briefs=[];
+    allSetBriefs=briefs;saveUniversalSetCatalogue();
+  }catch(e){
+    briefs=loadUniversalSetCatalogue();
+    if(!briefs.length)throw e;
+    allSetBriefs=briefs;
+  }
+  supportedResolved=briefs.map(brief=>{
+    const apiSeries=typeof brief.serie==='string'?brief.serie:(brief.serie?.name||brief.series?.name||brief.series||'Pokémon TCG');
+    const existing=SETS[brief.id];
+    SETS[brief.id]={
+      ...(existing||{}),id:brief.id,name:brief.name||existing?.name||brief.id,
+      series:existing?.series&&existing.series!=='Pokémon TCG'?existing.series:apiSeries,
+      desc:existing?.desc||'Pokémon TCG catalogue set',
+      baseTotal:brief.cardCount?.total||existing?.baseTotal||0,
+      masterTotal:existing?.masterTotal||brief.cardCount?.total||0,
+      variantStrategy:brief.id==='sv03.5'?'known-151':'detail',
+      releaseDate:brief.releaseDate||existing?.releaseDate||'',
+      logo:brief.logo||existing?.logo||''
+    };
+    if(!Object.prototype.hasOwnProperty.call(variantReadyBySet,brief.id))variantReadyBySet[brief.id]=(brief.id==='sv03.5');
+    return {id:brief.id,name:brief.name||brief.id,era:setEraName(SETS[brief.id]),cardCount:brief.cardCount,releaseDate:brief.releaseDate||'',logo:brief.logo||''};
+  }).filter(x=>x.id);
   saveActiveSets();
   return supportedResolved;
 }
@@ -10333,46 +10365,46 @@ async function openLibrary(){
   $('#globalHuntScreen').classList.add('hidden');
   $('#libraryScreen').classList.remove('hidden');
   $('#bottomNav').classList.add('hidden');
-  $('#libraryStatus').textContent='Loading supported sets…';
+  $('#libraryStatus').textContent='Loading the Pokémon TCG catalogue…';
   try{
     await resolveSupportedLibrary();
-    const missing=SUPPORTED_LIBRARY.length-supportedResolved.length;
-    $('#libraryStatus').textContent=`${supportedResolved.length} supported sets${missing?` · ${missing} unavailable from data source`:''}`;
+    $('#libraryStatus').textContent=`${supportedResolved.length} sets available · ${activeSetIds.size} in My Active Sets`;
     renderLibrary();
   }catch(e){
     $('#libraryStatus').textContent='';
-    $('#libraryList').innerHTML=`<div class="notice error">Could not load the Set Library: ${e.message}</div>`;
+    $('#libraryList').innerHTML=`<div class="notice error">Could not load the Set Library: ${escapeHtml(e.message||'Unknown error')}</div>`;
   }
 }
 function renderLibrary(){
   const q=$('#librarySearch').value.trim().toLowerCase();
-  const rows=supportedResolved.filter(x=>!q||x.name.toLowerCase().includes(q)||x.era.toLowerCase().includes(q));
-  const eras=[...new Set(rows.map(x=>x.era))];
+  let rows=supportedResolved.filter(x=>libraryScope==='all'||activeSetIds.has(x.id));
+  rows=rows.filter(x=>!q||`${x.name} ${x.era} ${SETS[x.id]?.series||''}`.toLowerCase().includes(q));
+  rows.sort((a,b)=>(Date.parse(b.releaseDate||'')||0)-(Date.parse(a.releaseDate||'')||0)||a.name.localeCompare(b.name));
+  const eras=[...new Set(rows.map(x=>x.era||'Pokémon TCG'))];
   $('#libraryList').innerHTML=eras.map(era=>{
-    const cards=rows.filter(x=>x.era===era).map(x=>{
-      const active=activeSetIds.has(x.id);
-      const total=SETS[x.id]?.masterTotal||x.cardCount?.total||'—';
-      return `<article class="libraryCard"><div><h3>${x.name}</h3><p>${x.cardCount?.total||'—'} numbered/set cards · master total ${variantReadyBySet[x.id]?total:'calculated when prepared'}</p><span class="pill ${active?'active':''}">${active?'In My Dex':'Available'}</span></div><button class="btn ${active?'':'dark'} toggleSet" data-set="${x.id}">${active?'Remove':'Add'}</button></article>`;
+    const cards=rows.filter(x=>(x.era||'Pokémon TCG')===era).map(x=>{
+      const active=activeSetIds.has(x.id),set=SETS[x.id],total=set?.masterTotal||x.cardCount?.total||'—';
+      return `<article class="libraryCard universalLibraryCard" data-library-open="${x.id}">
+        <div class="librarySetIdentity"><div><h3>${escapeHtml(x.name)}</h3><p>${escapeHtml(era)} · ${x.cardCount?.total||'—'} set cards · ${variantReadyBySet[x.id]?`${total} master positions`:'variants prepare on first open'}</p><span class="pill ${active?'active':''}">${active?'My Active Set':'Catalogue'}</span></div></div>
+        <div class="universalLibraryActions"><button class="btn small openLibrarySet" data-open-library-set="${x.id}">Open Set</button><button class="btn ${active?'':'dark'} toggleSet" data-set="${x.id}">${active?'Remove':'＋ My Sets'}</button></div>
+      </article>`;
     }).join('');
-    return `<div class="eraHead">${era}</div>${cards}`;
-  }).join('') || '<div class="emptyState">No supported sets match your search.</div>';
-  $$('.toggleSet').forEach(b=>b.onclick=async()=>{
+    return `<div class="eraHead">${escapeHtml(era)}</div>${cards}`;
+  }).join('') || `<div class="emptyState">${libraryScope==='mine'?'No active sets match your search.':'No catalogue sets match your search.'}</div>`;
+  $$('[data-open-library-set]').forEach(b=>b.onclick=e=>{e.stopPropagation();openUniversalSet(b.dataset.openLibrarySet)});
+  $$('.toggleSet').forEach(b=>b.onclick=async e=>{
+    e.stopPropagation();
     try{
-    const sid=b.dataset.set;
-    if(activeSetIds.has(sid)){
-      activeSetIds.delete(sid);saveActiveSets();renderLibrary();renderStats();return;
-    }
-    activeSetIds.add(sid);saveActiveSets();renderLibrary();renderStats();
-    toast(`${SETS[sid].name} added to My Dex`);
-    // Load base metadata in the background, but don't block the UI.
-    loadSet(sid).then(()=>{
-      renderStats();renderLibrary();
-      if(sid!=='sv03.5'&&!variantReadyBySet[sid]){
-        ensureVariantMetadata(sid).then(()=>{renderStats();renderLibrary()}).catch(e=>console.warn('Background master metadata prep skipped',e));
-      }
-    }).catch(e=>console.warn('Added set preload failed',e));
-    }catch(e){console.error('Set toggle failed',e);toast('Could not update that set')}
+      const sid=b.dataset.set;
+      if(activeSetIds.has(sid)){activeSetIds.delete(sid);saveActiveSets();renderLibrary();renderStats();toast(`${SETS[sid]?.name||sid} removed from My Active Sets`);return}
+      activeSetIds.add(sid);saveActiveSets();renderLibrary();renderStats();toast(`${SETS[sid]?.name||sid} added to My Active Sets`);
+      loadSet(sid).then(()=>{renderStats();renderLibrary()}).catch(e=>console.warn('Active set preload failed',e));
+    }catch(e){console.error(e);toast('Could not update that set')}
   });
+}
+async function openUniversalSet(sid){
+  if(!SETS[sid])await resolveSupportedLibrary();
+  try{await openSet(sid,'binder')}catch(e){console.error(e);toast('Could not open that set')}
 }
 
 
@@ -10426,11 +10458,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0156',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0160',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0156_controller_reload';
+      const key='dexbinder_v0160_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
@@ -10448,8 +10480,8 @@ function runSelfTest(){
     const c=counts(s.id);
     if(!Array.isArray(c) || c.length!==2 || !Number.isFinite(c[0]) || !Number.isFinite(c[1])) problems.push(`Invalid counts for ${s&&s.id}`);
   });
-  if(!SUPPORTED_LIBRARY.some(x=>x.name==='151'))problems.push('151 missing from supported library');
-  if(!SUPPORTED_LIBRARY.some(x=>x.name==='Crown Zenith'))problems.push('Crown Zenith missing from supported library');
+  if(!SETS['sv03.5'])problems.push('151 missing from set registry');
+  if(!SETS['swsh12.5'])problems.push('Crown Zenith missing from set registry');
   if(problems.length) throw new Error(problems.join('; '));
   return true;
 }
