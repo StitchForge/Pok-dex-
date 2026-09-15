@@ -3654,6 +3654,35 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 
 .notice.catalogueOnly{border-color:color-mix(in srgb,var(--db-purple) 28%,transparent);background:color-mix(in srgb,var(--db-panel) 90%,var(--db-purple));}
 .notice.catalogueOnly b{display:block;margin-bottom:5px}
+
+/* v0.16.0f — dark-mode compatibility for legacy/library surfaces */
+body[data-theme="umbreon"]{
+  --bg:var(--db-bg);--paper:var(--db-panel);--ink:var(--db-text);
+  --muted:var(--db-muted);--line:var(--db-line);--shadow:var(--db-shadow-soft);
+}
+body[data-theme="umbreon"] .libraryCard,
+body[data-theme="umbreon"] .emptyState{background:var(--db-panel);color:var(--db-text)}
+body[data-theme="umbreon"] .libraryCard h3{color:var(--db-text)}
+body[data-theme="umbreon"] .libraryCard p,body[data-theme="umbreon"] .eraHead{color:var(--db-muted)}
+body[data-theme="umbreon"] .pill{background:var(--db-panel-2);color:var(--db-muted)}
+body[data-theme="umbreon"] .pill.active{background:var(--db-mint);color:#8ee0bb}
+body[data-theme="umbreon"] .btn,body[data-theme="umbreon"] .libraryCard button{color:var(--db-text);background:var(--db-panel-2);border-color:var(--db-line)}
+body[data-theme="umbreon"] .btn.dark{background:var(--db-purple);color:#10131d;border-color:var(--db-purple)}
+@media(prefers-color-scheme:dark){
+ body[data-theme="system"]{
+   --bg:var(--db-bg);--paper:var(--db-panel);--ink:var(--db-text);
+   --muted:var(--db-muted);--line:var(--db-line);--shadow:var(--db-shadow-soft);
+ }
+ body[data-theme="system"] .libraryCard,
+ body[data-theme="system"] .emptyState{background:var(--db-panel);color:var(--db-text)}
+ body[data-theme="system"] .libraryCard h3{color:var(--db-text)}
+ body[data-theme="system"] .libraryCard p,body[data-theme="system"] .eraHead{color:var(--db-muted)}
+ body[data-theme="system"] .pill{background:var(--db-panel-2);color:var(--db-muted)}
+ body[data-theme="system"] .pill.active{background:var(--db-mint);color:#8ee0bb}
+ body[data-theme="system"] .btn,body[data-theme="system"] .libraryCard button{color:var(--db-text);background:var(--db-panel-2);border-color:var(--db-line)}
+ body[data-theme="system"] .btn.dark{background:var(--db-purple);color:#10131d;border-color:var(--db-purple)}
+}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
