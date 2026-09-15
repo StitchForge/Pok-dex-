@@ -3902,7 +3902,7 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBinderHero{background:var(--db-panel-2);color:var(--db-text)}
 @media(prefers-color-scheme:dark){body[data-theme="system"] .smartBinderCard,body[data-theme="system"] .smartBinderHero{background:var(--db-panel-2);color:var(--db-text)}}
 
-/* v0.17.1 — unified My Binders dashboard */
+/* v0.17.2 — unified My Binders dashboard */
 .dashboardCustomBinderRail{gap:10px;padding-bottom:7px}
 .dashboardCustomBinderCard,.dashboardSmartBinderCard{flex:0 0 min(205px,58vw);display:block;position:relative;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:17px;padding:9px;text-align:left;scroll-snap-align:start;overflow:hidden}
 .dashboardUnifiedCover{width:100%;height:116px;border-radius:12px;background:var(--db-panel-2);overflow:hidden;display:grid;place-items:center;margin-bottom:8px}
@@ -3912,7 +3912,7 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 .newBinderChoices{display:grid;gap:8px;margin-top:10px}.newBinderChoice{display:grid;grid-template-columns:38px minmax(0,1fr) auto;gap:9px;align-items:center;width:100%;border:1px solid var(--db-line);background:var(--db-panel);color:var(--db-text);border-radius:14px;padding:10px;text-align:left}.newBinderChoice>span{font-size:1.15rem}.newBinderChoice b{display:block;font-size:.62rem}.newBinderChoice small{display:block;color:var(--db-muted);font-size:.45rem;line-height:1.3;margin-top:2px}.newBinderIdeas{margin-top:12px;padding-top:10px;border-top:1px solid var(--db-line)}.newBinderIdeas>small{display:block;color:var(--db-muted);font-size:.45rem;margin-bottom:7px}.newBinderIdeaRail{display:flex;gap:7px;overflow-x:auto}.newBinderIdea{flex:0 0 150px;border:1px solid var(--db-line);background:var(--db-panel-2);color:var(--db-text);border-radius:13px;padding:9px;text-align:left}.newBinderIdea b{display:block;font-size:.52rem}.newBinderIdea small{display:block;color:var(--db-muted);font-size:.41rem;margin-top:3px}.smartCoverHero{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:center}.smartCoverHero img{width:58px;aspect-ratio:245/337;object-fit:cover;border-radius:8px}.smartCoverHeroCopy{min-width:0}
 
 </style>
-<div class="version" id="buildVersion">v0.17.1</div>
+<div class="version" id="buildVersion">v0.17.2</div>
 </div>
 
   <section id="homeScreen">
@@ -4763,12 +4763,17 @@ body[data-theme="umbreon"] .smartBinderCard,body[data-theme="umbreon"] .smartBin
 <div class="discoveryActions"><button class="btn dark" id="runDiscoverySearch">Search</button><button class="btn" id="saveDiscoverySearch">☆ Save Search</button><button class="btn" id="discoveryCreateBinder">＋ Create Binder from Results</button><button class="btn" id="discoveryCreateSmartBinder">✨ Create Smart Binder</button></div></div>
 <div class="setMarketStatus" id="discoveryStatus">Enter a Pokémon or card name to search the full catalogue.</div><div class="discoveryResults" id="discoveryResults"></div></div></div>
 <div class="modal" id="smartBinderModal"><div class="sheet binderViewSheet smartBinderSheet"><div class="grab"></div>
-<div class="detailTop"><div><div class="eyebrow">SMART BINDER</div><h2 id="smartBinderTitle">Smart Binder</h2><p id="smartBinderMeta">Live catalogue collection</p></div><button class="btn small close">Close</button></div>
-<div class="smartBinderHero" id="smartBinderHero"></div>
-<div class="binderViewActions"><button class="btn small" id="smartBinderEditRules">⚙️ Edit Rules</button><button class="btn small" id="smartBinderChasePick">⭐ Chase Pick</button><button class="btn small" id="smartBinderRefresh">↻ Refresh</button><button class="btn small" id="smartBinderDelete">Delete</button></div>
-<div class="binderFilterRow"><button class="chip active" data-smart-filter="all">All</button><button class="chip" data-smart-filter="owned">Owned</button><button class="chip" data-smart-filter="missing">Missing</button><button class="chip" data-smart-filter="wishlist">Wishlist</button></div>
-<div class="setMarketStatus" id="smartBinderStatus">Loading live results…</div><div class="binderGrid" id="smartBinderGrid"></div>
+<div class="detailTop"><div><div class="eyebrow">CUSTOM BINDER</div><h2 id="smartBinderTitle">Binder</h2><p id="smartBinderMeta">Live catalogue collection</p></div><button class="btn small close">Close</button></div>
+<div class="binderViewHero" id="smartBinderHero"></div>
+<div class="binderViewActions binderViewActionsFour">
+<button class="btn small" id="smartBinderEditRules">⚙️ Edit Rules</button><button class="btn small" id="smartBinderRefresh">↻ Refresh</button><button class="btn small dark" id="smartBinderChasePick">⭐ Chase Pick</button><button class="btn small" id="smartBinderCover">🖼 Cover</button><button class="btn small" id="smartBinderDetails">⚙️ Details</button>
+</div>
+<div class="binderFilterChips"><button class="chip active" data-smart-filter="all">Binder</button><button class="chip" data-smart-filter="missing">Missing</button><button class="chip" data-smart-filter="wishlist">Wishlist</button><button class="chip" data-smart-filter="owned">Owned</button></div>
+<div class="binderPageMeta"><div><b id="smartBinderPageLabel">Page 1 / 1</b><span id="smartBinderPageStats"></span></div><select class="select binderPageSize" id="smartBinderPageSize"><option value="9">9 / page</option><option value="12">12 / page</option><option value="all">All</option></select></div>
+<div class="binderEditHint" id="smartBinderStatus">Live positions recalculate from your current collection. Tap a card to view its details.</div><div class="binderVisualGrid" id="smartBinderGrid"></div>
+<div class="binderPager binderPagerTwo"><button class="btn small" id="smartBinderPrevPage">← Prev</button><button class="btn small" id="smartBinderNextPage">Next →</button></div>
 </div></div>
+<div class="modal" id="smartBinderDetailsModal"><div class="sheet"><div class="grab"></div><div class="detailTop"><div><div class="eyebrow">CUSTOM BINDER</div><h2 id="smartBinderDetailsTitle">Binder Details</h2><p>Smart rules maintain this custom binder automatically.</p></div><button class="btn small close">Close</button></div><div class="smartBinderHero" id="smartBinderDetailsBody"></div><div class="binderEditorActions"><button class="btn" id="smartBinderDetailsEdit">⚙️ Edit Rules</button><button class="btn" id="smartBinderDelete">Delete Binder</button></div></div></div>
 <div class="modal" id="huntHistoryModal"><div class="sheet huntHistorySheet"><div class="grab"></div><div class="detailTop"><div><div class="eyebrow">HUNT HISTORY</div><h2>Past Hunt Sessions</h2><p>Your saved convention hunts.</p></div><button class="btn small close">Close</button></div><div id="huntHistoryList"></div></div></div>
 <div class="modal" id="collectionValueModal"><div class="sheet valueIntelligenceSheet">
   <div class="grab"></div>
@@ -5111,7 +5116,8 @@ function saveCustomBinders(){
 let customBinders=loadCustomBinders();
 function loadSmartBinders(){try{const x=JSON.parse(localStorage.getItem(SMART_BINDERS_KEY)||'[]');return Array.isArray(x)?x.filter(b=>b&&b.id&&b.name&&b.rules).map(b=>({...b,chaseKey:b.chaseKey||'',lastOpenedAt:b.lastOpenedAt||b.updatedAt||b.createdAt||'',rules:{query:String(b.rules.query||''),ownership:b.rules.ownership||'all',rarity:b.rules.rarity||'',artist:b.rules.artist||'',maxPrice:b.rules.maxPrice||''}})):[]}catch(e){return []}}
 function saveSmartBinders(){try{localStorage.setItem(SMART_BINDERS_KEY,JSON.stringify(smartBinders))}catch(e){}try{renderSmartBinderRails()}catch(e){}}
-let smartBinders=loadSmartBinders(),activeSmartBinderId=null,editingSmartBinderId=null,smartBinderRows=[],smartBinderFilter='all',smartBinderChasePicking=false;
+let smartBinders=loadSmartBinders(),activeSmartBinderId=null,editingSmartBinderId=null,smartBinderRows=[],smartBinderFilter='all',smartBinderChasePicking=false,smartBinderViewPage=1;
+let smartBinderPageSize=(()=>{try{return localStorage.getItem('dexbinder_smart_binder_page_size')||localStorage.getItem('dexbinder_custom_binder_page_size')||'12'}catch(e){return '12'}})();
 function smartBinderById(id){return smartBinders.find(b=>b.id===id)||null}
 function smartRuleSummary(r={}){return [r.query,r.ownership&&r.ownership!=='all'?r.ownership:null,r.rarity,r.artist,r.maxPrice?`≤ $${r.maxPrice}`:null].filter(Boolean).join(' · ')}
 function renderSmartBinderRails(){
@@ -7012,12 +7018,18 @@ async function smartSearchRows(b){
 }
 function renderSmartBinderView(){
  const b=smartBinderById(activeSmartBinderId);if(!b)return;let rows=smartBinderRows;if(smartBinderFilter==='owned')rows=rows.filter(r=>r.owned);else if(smartBinderFilter==='missing')rows=rows.filter(r=>!r.owned);else if(smartBinderFilter==='wishlist')rows=rows.filter(r=>r.wanted);
- const ownedN=smartBinderRows.filter(r=>r.owned).length,total=smartBinderRows.length,value=smartBinderRows.filter(r=>r.owned&&Number.isFinite(r.unit)).reduce((n,r)=>n+r.unit,0);
- const chase=smartBinderChaseRow(b,smartBinderRows);$('#smartBinderTitle').textContent=b.name;$('#smartBinderMeta').textContent=`${ownedN}/${total} collected${total?` · ${Math.round(ownedN/total*100)}%`:''}`;$('#smartBinderHero').innerHTML=`<div class="smartCoverHero">${chase?.c?cardArtworkOrPlaceholder(chase.c,'low',''):''}<div class="smartCoverHeroCopy"><span class="smartTag">SMART</span><b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules))}</small>${chase?.c?`<small>Chase Pick · ${escapeHtml(chase.c.name)}</small>`:''}${value?`<small>${formatTradeMoney(value)} owned reference value</small>`:''}</div></div>`;$('#smartBinderStatus').textContent=`${rows.length} live position${rows.length===1?'':'s'} · recalculated from your current collection`;
- $('#smartBinderGrid').innerHTML=rows.length?rows.map((r,i)=>binderPocketHTML({sid:r.sid,cid:r.c.id,variantId:r.v.id,key:r.key,c:r.c,v:r.v,setName:r.c.set?.name||SETS[r.sid]?.name||r.sid,owned:r.owned,wanted:r.wanted,tradeTarget:tradeTargets.has(r.key)},i)).join(''):'<div class="collectionEmpty">No cards currently match these rules.</div>';
- $$('#smartBinderGrid [data-binder-card]').forEach(el=>el.onclick=()=>{const r=smartBinderRows.find(x=>x.key===el.dataset.binderCard);if(!r)return;if(smartBinderChasePicking){const b=smartBinderById(activeSmartBinderId);if(b){b.chaseKey=r.key;b.updatedAt=new Date().toISOString();smartBinderChasePicking=false;saveSmartBinders();renderSmartBinderView();renderDashboardCustomBinders();toast('Smart Binder Chase Pick updated ⭐')}return}$('#smartBinderModal').classList.remove('open');currentSet=r.sid;setCardDetailContext(null);openCard(r.c.id,r.v.id)});
+ const ownedN=smartBinderRows.filter(r=>r.owned).length,total=smartBinderRows.length,missing=smartBinderRows.filter(r=>!r.owned).length,wish=smartBinderRows.filter(r=>!r.owned&&r.wanted).length,value=smartBinderRows.filter(r=>r.owned&&Number.isFinite(r.unit)).reduce((n,r)=>n+r.unit,0);
+ const chase=smartBinderChaseRow(b,smartBinderRows);$('#smartBinderTitle').textContent=b.name;$('#smartBinderMeta').textContent=`${ownedN}/${total} owned · ${missing} missing${wish?` · ${wish} wishlisted`:''}`;
+ $('#smartBinderHero').innerHTML=`${chase?.c&&cardHasArtwork(chase.c)?`<img src="${binderCardImage(chase.c,'low')}" data-fallback="${assetFallback(chase.c,'low')}" onerror="showCardArtworkPlaceholder(this)" alt="">`:''}<div><b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules)||'Live custom collection')}<span class="binderPurposeBadge">SMART</span></small>${chase?.c?`<em>Chase Pick · ${escapeHtml(chase.c.name)}</em>`:''}${value?`<em>${formatTradeMoney(value)} owned reference value</em>`:''}</div>`;
+ const isAll=smartBinderPageSize==='all',size=isAll?Math.max(1,rows.length):Number(smartBinderPageSize||12),pages=isAll?1:Math.max(1,Math.ceil(rows.length/size));smartBinderViewPage=isAll?1:Math.min(Math.max(1,smartBinderViewPage),pages);const begin=isAll?0:(smartBinderViewPage-1)*size,pageRows=isAll?rows:rows.slice(begin,begin+size);
+ $('#smartBinderPageLabel').textContent=isAll?'All cards':`Page ${smartBinderViewPage} / ${pages}`;$('#smartBinderPageStats').textContent=smartBinderFilter==='all'?`${total} live positions`:`${rows.length} ${smartBinderFilter}`;$('#smartBinderPrevPage').disabled=isAll||smartBinderViewPage<=1;$('#smartBinderNextPage').disabled=isAll||smartBinderViewPage>=pages;$('#smartBinderPrevPage').classList.toggle('hidden',isAll);$('#smartBinderNextPage').classList.toggle('hidden',isAll);if($('#smartBinderPageSize').value!==smartBinderPageSize)$('#smartBinderPageSize').value=smartBinderPageSize;
+ $('#smartBinderStatus').textContent=`${total} live positions · recalculated from your current collection${smartBinderChasePicking?' · Tap a card to make it the Chase Pick':''}`;
+ $('#smartBinderGrid').innerHTML=pageRows.length?pageRows.map((r,i)=>binderPocketHTML({sid:r.sid,cid:r.c.id,variantId:r.v.id,key:r.key,c:r.c,v:r.v,setName:r.c.set?.name||SETS[r.sid]?.name||r.sid,owned:r.owned,wanted:r.wanted,tradeTarget:tradeTargets.has(r.key)},begin+i)).join(''):'<div class="collectionEmpty">No cards currently match this binder view.</div>';
+ $$('#smartBinderGrid [data-binder-card]').forEach(el=>el.onclick=()=>{const r=smartBinderRows.find(x=>x.key===el.dataset.binderCard);if(!r)return;if(smartBinderChasePicking){b.chaseKey=r.key;b.updatedAt=new Date().toISOString();smartBinderChasePicking=false;saveSmartBinders();renderSmartBinderView();renderDashboardCustomBinders();toast('Binder Chase Pick updated ⭐');return}$('#smartBinderModal').classList.remove('open');currentSet=r.sid;setCardDetailContext('smartBinder',{binderId:b.id});openCard(r.c.id,r.v.id)});
 }
-async function openSmartBinder(id){const b=smartBinderById(id);if(!b)return;smartBinderChasePicking=false;b.lastOpenedAt=new Date().toISOString();saveSmartBinders();activeSmartBinderId=id;smartBinderFilter='all';$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x.dataset.smartFilter==='all'));$('#smartBinderModal').classList.add('open');$('#smartBinderStatus').textContent='Refreshing live catalogue rules…';$('#smartBinderGrid').innerHTML='<div class="collectionEmpty">Loading Smart Binder…</div>';try{smartBinderRows=await smartSearchRows(b);renderSmartBinderView()}catch(e){$('#smartBinderStatus').textContent='Smart Binder could not refresh. Check your connection and try again.'}}
+async function openSmartBinder(id){const b=smartBinderById(id);if(!b)return;smartBinderChasePicking=false;b.lastOpenedAt=new Date().toISOString();saveSmartBinders();activeSmartBinderId=id;smartBinderFilter='all';smartBinderViewPage=1;$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x.dataset.smartFilter==='all'));$('#smartBinderModal').classList.add('open');$('#smartBinderStatus').textContent='Refreshing live catalogue rules…';$('#smartBinderGrid').innerHTML='<div class="collectionEmpty">Loading binder…</div>';try{smartBinderRows=await smartSearchRows(b);renderSmartBinderView()}catch(e){$('#smartBinderStatus').textContent='This binder could not refresh. Check your connection and try again.'}}
+function openSmartBinderDetails(){const b=smartBinderById(activeSmartBinderId);if(!b)return;$('#smartBinderDetailsTitle').textContent=b.name;$('#smartBinderDetailsBody').innerHTML=`<b>${escapeHtml(b.name)}</b><small>${escapeHtml(smartRuleSummary(b.rules)||'Live custom collection')}</small><small>Binder type · Smart</small><small>Purpose · Collection View</small><small>${b.chaseKey?'Manual Chase Pick selected':'Chase Pick · Automatic'}</small>`;$('#smartBinderDetailsModal').classList.add('open')}
+
 function editActiveSmartBinder(){const b=smartBinderById(activeSmartBinderId);if(!b)return;editingSmartBinderId=b.id;$('#smartBinderModal').classList.remove('open');openDiscovery();$('#discoveryName').value=b.name;$('#discoveryQuery').value=b.rules.query||'';$('#discoveryOwnership').value=b.rules.ownership||'all';$('#discoveryArtist').value=b.rules.artist||'';$('#discoveryMaxPrice').value=b.rules.maxPrice||'';$('#discoveryCreateSmartBinder').textContent='✨ Save Smart Binder Rules';renderDiscoveryRarities().then(()=>{$('#discoveryRarity').value=b.rules.rarity||''})}
 function deleteActiveSmartBinder(){const b=smartBinderById(activeSmartBinderId);if(!b||!confirm(`Delete Smart Binder "${b.name}"? No cards will be removed from your collection.`))return;smartBinders=smartBinders.filter(x=>x.id!==b.id);saveSmartBinders();activeSmartBinderId=null;$('#smartBinderModal').classList.remove('open');renderDashboardCustomBinders();toast('Smart Binder deleted')}
 
@@ -9698,7 +9710,7 @@ function setCardDetailContext(origin,state=null){
  const actions=$('#cardContextActions');
  if(back){
    back.textContent=origin==='globalHunt'?'← Back'
-     :origin==='customBinder'?'← Binder'
+     :origin==='customBinder'||origin==='smartBinder'?'← Binder'
      :origin==='artist'?'← Artist'
      :origin==='tradeBinder'?'← Trade Binder'
      :origin==='setMarket'?'← Set Market'
@@ -9718,6 +9730,10 @@ function closeCardDetail(){
    if(state?.binderId)activeCustomBinderId=state.binderId;
    $('#binderViewModal').classList.add('open');
    renderCustomBinderView();
+ }else if(origin==='smartBinder'){
+   if(state?.binderId)activeSmartBinderId=state.binderId;
+   $('#smartBinderModal').classList.add('open');
+   renderSmartBinderView();
  }else if(origin==='artist'){
    $('#artistModal').classList.add('open');
    renderArtistCollection();
@@ -9905,11 +9921,11 @@ async function openCard(cid,forcedVariant){
  let c=(cardsBySet[currentSet]||[]).find(x=>x.id===cid);if(!c)return;
  selected=c;$('#detailImg').dataset.fallback=assetFallback(c,'high');$('#detailImg').onerror=function(){retryImage(this)};$('#detailImg').src=image(c,'high');$('#detailName').textContent=c.name;
  $('#detailMeta').textContent=`${SETS[currentSet].name} · #${c.localId}${forcedVariant?` · ${variantsFor(currentSet,c).find(v=>v.id===forcedVariant)?.label||''}`:''}`;
- const chaseBtn=$('#setAsChasePick'),resetChaseBtn=$('#resetCardChasePick'),isCurrentChase=chasePicks[currentSet]===c.id;
+ const chaseBtn=$('#setAsChasePick'),resetChaseBtn=$('#resetCardChasePick'),smartContext=cardDetailOrigin==='smartBinder'?smartBinderById(cardDetailOriginState?.binderId):null,smartKey=smartContext?key(currentSet,c.id,forcedVariant||variantsFor(currentSet,c)[0]?.id||'base'):null,isCurrentChase=smartContext?smartContext.chaseKey===smartKey:chasePicks[currentSet]===c.id;
  chaseBtn.textContent=isCurrentChase?'★ Current Chase Pick':'★ Set as Chase Pick';
- chaseBtn.onclick=()=>{setCustomChasePick(currentSet,c.id);toast(`${c.name} is now the Chase Pick`);openCard(cid,forcedVariant)};
+ chaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey=smartKey;smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast(`${c.name} is now this binder's Chase Pick`);openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,c.id);toast(`${c.name} is now the Chase Pick`);openCard(cid,forcedVariant)}};
  resetChaseBtn.classList.toggle('hidden',!isCurrentChase);
- resetChaseBtn.onclick=()=>{setCustomChasePick(currentSet,null);toast('Chase Pick reset to automatic');openCard(cid,forcedVariant)};
+ resetChaseBtn.onclick=()=>{if(smartContext){smartContext.chaseKey='';smartContext.updatedAt=new Date().toISOString();saveSmartBinders();renderDashboardCustomBinders();toast('Binder Chase Pick reset to automatic');openCard(cid,forcedVariant)}else{setCustomChasePick(currentSet,null);toast('Chase Pick reset to automatic');openCard(cid,forcedVariant)}};
  const favBtn=$('#toggleFavouriteCard'),favVariant=forcedVariant||variantsFor(currentSet,c).find(v=>owned.has(key(currentSet,c.id,v.id)))?.id||null;
  favBtn.classList.toggle('hidden',!favVariant);
  if(favVariant){const favOn=isFavourite(currentSet,c.id,favVariant);favBtn.textContent=favOn?'♥ Favourite':'♡ Favourite';favBtn.classList.toggle('on',favOn);favBtn.onclick=()=>{const on=toggleFavourite(currentSet,c.id,favVariant);toast(on?'Added to favourites':'Removed from favourites');openCard(cid,forcedVariant);if(!$('#myCollectionScreen').classList.contains('hidden'))renderMyCollection()}}
@@ -10255,7 +10271,7 @@ async function renderGlobalHunt(){
  sortGlobalHuntRows();
  hydrateHuntPrices(items,generation);
 }
-function backup(){return JSON.stringify({version:'0.17.1',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
+function backup(){return JSON.stringify({version:'0.17.2',owned:[...owned],activeSets:[...activeSetIds],collectorMeta,tradeHistory,wishlist,setGoals,tradeTargets:[...tradeTargets],chasePicks,favourites:[...favourites],priceHistory,savedSearches,huntSessions,discoveryCardCache,customBinders,smartBinders,tradeBinderOrder,saved:new Date().toISOString()},null,2)}
 $$('.close').forEach(b=>b.onclick=()=>{
   const m=b.closest('.modal');
   m.classList.remove('open');
@@ -10402,10 +10418,15 @@ $('#saveDiscoverySearch').onclick=saveCurrentDiscoverySearch;
 $('#discoveryCreateBinder').onclick=createBinderFromDiscovery;
 $('#discoveryCreateSmartBinder').onclick=createSmartBinderFromDiscovery;
 $('#smartBinderRefresh').onclick=()=>activeSmartBinderId&&openSmartBinder(activeSmartBinderId);
-$('#smartBinderChasePick').onclick=()=>{if(!activeSmartBinderId||!smartBinderRows.length){toast('Refresh this Smart Binder first');return}smartBinderChasePicking=true;toast('Tap a card to make it the Chase Pick')};
+$('#smartBinderChasePick').onclick=$('#smartBinderCover').onclick=()=>{if(!activeSmartBinderId||!smartBinderRows.length){toast('Refresh this binder first');return}smartBinderChasePicking=true;renderSmartBinderView();toast('Tap a card to make it the Chase Pick')};
 $('#smartBinderEditRules').onclick=editActiveSmartBinder;
+$('#smartBinderDetails').onclick=openSmartBinderDetails;
+$('#smartBinderDetailsEdit').onclick=()=>{$('#smartBinderDetailsModal').classList.remove('open');editActiveSmartBinder()};
 $('#smartBinderDelete').onclick=deleteActiveSmartBinder;
-$$('[data-smart-filter]').forEach(btn=>btn.onclick=()=>{smartBinderFilter=btn.dataset.smartFilter;$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x===btn));renderSmartBinderView()});
+$('#smartBinderPageSize').onchange=()=>{smartBinderPageSize=$('#smartBinderPageSize').value;smartBinderViewPage=1;try{localStorage.setItem('dexbinder_smart_binder_page_size',smartBinderPageSize)}catch(e){}renderSmartBinderView()};
+$('#smartBinderPrevPage').onclick=()=>{smartBinderViewPage=Math.max(1,smartBinderViewPage-1);renderSmartBinderView()};
+$('#smartBinderNextPage').onclick=()=>{smartBinderViewPage++;renderSmartBinderView()};
+$$('[data-smart-filter]').forEach(btn=>btn.onclick=()=>{smartBinderFilter=btn.dataset.smartFilter;smartBinderViewPage=1;$$('[data-smart-filter]').forEach(x=>x.classList.toggle('active',x===btn));renderSmartBinderView()});
 $('#huntHistoryBtn').onclick=()=>{renderHuntHistory();$('#huntHistoryModal').classList.add('open')};
 $('#huntFinishBtn').onclick=finishHuntSession;
 $('#binderHuntBtn').onclick=openHuntMode;
@@ -10817,11 +10838,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0171',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0172',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0171_controller_reload';
+      const key='dexbinder_v0172_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
