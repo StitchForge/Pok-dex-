@@ -3877,6 +3877,19 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 }
 </style>
 
+
+<style id="v0182b-scene-containment">
+/* v0.18.2b — keep Trainer Scene artwork strictly inside its designated grid cell */
+.trainerScene{width:100%;min-width:0;overflow:hidden}
+.trainerScene>.trainerArt{box-sizing:border-box;width:100%;max-width:100%;min-width:0;height:auto;min-height:0;aspect-ratio:3/2;overflow:hidden;position:relative}
+.trainerScene>.trainerStats{min-width:0;position:relative;z-index:2}
+.trainerScene>.trainerStats .trainerStatBox{min-width:0;overflow:hidden}
+@media(max-width:430px){
+ .trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}
+ .trainerScene>.trainerArt{width:100%;max-width:100%;min-height:0}
+}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -3953,7 +3966,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2a</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2b</div>
 </div>
 
   <section id="homeScreen">
