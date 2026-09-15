@@ -3646,11 +3646,14 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 @media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
 
-/* v0.16.0c — universal catalogue polish */
+/* v0.16.0d — universal catalogue polish */
 .card>.universalNoArtwork{inset:0 0 27px;position:absolute;border-radius:10px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 5%,var(--db-panel)),var(--db-panel))}
 .card.noArtwork{background:var(--db-panel)}
 .card.noArtwork>.tag{z-index:3}
 
+
+.notice.catalogueOnly{border-color:color-mix(in srgb,var(--db-purple) 28%,transparent);background:color-mix(in srgb,var(--db-panel) 90%,var(--db-purple));}
+.notice.catalogueOnly b{display:block;margin-bottom:5px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -3703,7 +3706,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.0c</div>
+  <div class="version" id="buildVersion">v0.16.0d</div>
 </div>
 
   <section id="homeScreen">
@@ -5971,6 +5974,15 @@ function renderSet(){
 
  $('#viewTitle').textContent=view==='binder'?(binderMode==='compact'?'Binder · Compact':'Binder · Full master set'):'Missing cards';
  $('#snapshotBtn').classList.toggle('hidden',view!=='binder');
+
+ if(SETS[currentSet]?._catalogueOnly && !cs.length){
+   const n=catalogueCountForSet(currentSet);
+   $('#meta').textContent=n?`${n} announced cards · card catalogue pending`:'Card catalogue pending';
+   $('#pageToolsWrap').classList.add('hidden');
+   $('#content').className='';
+   $('#content').innerHTML=`<div class="notice catalogueOnly"><b>Card catalogue coming soon</b><br>${escapeHtml(SETS[currentSet]?.name||currentSet)} is already listed${n?` with ${n} announced cards`:''}, but individual card data is not available yet. DexBinder will build this binder automatically when the card feed is published.</div>`;
+   return;
+ }
 
  const needsVariants=(binderMode==='full'||view!=='binder');
  if(currentSet!=='sv03.5'&&needsVariants&&!variantReadyBySet[currentSet]){
