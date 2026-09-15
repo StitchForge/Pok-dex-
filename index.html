@@ -4004,6 +4004,45 @@ body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
 body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
 </style>
 
+
+<style id="v0182j-seat-geometry-fix">
+/* v0.18.2j — map the ACTUAL SVG pelvis to the authored scene seat anchor.
+   The previous build positioned the SVG box, not the character's hip point. */
+.trainerArt{
+  --db-seat-x:30%;
+  --db-seat-y:68%;
+  --db-partner-x:70%;
+  --db-partner-y:68%;
+  overflow:hidden!important;
+}
+.trainerRig{position:absolute!important;inset:0!important;overflow:hidden!important;pointer-events:none}
+.trainerRigSvg{
+  /* SVG pelvis centre is ~72.2% down the 600×900 viewBox.
+     At this rendered size, top:-11.6% maps it to y=68% of the scene. */
+  width:49%!important;
+  height:auto!important;
+  left:8%!important;
+  top:-11.6%!important;
+  bottom:auto!important;
+  transform:none!important;
+  transform-origin:center center!important;
+  overflow:visible!important;
+  z-index:2!important;
+}
+/* Reserve the right-hand side as a true independent partner layer. */
+.trainerPartnerSlot{
+  position:absolute!important;
+  left:58%!important;
+  top:37%!important;
+  width:34%!important;
+  height:39%!important;
+  z-index:2!important;
+  pointer-events:none!important;
+}
+/* Keep the authored ledge/background visible; no synthetic foreground walls. */
+.trainerSceneForeground{display:none!important}
+</style>
+
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -4080,7 +4119,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2i</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2j</div>
 </div>
 
   <section id="homeScreen">
