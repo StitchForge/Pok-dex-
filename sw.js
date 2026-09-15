@@ -1,4 +1,4 @@
-const CACHE='dexbinder-shell-v0182c';
+const CACHE='dexbinder-shell-v0182d';
 const APP_SHELL=[
   './',
   './index.html',
@@ -13,12 +13,6 @@ const APP_SHELL=[
   './trainer-bg-sunset-lake.webp',
   './trainer-bg-cozy-town.webp',
   './trainer-bg-forest-trail.webp',
-  './trainer-base.svg',
-  './trainer-hair-back.svg',
-  './trainer-eyes.svg',
-  './trainer-outfit.svg',
-  './trainer-hair-front.svg',
-  './trainer-accessory-cap.svg'
 ];
 
 self.addEventListener('install',event=>{

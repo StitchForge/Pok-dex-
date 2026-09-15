@@ -3894,6 +3894,18 @@ body[data-theme="umbreon"] :is(.cabinetCard.tier-bronze,.cabinetCard.tier-silver
 .trainerArt{position:relative}.trainerRig{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}.rigLayer{position:absolute;left:1%;bottom:-3%;width:61%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 5px 3px rgba(29,24,48,.20))}
 .trainerArt:after{z-index:5}.trainerQuickBuilder{margin-top:9px;padding:9px;border:1px solid rgba(98,77,151,.14);background:rgba(255,255,255,.60);border-radius:15px}.trainerBuildRow{display:flex;align-items:center;gap:7px;margin-top:8px}.trainerBuildRow span{width:42px;font-size:.39rem;font-weight:1000;color:#625a78}.trainerBuildRow button{width:25px;height:25px;border-radius:50%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(65,54,94,.18)}.trainerBuildRow button.active{box-shadow:0 0 0 3px #806be6}.trainerCapToggle{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:.4rem;font-weight:900;color:#625a78}.trainerCapToggle input{accent-color:#806be6}body[data-theme="umbreon"] .trainerQuickBuilder{background:rgba(29,35,49,.76);border-color:rgba(238,240,255,.10)}body[data-theme="umbreon"] .trainerBuildRow span,body[data-theme="umbreon"] .trainerCapToggle{color:#d9dcef}
 </style>
+<style id="v0182d-seated-rig">
+.trainerRig{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;--trainer-skin:#e9ae88;--trainer-hair:#49323c;--trainer-eyes:#6b4638;--trainer-outfit:#8b79eb}
+.trainerRigSvg{position:absolute;width:58%;height:103%;left:4%;bottom:-11%;overflow:visible;filter:drop-shadow(0 5px 4px rgba(24,20,42,.20))}
+.trainerPerchFront{position:absolute;z-index:4;left:0;right:0;bottom:0;height:19%;background:linear-gradient(180deg,rgba(65,55,67,0) 0%,rgba(55,47,55,.10) 10%,rgba(48,42,50,.20) 100%);clip-path:polygon(0 45%,100% 28%,100% 100%,0 100%);mix-blend-mode:multiply;opacity:.24}
+.hairStyle{display:none}.trainerRig[data-hair-style="long"] .hair-long,.trainerRig[data-hair-style="short"] .hair-short,.trainerRig[data-hair-style="pony"] .hair-pony{display:block}
+.trainerQuickBuilder .trainerBuildRow button:not(.stylePill){width:25px;height:25px;min-width:25px;padding:0;border-radius:50%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 1px rgba(65,54,94,.18)}
+.trainerQuickBuilder .trainerBuildRow button.active{box-shadow:0 0 0 3px #806be6}
+.trainerStyleRow{flex-wrap:wrap}.trainerStyleRow span{width:42px}.trainerStyleRow .stylePill{width:auto;height:29px;padding:0 10px;border-radius:999px;border:1px solid rgba(98,77,151,.18);background:rgba(255,255,255,.75);font-size:.38rem;font-weight:900;color:#4f4668}
+.trainerStyleRow .stylePill.active{background:#eee9ff;color:#4d3ca0;border-color:#806be6}
+body[data-theme="umbreon"] .trainerStyleRow .stylePill{background:#242a39;color:#e8e9f3;border-color:rgba(238,240,255,.12)}
+body[data-theme="umbreon"] .trainerStyleRow .stylePill.active{background:#342e58;border-color:#9e95ff}
+</style>
 </head>
 <body>
 <div class="themeAtmosphere" aria-hidden="true">
@@ -3970,7 +3982,7 @@ body[data-theme="umbreon"] .trainerScenePicker{background:rgba(29,35,49,.76);bor
 body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] .trainerSceneChoice{color:#f5f6fb}
 @media(max-width:430px){.trainerScene{grid-template-columns:minmax(0,1.38fr) minmax(105px,.72fr)}.trainerArt{min-height:178px}.trainerCardName{font-size:1.08rem}.trainerStatBox{padding:8px}.trainerStatBox b{font-size:.82rem}}
 </style>
-<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2c</div>
+<button class="profileHeaderBtn" id="profileHeaderBtn" type="button" onclick="openProfiles()">👤 My Profile</button><div class="version" id="buildVersion">v0.18.2d</div>
 </div>
 
   <section id="homeScreen">
@@ -5069,13 +5081,94 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
   <div class="trainerProfileHead"><div><span class="eyebrow">MY PROFILE</span><h2 id="profilePageTitle">Trainer Profile</h2><p>Your collection. Your journey.</p></div><button class="btn close trainerProfileMenu">Close</button></div>
   <section class="trainerCard" id="trainerCardShareArea">
     <div class="trainerCardTop"><div><div class="trainerCardLabel">DEXBINDER · TRAINER CARD</div><div class="trainerCardName" id="trainerCardName">MY PROFILE</div></div><div class="trainerNo" id="trainerCardNo">TRAINER NO. 0001</div></div>
-    <div class="trainerScene"><div class="trainerArt" role="img" aria-label="Trainer scene"><div class="trainerRig" aria-hidden="true"><img class="rigLayer hairBack" src="./trainer-hair-back.svg"><img class="rigLayer base" src="./trainer-base.svg"><img class="rigLayer eyes" src="./trainer-eyes.svg"><img class="rigLayer outfit" src="./trainer-outfit.svg"><img class="rigLayer hairFront" src="./trainer-hair-front.svg"><img class="rigLayer cap" src="./trainer-accessory-cap.svg"></div></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
-    <div class="trainerQuickBuilder"><div class="trainerScenePickerHead"><b>TRAINER</b><span>Saved to this profile</span></div>
-<div class="trainerBuildRow"><span>Skin</span><button data-skin="#f6c7aa"></button><button data-skin="#e9ae88"></button><button data-skin="#c9825f"></button><button data-skin="#8f553d"></button><button data-skin="#5d382e"></button></div>
-<div class="trainerBuildRow"><span>Hair</span><button data-hair="#211d2a"></button><button data-hair="#49323c"></button><button data-hair="#7a4b31"></button><button data-hair="#c58a50"></button><button data-hair="#e4c785"></button><button data-hair="#9a79d7"></button></div>
-<div class="trainerBuildRow"><span>Eyes</span><button data-eyes="#4d352d"></button><button data-eyes="#6f9b6b"></button><button data-eyes="#638bb6"></button><button data-eyes="#9b6b4f"></button></div>
-<div class="trainerBuildRow"><span>Outfit</span><button data-outfit="#8b79eb"></button><button data-outfit="#e27da7"></button><button data-outfit="#5c8fc8"></button><button data-outfit="#4f7c68"></button><button data-outfit="#30354f"></button></div>
-<label class="trainerCapToggle"><input id="trainerCapToggle" type="checkbox" checked> DexBinder cap</label></div><div class="badgeCase"><div class="badgeCaseHead"><div><div class="trainerCardLabel">SHOWCASE BADGES</div><b>Your collector achievements</b></div><button class="btn small" id="profileAchievementsBtn">View all</button></div><div class="trainerBadges"><div class="trainerBadge">★</div><div class="trainerBadge">◆</div><div class="trainerBadge">↔</div><div class="trainerBadge">✦</div><div class="trainerBadge">▣</div><div class="trainerBadge empty">＋</div></div></div>
+    <div class="trainerScene"><div class="trainerArt" role="img" aria-label="Trainer scene"><div class="trainerRig" aria-hidden="true">
+<svg class="trainerRigSvg" viewBox="0 0 600 900" role="presentation">
+  <!-- back hair -->
+  <g class="hairStyle hair-long" fill="var(--trainer-hair)">
+    <path d="M210 245c-54 35-71 104-60 181 9 62 0 130-38 187 52 1 92-21 119-60l38-107h62l38 107c27 39 67 61 119 60-38-57-47-125-38-187 11-77-6-146-60-181-43-28-137-28-180 0z"/>
+  </g>
+  <g class="hairStyle hair-short" fill="var(--trainer-hair)">
+    <path d="M204 264c18-88 174-104 205-7 14 43 5 97-17 130l-35-19-115 4-38 17c-26-34-31-83-20-125z"/>
+  </g>
+  <g class="hairStyle hair-pony" fill="var(--trainer-hair)">
+    <path d="M204 264c18-88 174-104 205-7 10 30 8 67-3 98l-43 13-121 4-38 17c-26-34-31-83-20-125z"/>
+    <path d="M401 293c76 14 91 81 50 142-12-49-39-55-77-58z"/>
+  </g>
+
+  <!-- head / neck -->
+  <g fill="var(--trainer-skin)" stroke="#332945" stroke-width="13" stroke-linejoin="round">
+    <path d="M226 274c-20 25-29 60-24 101 8 65 43 102 98 102s90-37 98-102c5-41-4-76-24-101-31-38-117-38-148 0z"/>
+    <path d="M266 454h68v66h-68z"/>
+  </g>
+
+  <!-- ears -->
+  <g fill="var(--trainer-skin)" stroke="#332945" stroke-width="11"><ellipse cx="202" cy="365" rx="16" ry="23"/><ellipse cx="398" cy="365" rx="16" ry="23"/></g>
+
+  <!-- face -->
+  <g stroke="#332945" stroke-width="8" stroke-linecap="round">
+    <path d="M232 340q27-16 51 1M317 341q25-17 51-1" fill="none"/>
+    <ellipse cx="258" cy="359" rx="10" ry="16" fill="var(--trainer-eyes)"/>
+    <ellipse cx="342" cy="359" rx="10" ry="16" fill="var(--trainer-eyes)"/>
+    <circle cx="261" cy="354" r="3.5" fill="#fff" stroke="none"/><circle cx="345" cy="354" r="3.5" fill="#fff" stroke="none"/>
+    <path d="M282 414q18 13 36 0" fill="none"/>
+  </g>
+
+  <!-- seated outfit / torso -->
+  <g stroke="#332945" stroke-width="13" stroke-linejoin="round">
+    <path fill="var(--trainer-outfit)" d="M225 505q75-38 150 0l35 145-78 17-16-78-5 91h-22l-5-91-16 78-78-17z"/>
+    <path fill="#fbf7ff" d="M264 496l36 49 36-49-18-14h-36z"/>
+    <path fill="#f1a6c8" d="M289 536h22l14 64-25 26-25-26z"/>
+    <!-- seated shorts/skirt block -->
+    <path fill="#34354f" d="M238 641q62-24 124 0l19 67-72 7-9-34-9 34-72-7z"/>
+    <!-- bent legs: thighs forward, shins down -->
+    <path fill="var(--trainer-skin)" d="M244 690q35-15 62 7l-12 61-82 34-23-45z"/>
+    <path fill="var(--trainer-skin)" d="M356 690q-35-15-62 7l12 61 82 34 23-45z"/>
+    <path fill="#34354f" d="M215 770l80-33 19 38-61 55-43 4z"/>
+    <path fill="#34354f" d="M385 770l-80-33-19 38 61 55 43 4z"/>
+    <path fill="#fff" d="M207 819h67l13 39h-96q-14-4-4-20z"/>
+    <path fill="#fff" d="M393 819h-67l-13 39h96q14-4 4-20z"/>
+    <!-- arms resting beside body -->
+    <path fill="var(--trainer-skin)" d="M217 531q-36 35-49 105l-8 73 42 5 23-79 31-58z"/>
+    <path fill="var(--trainer-skin)" d="M383 531q36 35 49 105l8 73-42 5-23-79-31-58z"/>
+  </g>
+
+  <!-- front hair -->
+  <g class="hairStyle hair-long" fill="var(--trainer-hair)" stroke="#332945" stroke-width="11" stroke-linejoin="round">
+    <path d="M206 303q17-105 94-108 77 3 94 108l-35 11-18-56-25 48-23-50-29 53-25-49-13 53z"/>
+    <path d="M213 309q-17 71 7 119l27-20-4-93zM387 309q17 71-7 119l-27-20 4-93z"/>
+  </g>
+  <g class="hairStyle hair-short" fill="var(--trainer-hair)" stroke="#332945" stroke-width="11" stroke-linejoin="round">
+    <path d="M204 307q16-107 96-111 80 4 96 111l-34 7-22-53-24 45-24-49-30 52-25-44-11 47z"/>
+  </g>
+  <g class="hairStyle hair-pony" fill="var(--trainer-hair)" stroke="#332945" stroke-width="11" stroke-linejoin="round">
+    <path d="M204 307q16-107 96-111 80 4 96 111l-34 7-22-53-24 45-24-49-30 52-25-44-11 47z"/>
+    <path d="M388 274q50 3 65 36-36 14-67 2z"/>
+  </g>
+
+  <!-- optional cap -->
+  <g class="trainerCap" stroke="#332945" stroke-width="11" stroke-linejoin="round">
+    <path fill="#f3a3ca" d="M214 229q86-65 172 0l-10 42H224z"/>
+    <path fill="#fff7fd" d="M225 267h176q18 0 24 17-56 16-115 2l-85-3z"/>
+    <circle cx="300" cy="232" r="20" fill="#fff7fd"/><path d="M291 232h18M300 223v18" stroke="#806be6" stroke-width="6"/>
+  </g>
+</svg>
+<!-- foreground occlusion: the scene's shared perch edge -->
+<div class="trainerPerchFront"></div>
+</div></div><div class="trainerStats"><div class="trainerStatBox"><small>MASTER COLLECTION</small><b id="trainerMasterPct">0%</b><div class="trainerProgress"><i id="trainerMasterBar" style="width:0%"></i></div></div><div class="trainerStatBox"><small>CARDS OWNED</small><b id="trainerPhysicalCards">0</b></div><div class="trainerStatBox"><small>MASTERED SETS</small><b id="trainerMasteredSets">0</b></div></div></div><div class="trainerScenePicker"><div class="trainerScenePickerHead"><b>SCENE</b><span>Saved to this profile</span></div><div class="trainerSceneChoices"><button class="trainerSceneChoice" type="button" data-trainer-scene="sunset-lake"><img src="./trainer-bg-sunset-lake.webp" alt="">Sunset Lake</button><button class="trainerSceneChoice" type="button" data-trainer-scene="cozy-town"><img src="./trainer-bg-cozy-town.webp" alt="">Cozy Town</button><button class="trainerSceneChoice" type="button" data-trainer-scene="forest-trail"><img src="./trainer-bg-forest-trail.webp" alt="">Forest Trail</button></div></div>
+    <div class="trainerQuickBuilder">
+ <div class="trainerScenePickerHead"><b>TRAINER</b><span>Seated rig · saved to this profile</span></div>
+ <div class="trainerBuildRow trainerStyleRow"><span>Hair style</span>
+   <button class="stylePill" data-hairstyle="short">Short</button>
+   <button class="stylePill" data-hairstyle="long">Long</button>
+   <button class="stylePill" data-hairstyle="pony">Ponytail</button>
+ </div>
+ <div class="trainerBuildRow"><span>Skin</span><button data-skin="#f6c7aa"></button><button data-skin="#e9ae88"></button><button data-skin="#c9825f"></button><button data-skin="#8f553d"></button><button data-skin="#5d382e"></button></div>
+ <div class="trainerBuildRow"><span>Hair</span><button data-hair="#211d2a"></button><button data-hair="#49323c"></button><button data-hair="#7a4b31"></button><button data-hair="#c58a50"></button><button data-hair="#e4c785"></button><button data-hair="#9a79d7"></button></div>
+ <div class="trainerBuildRow"><span>Eyes</span><button data-eyes="#4d352d"></button><button data-eyes="#6f9b6b"></button><button data-eyes="#638bb6"></button><button data-eyes="#9b6b4f"></button></div>
+ <div class="trainerBuildRow"><span>Outfit</span><button data-outfit="#8b79eb"></button><button data-outfit="#e27da7"></button><button data-outfit="#5c8fc8"></button><button data-outfit="#4f7c68"></button><button data-outfit="#30354f"></button></div>
+ <label class="trainerCapToggle"><input id="trainerCapToggle" type="checkbox" checked> DexBinder cap</label>
+</div>
+<div class="badgeCase"><div class="badgeCaseHead"><div><div class="trainerCardLabel">SHOWCASE BADGES</div><b>Your collector achievements</b></div><button class="btn small" id="profileAchievementsBtn">View all</button></div><div class="trainerBadges"><div class="trainerBadge">★</div><div class="trainerBadge">◆</div><div class="trainerBadge">↔</div><div class="trainerBadge">✦</div><div class="trainerBadge">▣</div><div class="trainerBadge empty">＋</div></div></div>
     <div class="trainerCardFoot"><span id="trainerSince">DEXBINDER COLLECTOR</span><button class="shareTrainerBtn" id="shareTrainerCardBtn">Share Trainer Card ↗</button></div>
   </section>
   <div class="profileStatGrid"><div class="profileStat"><em>🗂️</em><b id="profileBinderCount">0</b><small>Binders</small></div><div class="profileStat"><em>🎯</em><b id="profileWishlistCount">0</b><small>Wishlist</small></div><div class="profileStat"><em>↔️</em><b id="profileTradeCount">0</b><small>For Trade</small></div><div class="profileStat"><em>💎</em><b id="profileGradedCount">0</b><small>Graded</small></div></div>
@@ -11231,8 +11324,22 @@ function renderTrainerScenePrefs(){
  art.setAttribute('aria-label',`${scene.replaceAll('-',' ')} trainer background preview`);
  $$('[data-trainer-scene]').forEach(b=>b.classList.toggle('active',b.dataset.trainerScene===scene));
 }
-function applyTrainerAppearance(){const pref=trainerPrefsForCurrent(),rig=$('.trainerRig');if(!rig)return;const vals={skin:pref.skin||'#e9ae88',hair:pref.hair||'#49323c',eyes:pref.eyes||'#6b4638',outfit:pref.outfit||'#8b79eb'};$$('.trainerRig .base').forEach(x=>x.style.setProperty('--skin',vals.skin));$$('.trainerRig .hairBack,.trainerRig .hairFront').forEach(x=>x.style.setProperty('--hair',vals.hair));$$('.trainerRig .eyes').forEach(x=>x.style.setProperty('--eyes',vals.eyes));$$('.trainerRig .outfit').forEach(x=>x.style.setProperty('--outfit',vals.outfit));const cap=$('.trainerRig .cap');if(cap)cap.style.display=pref.cap===false?'none':'block';const toggle=$('#trainerCapToggle');if(toggle)toggle.checked=pref.cap!==false;$$('[data-skin],[data-hair],[data-eyes],[data-outfit]').forEach(b=>{const k=b.dataset.skin?'skin':b.dataset.hair?'hair':b.dataset.eyes?'eyes':'outfit',v=b.dataset[k];b.style.background=v;b.classList.toggle('active',vals[k]===v)})}
-function bindTrainerAppearance(){$$('[data-skin],[data-hair],[data-eyes],[data-outfit]').forEach(b=>b.onclick=()=>{const k=b.dataset.skin?'skin':b.dataset.hair?'hair':b.dataset.eyes?'eyes':'outfit';saveTrainerPrefsForCurrent({[k]:b.dataset[k]});applyTrainerAppearance()});const t=$('#trainerCapToggle');if(t)t.onchange=()=>{saveTrainerPrefsForCurrent({cap:t.checked});applyTrainerAppearance()};applyTrainerAppearance()}
+function applyTrainerAppearance(){
+ const pref=trainerPrefsForCurrent(),rig=$('.trainerRig');if(!rig)return;
+ const vals={skin:pref.skin||'#e9ae88',hair:pref.hair||'#49323c',eyes:pref.eyes||'#6b4638',outfit:pref.outfit||'#8b79eb',hairStyle:pref.hairStyle||'long'};
+ rig.style.setProperty('--trainer-skin',vals.skin);rig.style.setProperty('--trainer-hair',vals.hair);rig.style.setProperty('--trainer-eyes',vals.eyes);rig.style.setProperty('--trainer-outfit',vals.outfit);
+ rig.dataset.hairStyle=vals.hairStyle;
+ const cap=$('.trainerCap');if(cap)cap.style.display=pref.cap===false?'none':'block';
+ const toggle=$('#trainerCapToggle');if(toggle)toggle.checked=pref.cap!==false;
+ $$('[data-skin],[data-hair],[data-eyes],[data-outfit]').forEach(b=>{const k=b.dataset.skin?'skin':b.dataset.hair?'hair':b.dataset.eyes?'eyes':'outfit',v=b.dataset[k];b.style.background=v;b.classList.toggle('active',vals[k]===v)});
+ $$('[data-hairstyle]').forEach(b=>b.classList.toggle('active',b.dataset.hairstyle===vals.hairStyle));
+}
+function bindTrainerAppearance(){
+ $$('[data-skin],[data-hair],[data-eyes],[data-outfit]').forEach(b=>b.onclick=()=>{const k=b.dataset.skin?'skin':b.dataset.hair?'hair':b.dataset.eyes?'eyes':'outfit';saveTrainerPrefsForCurrent({[k]:b.dataset[k]});applyTrainerAppearance()});
+ $$('[data-hairstyle]').forEach(b=>b.onclick=()=>{saveTrainerPrefsForCurrent({hairStyle:b.dataset.hairstyle});applyTrainerAppearance()});
+ const t=$('#trainerCapToggle');if(t)t.onchange=()=>{saveTrainerPrefsForCurrent({cap:t.checked});applyTrainerAppearance()};
+ applyTrainerAppearance();
+}
 function bindTrainerScenePrefs(){
  $$('[data-trainer-scene]').forEach(b=>b.onclick=()=>{const scene=b.dataset.trainerScene;if(!TRAINER_SCENES[scene])return;saveTrainerPrefsForCurrent({scene});renderTrainerScenePrefs();toast('Trainer scene saved to this profile')});
  renderTrainerScenePrefs();
