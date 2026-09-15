@@ -3646,7 +3646,7 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 @media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
 
-/* v0.16.0b — universal catalogue polish */
+/* v0.16.0c — universal catalogue polish */
 .card>.universalNoArtwork{inset:0 0 27px;position:absolute;border-radius:10px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 5%,var(--db-panel)),var(--db-panel))}
 .card.noArtwork{background:var(--db-panel)}
 .card.noArtwork>.tag{z-index:3}
@@ -3703,7 +3703,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.0b</div>
+  <div class="version" id="buildVersion">v0.16.0c</div>
 </div>
 
   <section id="homeScreen">
@@ -5782,30 +5782,60 @@ function renderSetCards(){
  $$('.setGroup').forEach(d=>d.ontoggle=()=>{const era=d.dataset.era;if(d.open)openSetEras.add(era);else openSetEras.delete(era);saveOpenEras()});
  $$('.openSet').forEach(card=>{card.onclick=()=>openSet(card.dataset.set,'binder');card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openSet(card.dataset.set,'binder')}}});
 }
+async function fetchSetDetailSafe(sid){
+ const r=await fetch(`${API}/sets/${encodeURIComponent(sid)}`);
+ if(!r.ok)throw new Error(`Set detail HTTP ${r.status}`);
+ const data=await r.json();
+ if(!data||typeof data!=='object')throw new Error('Set detail returned no data');
+ return data;
+}
+async function fetchCatalogueCardsForSet(sid){
+ // TCGdex CardBrief IDs are set-prefixed. This fallback intentionally uses the
+ // documented unpaginated card list, then narrows locally so unusual set IDs
+ // don't depend on undocumented nested-field filters.
+ const r=await fetch(`${API}/cards`);
+ if(!r.ok)throw new Error(`Card catalogue HTTP ${r.status}`);
+ const rows=await r.json();
+ if(!Array.isArray(rows))throw new Error('Card catalogue returned no list');
+ const prefix=`${sid}-`;
+ return rows.filter(c=>String(c?.id||'').startsWith(prefix)).map(c=>({...c}));
+}
+function cachedDiscoveryCardsForSet(sid){
+ return Object.entries(discoveryCardCache||{}).filter(([k,c])=>k.startsWith(`${sid}|`)||String(c?.id||'').startsWith(`${sid}-`)).map(([,c])=>({...c}));
+}
 async function loadSet(sid){
- if(cardsBySet[sid])return cardsBySet[sid];
- const r=await fetch(`${API}/sets/${sid}`);
- if(!r.ok) throw new Error(`Set ${sid} HTTP ${r.status}`);
- const main=await r.json();
- let cs=(main.cards||[]).map(x=>({...x}));
- // Universal sets become first-class as soon as they are opened.
- for(const c of cs)cacheDiscoveryCard(sid,c);
- saveDiscoveryCardCache();
-
-
+ if(cardsBySet[sid]?.length)return cardsBySet[sid];
+ let main=null,cs=[],detailError=null,fallbackError=null;
+ try{
+   main=await fetchSetDetailSafe(sid);
+   cs=Array.isArray(main.cards)?main.cards.map(x=>({...x})):[];
+   if(!cs.length)throw new Error('Set detail contained no cards');
+ }catch(e){
+   detailError=e;console.warn(`Universal set detail failed for ${sid}; trying catalogue fallback`,e);
+   try{cs=await fetchCatalogueCardsForSet(sid)}catch(err){fallbackError=err;console.warn(`Universal card fallback failed for ${sid}`,err)}
+   if(!cs.length)cs=cachedDiscoveryCardsForSet(sid);
+   if(!cs.length)throw new Error(`No card data available for ${SETS[sid]?.name||sid}`);
+   // Reconstruct enough set metadata to make the set a first-class DexBinder set.
+   const brief=(allSetBriefs||[]).find(x=>x.id===sid)||{};
+   main={id:sid,name:brief.name||SETS[sid]?.name||sid,logo:brief.logo||SETS[sid]?.logo||'',symbol:brief.symbol||'',cardCount:brief.cardCount||{total:cs.length,official:cs.length},releaseDate:brief.releaseDate||SETS[sid]?.releaseDate||'',cards:cs,_dexbinderFallback:true};
+ }
  const apiSeries=(typeof main.serie==='string'?main.serie:(main.serie?.name||main.series?.name||main.series||''));
  if(!SETS[sid]){
    SETS[sid]={id:sid,name:main.name||sid,series:apiSeries||'Pokémon TCG',desc:'Master set',baseTotal:main.cardCount?.total||cs.length,masterTotal:main.cardCount?.total||cs.length,variantStrategy:'detail',releaseDate:main.releaseDate||'',logo:main.logo||''};
  }else{
-   SETS[sid].baseTotal=main.cardCount?.total||cs.length;SETS[sid].releaseDate=main.releaseDate||SETS[sid].releaseDate||'';SETS[sid].logo=main.logo||SETS[sid].logo||'';
+   SETS[sid].name=main.name||SETS[sid].name||sid;
+   SETS[sid].baseTotal=main.cardCount?.total||cs.length;
+   SETS[sid].releaseDate=main.releaseDate||SETS[sid].releaseDate||'';
+   SETS[sid].logo=main.logo||SETS[sid].logo||'';
    if(apiSeries&&(!SETS[sid].series||SETS[sid].series==='Pokémon TCG'))SETS[sid].series=apiSeries;
  }
+ // Universal sets become reusable by Discovery/Custom Binders after one successful open.
+ for(const c of cs)cacheDiscoveryCard(sid,c);
+ saveDiscoveryCardCache();
 
  if(sid==='swsh12.5'){
    try{
-     const ggR=await fetch(`${API}/sets/swsh12.5gg`);
-     if(!ggR.ok) throw new Error(`GG HTTP ${ggR.status}`);
-     const gg=await ggR.json();
+     const gg=await fetchSetDetailSafe('swsh12.5gg');
      const extra=(gg.cards||[]).map(x=>({...x,image:`https://assets.tcgdex.net/en/swsh/swsh12.5/${x.localId}`}));
      cs=[...cs,...extra];
    }catch(e){console.warn('Galarian Gallery failed',e);throw new Error('Crown Zenith Galarian Gallery could not load')}
@@ -5814,17 +5844,15 @@ async function loadSet(sid){
  cardsBySet[sid]=[...map.values()].sort(numSort);
  SETS[sid].baseTotal=main.cardCount?.total||cardsBySet[sid].length;
  SETS[sid].masterTotal=variantReadyBySet[sid]?masterItems(sid).length:(SETS[sid].masterTotal||SETS[sid].baseTotal);
- SETS[sid].desc=`${setEraName(SETS[sid])} · ${cardsBySet[sid].length} catalogue cards`;
+ SETS[sid].desc=`${setEraName({...SETS[sid],id:sid})} · ${cardsBySet[sid].length} catalogue cards${main._dexbinderFallback?' · resilient catalogue mode':''}`;
  const catalogueRow=supportedResolved.find(x=>x.id===sid);
  if(catalogueRow)catalogueRow.era=setEraName({...SETS[sid],id:sid});
-
-
 
  if(sid!=='sv03.5'){
    const targets=cardsBySet[sid].filter(c=>!(sid==='swsh12.5' && String(c.localId).startsWith('GG')));
    if(targets.length && targets.every(c=>variantCache[c.id])){
      variantReadyBySet[sid]=true;
-     if(SETS[sid])SETS[sid].masterTotal=masterItems(sid).length;
+     SETS[sid].masterTotal=masterItems(sid).length;
    }
  }
  return cardsBySet[sid];
@@ -5929,7 +5957,7 @@ async function openSet(sid,target='binder'){
      if(!SETS[sid])SETS[sid]={id:sid,name:cached[0]?.set?.name||sid,series:cached[0]?.set?.serie?.name||'Pokémon TCG',desc:'Catalogue set',baseTotal:cached.length,masterTotal:cached.length,variantStrategy:'detail'};
      $('#setSeries').textContent=SETS[sid].series||'Pokémon TCG';$('#setTitle').textContent=SETS[sid].name||sid;
      renderStats();renderSet();toast('Showing cached catalogue cards for this set');
-   }else $('#content').innerHTML='<div class="notice error">Could not load card data. Check your connection and try again.</div>';
+   }else $('#content').innerHTML='<div class="notice error">Could not load this set card data. DexBinder tried both the set feed and catalogue fallback.</div>';
  }
  setNav();
 }
