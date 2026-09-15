@@ -3646,7 +3646,7 @@ body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
 @media(max-width:520px){.universalLibraryCard{align-items:flex-start}.universalLibraryActions{width:100%;justify-content:flex-start;margin-top:8px}.universalLibraryActions .btn{flex:1}}
 
 
-/* v0.16.0a — universal catalogue polish */
+/* v0.16.0b — universal catalogue polish */
 .card>.universalNoArtwork{inset:0 0 27px;position:absolute;border-radius:10px;background:linear-gradient(145deg,color-mix(in srgb,var(--db-purple) 5%,var(--db-panel)),var(--db-panel))}
 .card.noArtwork{background:var(--db-panel)}
 .card.noArtwork>.tag{z-index:3}
@@ -3703,7 +3703,7 @@ body[data-theme="umbreon"] .themeAtmosphere .shootingStar{display:block!importan
 <div class="app">
   <div class="top">
   <div class="brand"><div class="ball"></div>DexBinder</div>
-  <div class="version" id="buildVersion">v0.16.0a</div>
+  <div class="version" id="buildVersion">v0.16.0b</div>
 </div>
 
   <section id="homeScreen">
@@ -5025,7 +5025,7 @@ function wishlistStats(){
 
 function collectionIntelligence(){
  const wishes=wishlistEntries();
- const active=[...activeSetIds].map(sid=>{
+ const active=sortSetIdsNewestFirst(activeSetIds).map(sid=>{
    const [have,total]=counts(sid),goal=goalTarget(sid)||total||0;
    const target=Math.max(0,goal),remaining=Math.max(0,target-have),pct=target?Math.min(100,Math.round(have/target*100)):0;
    const setWishes=wishes.filter(x=>x.sid===sid);
@@ -5647,6 +5647,14 @@ function setEraName(s){
 }
 function eraFallbackRank(era){return ({'Mega Evolution':700,'Scarlet & Violet':600,'Sword & Shield':500,'Sun & Moon':400,'XY':300,'Black & White':200})[era]||100}
 function setReleaseTime(s){const d=Date.parse(s?.releaseDate||'');return Number.isFinite(d)?d:0}
+function setNewestFirst(a,b){
+ const ta=setReleaseTime(a),tb=setReleaseTime(b);
+ if(tb!==ta)return tb-ta;
+ return String(b?.id||'').localeCompare(String(a?.id||''),undefined,{numeric:true});
+}
+function setIdNewestFirst(a,b){return setNewestFirst(SETS[a]||{id:a},SETS[b]||{id:b})}
+function sortSetIdsNewestFirst(ids){return [...ids].sort(setIdNewestFirst)}
+
 function normalizeSetLogo(raw){if(!raw)return '';if(typeof raw==='object')raw=raw.url||raw.image||raw.path||'';raw=String(raw||'');if(!raw)return '';return /\.(png|webp|jpg|jpeg|svg)(\?|$)/i.test(raw)?raw:raw+'.webp'}
 const SET_LOGO_OVERRIDES={
  'Temporal Forces':['./assets/temporal-forces-logo.png','https://assets.tcgdex.net/en/sv/sv05/logo.webp','https://assets.tcgdex.net/en/sv/sv05/logo.png']
@@ -5741,7 +5749,7 @@ function dashboardChaseImage(sid){
 
 function renderSetCards(){
  const box=$('#setCards');if(!box)return;
- const active=[...activeSetIds].map(id=>SETS[id]).filter(Boolean);
+ const active=sortSetIdsNewestFirst(activeSetIds).map(id=>SETS[id]).filter(Boolean);
  if(!active.length){box.innerHTML='<div class="emptyState">No active collections yet.<br><br><button class="btn dark" id="emptyLibraryBtn">Browse Set Library</button></div>';const b=$('#emptyLibraryBtn');if(b)b.onclick=openLibrary;return}
  const grouped=new Map();
  for(const s of active){const era=setEraName(s);if(!grouped.has(era))grouped.set(era,[]);grouped.get(era).push(s)}
@@ -8046,7 +8054,7 @@ async function openScanCard(){
   const select=$('#scanSetScope');
   const previous=select.value||'active';
   select.innerHTML='<option value="active">All active sets</option>'
-    +[...activeSetIds].map(sid=>`<option value="${sid}">${escapeHtml(SETS[sid]?.name||sid)}</option>`).join('')
+    +sortSetIdsNewestFirst(activeSetIds).map(sid=>`<option value="${sid}">${escapeHtml(SETS[sid]?.name||sid)}</option>`).join('')
     +'<option value="catalogue">All sets</option>';
   select.value=[...activeSetIds,'active','catalogue'].includes(previous)?previous:'active';
   $('#scanStatus').textContent='Ready. Photograph a card to begin.';
@@ -8690,7 +8698,7 @@ function renderAchievements(){
 function achievementDetailRows(c){
  const s=achievementStats();
  if(c.id==='sets'){
-   return [...activeSetIds].map(sid=>{
+   return sortSetIdsNewestFirst(activeSetIds).map(sid=>{
      const total=SETS[sid]?.masterTotal||0;let n=0;for(const k of owned)if(k.startsWith(`${sid}|`))n++;
      const pct=total?Math.min(100,Math.round(n/total*100)):0;
      return `<div class="cabinetDetailRow"><b>${escapeHtml(SETS[sid]?.name||sid)} · ${pct}%</b><small>${n.toLocaleString()} / ${total.toLocaleString()} master positions</small><div class="achievementProgress" style="margin-top:6px"><i style="width:${pct}%"></i></div></div>`;
@@ -10423,9 +10431,12 @@ function renderLibrary(){
   let rows=supportedResolved.filter(x=>libraryScope==='all'||activeSetIds.has(x.id));
   rows=rows.filter(x=>!q||`${x.name} ${x.era} ${SETS[x.id]?.series||''}`.toLowerCase().includes(q));
   rows.sort((a,b)=>(Date.parse(b.releaseDate||'')||0)-(Date.parse(a.releaseDate||'')||0)||a.name.localeCompare(b.name));
-  const eras=[...new Set(rows.map(x=>x.era||'Pokémon TCG'))];
+  const eras=[...new Set(rows.map(x=>x.era||'Pokémon TCG'))].sort((a,b)=>{
+    const newest=era=>Math.max(0,...rows.filter(x=>(x.era||'Pokémon TCG')===era).map(x=>Date.parse(x.releaseDate||SETS[x.id]?.releaseDate||'')||0));
+    return newest(b)-newest(a)||eraFallbackRank(b)-eraFallbackRank(a)||a.localeCompare(b);
+  });
   $('#libraryList').innerHTML=eras.map(era=>{
-    const cards=rows.filter(x=>(x.era||'Pokémon TCG')===era).map(x=>{
+    const cards=rows.filter(x=>(x.era||'Pokémon TCG')===era).sort((a,b)=>setNewestFirst(SETS[a.id]||a,SETS[b.id]||b)).map(x=>{
       const active=activeSetIds.has(x.id),set=SETS[x.id],total=set?.masterTotal||x.cardCount?.total||'—';
       return `<article class="libraryCard universalLibraryCard" data-library-open="${x.id}">
         <div class="librarySetIdentity"><div><h3>${escapeHtml(x.name)}</h3><p>${escapeHtml(era)} · ${x.cardCount?.total||'—'} set cards · ${variantReadyBySet[x.id]?`${total} master positions`:'variants prepare on first open'}</p><span class="pill ${active?'active':''}">${active?'My Active Set':'Catalogue'}</span></div></div>
@@ -10501,11 +10512,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0160a',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0160b',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0160a_controller_reload';
+      const key='dexbinder_v0160b_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
@@ -10701,7 +10712,7 @@ function initDexBinder(){
     renderSetCards();renderStats();
     // v0.10.1: load lightweight active-set card lists so dashboard artwork is available
     // even before the user opens each binder. Variant/detail metadata is not bulk-loaded here.
-    await Promise.allSettled([...activeSetIds].map(sid=>loadSet(sid)));
+    await Promise.allSettled(sortSetIdsNewestFirst(activeSetIds).map(sid=>loadSet(sid)));
     renderSetCards();
   }).catch(e=>console.warn('Set library preload skipped',e));
   try{bindSwipeNavigation()}catch(e){console.warn('Swipe navigation unavailable',e)}
