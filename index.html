@@ -3616,6 +3616,18 @@ body[data-theme="umbreon"] .huntSessionHero small,body[data-theme="umbreon"] .hu
 .binderCardArt{width:100%;height:100%;min-height:0;border-radius:inherit}
 .dashboardBinderArtwork{width:100%;height:100%;border-radius:inherit}
 
+
+/* v0.15.5c — Custom Binder artwork states */
+.binderPocket.noArtwork{background:linear-gradient(145deg,color-mix(in srgb,var(--db-panel-2) 92%,var(--db-purple)),var(--db-panel));border-style:solid}
+.binderNoArtwork{position:absolute;inset:0 0 28px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:9px;text-align:center;color:var(--db-muted)}
+.binderNoArtworkMark{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--db-purple) 13%,var(--db-panel));border:1px solid color-mix(in srgb,var(--db-purple) 25%,var(--db-line));color:var(--db-purple);font-size:.43rem;font-weight:1000;margin-bottom:7px}
+.binderNoArtwork small{font-size:.30rem;font-weight:950;letter-spacing:.06em;opacity:.72}
+.binderNoArtwork b{font-size:.61rem;color:var(--db-text);margin-top:5px;line-height:1.1}
+.binderNoArtwork span{font-size:.36rem;line-height:1.2;margin-top:4px;max-width:95%}
+.binderNoArtwork em{font-size:.37rem;font-style:normal;font-weight:850;margin-top:5px;color:var(--db-text)}
+.binderPocket.noArtwork .tag{background:color-mix(in srgb,var(--db-text) 88%,transparent)}
+body[data-theme="umbreon"] .binderNoArtwork{color:#d7dbea}
+
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./cloud-config.js"></script>
@@ -6289,6 +6301,28 @@ function showCardArtworkPlaceholder(img){
   c.innerHTML='<span>Image unavailable</span><b>Card artwork</b>';
   img.replaceWith(c);
 }
+function binderPocketNoArtwork(x){
+  const setName=x?.setName||x?.c?.set?.name||'Pokémon TCG';
+  return `<div class="binderNoArtwork">
+    <div class="binderNoArtworkMark">TCG</div>
+    <small>ARTWORK UNAVAILABLE</small>
+    <b>${escapeHtml(x?.c?.name||'Card')}</b>
+    <span>${escapeHtml(setName)}</span>
+    <em>#${escapeHtml(String(x?.c?.localId||'—'))} · ${escapeHtml(x?.v?.label||'Card')}</em>
+  </div>`;
+}
+function showBinderPocketNoArtwork(img){
+  const pocket=img.closest('.binderPocket');
+  if(!pocket)return;
+  const k=pocket.dataset.binderCard,p=cardPositionFromKey(k);
+  img.replaceWith((()=>{
+    const t=document.createElement('div');
+    t.innerHTML=binderPocketNoArtwork(p);
+    return t.firstElementChild;
+  })());
+  pocket.classList.remove('hasArtwork');pocket.classList.add('noArtwork');
+}
+
 function binderPositions(b){return (b?.cards||[]).map(cardPositionFromKey).filter(Boolean)}
 function binderRows(b){return binderPositions(b).filter(x=>!x.blank&&!x.unresolved)}
 function binderOwnedCount(b){return binderPositions(b).filter(x=>!x.blank&&x.owned).length}
@@ -6526,9 +6560,11 @@ function binderPocketHTML(x,globalIndex){
     x.tradeTarget&&!x.owned?'<span class="binderStatusBadge trade">TRADE TARGET</span>':''
   ].join('');
   const targetBadge=wish?.targetPrice?`<span class="binderTargetPrice">Target ≤ ${formatTradeMoney(Number(wish.targetPrice))}</span>`:'';
-  return `<article class="card binderPocket ${state} ${binderUnlocked?'unlocked':''}" data-binder-card="${x.key}" data-binder-index="${globalIndex}" data-binder-key="${x.key}">
-    <img src="${image(x.c)}" data-fallback="${assetFallback(x.c)}" alt="${escapeHtml(x.c.name)}" onload="this.classList.add('loaded')" onerror="retryImage(this)">
-    <div class="fallback">#${escapeHtml(String(x.c.localId))}<br>${escapeHtml(x.c.name)}</div>
+  const artwork=cardHasArtwork(x.c)
+    ? `<img src="${binderCardImage(x.c,'high')}" data-fallback="${assetFallback(x.c,'high')}" alt="${escapeHtml(x.c.name)}" onload="this.classList.add('loaded')" onerror="showBinderPocketNoArtwork(this)">`
+    : binderPocketNoArtwork(x);
+  return `<article class="card binderPocket ${state} ${binderUnlocked?'unlocked':''} ${cardHasArtwork(x.c)?'hasArtwork':'noArtwork'}" data-binder-card="${x.key}" data-binder-index="${globalIndex}" data-binder-key="${x.key}">
+    ${artwork}
     ${badges}${targetBadge}
     <div class="tag">#${escapeHtml(String(x.c.localId))} · ${escapeHtml(x.v.label)}</div>
     ${x.owned?'<div class="tick">✓</div>':''}
@@ -6641,7 +6677,7 @@ async function renderCustomBinderView(){
   const all=binderPositions(b),planned=all.filter(x=>!x.blank),ownedN=planned.filter(x=>x.owned).length,missing=planned.filter(x=>!x.owned).length,wish=planned.filter(x=>!x.owned&&x.wanted).length,value=binderValue(b),cover=binderCoverRow(b);
   $('#binderViewTitle').textContent=b.name;
   $('#binderViewMeta').textContent=`${ownedN}/${planned.length} owned · ${missing} missing${wish?` · ${wish} wishlisted`:''}`;
-  $('#binderViewHero').innerHTML=`${cover?`<img src="${image(cover.c,'low')}" data-fallback="${assetFallback(cover.c,'low')}" onerror="retryImage(this)" alt="">`:''}<div><b>${escapeHtml(b.name)}</b><small>${escapeHtml(b.description||'Custom collection')}</small><em>${value?`${formatTradeMoney(value)} owned reference value`:''}</em></div>`;
+  $('#binderViewHero').innerHTML=`${cover&&cardHasArtwork(cover.c)?`<img src="${binderCardImage(cover.c,'low')}" data-fallback="${assetFallback(cover.c,'low')}" onerror="showCardArtworkPlaceholder(this)" alt="">`:''}<div><b>${escapeHtml(b.name)}</b><small>${escapeHtml(b.description||'Custom collection')}</small><em>${value?`${formatTradeMoney(value)} owned reference value`:''}</em></div>`;
 
   const filtered=filteredBinderPositions(b);
   const isAll=binderPageSize==='all';
