@@ -4071,8 +4071,8 @@ body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
 </style>
 
 
-<style id="v0183a-asset-trainer">
-/* v0.18.3a: asset-backed trainer. Scene geometry is intentionally unchanged. */
+<style id="v0183b-asset-trainer">
+/* v0.18.3b: registered asset-backed trainer. Scene geometry is intentionally unchanged. */
 .trainerRigSvg{display:none!important}
 .trainerSpriteStack{
   position:absolute;
@@ -4094,9 +4094,10 @@ body[data-theme="umbreon"] .trainerEditButton{background:var(--db-panel-2)}
   user-select:none;
   -webkit-user-drag:none;
 }
-.trainerSpriteBase{z-index:1}
-.trainerSpriteHair{z-index:2}
-.trainerSpriteCap{z-index:3}
+.trainerSpriteHairRear{z-index:1}
+.trainerSpriteBase{z-index:2}
+.trainerSpriteHairFront{z-index:3}
+.trainerSpriteCap{z-index:4}
 @media (max-width:390px){
   .trainerSpriteStack{width:30.5%;left:12.5%;top:4%}
 }
@@ -5279,8 +5280,9 @@ body[data-theme="umbreon"] .trainerScenePickerHead b,body[data-theme="umbreon"] 
     <div class="trainerCardTop"><div><div class="trainerCardLabel">DEXBINDER · TRAINER CARD</div><div class="trainerCardName" id="trainerCardName">MY PROFILE</div></div><div class="trainerNo" id="trainerCardNo">TRAINER NO. 0001</div></div>
     <div class="trainerScene"><div class="trainerArt" role="img" aria-label="Trainer scene"><div class="trainerRig" aria-hidden="true">
 <div class="trainerSpriteStack" aria-hidden="true">
+  <img class="trainerSpriteHairRear" id="trainerSpriteHairRear" src="./trainer-assets/hair-long-brown-rear.svg" alt="">
   <img class="trainerSpriteBase" id="trainerSpriteBase" src="./trainer-assets/base-light-purple-brown.png" alt="">
-  <img class="trainerSpriteHair" id="trainerSpriteHair" src="./trainer-assets/hair-long-brown.png" alt="">
+  <img class="trainerSpriteHairFront" id="trainerSpriteHairFront" src="./trainer-assets/hair-long-brown-front.svg" alt="">
   <img class="trainerSpriteCap" id="trainerSpriteCap" src="./trainer-assets/cap.svg" alt="">
 </div>
 <div class="trainerPartnerSlot" aria-hidden="true"></div>
@@ -11219,11 +11221,11 @@ async function registerDexBinderServiceWorker(){
   if(!('serviceWorker' in navigator))return;
   try{
     const hadController=!!navigator.serviceWorker.controller;
-    const reg=await navigator.serviceWorker.register('./sw.js?v=0183a',{scope:'./',updateViaCache:'none'});
+    const reg=await navigator.serviceWorker.register('./sw.js?v=0183b',{scope:'./',updateViaCache:'none'});
     try{await reg.update()}catch(e){console.warn('DexBinder service worker update check skipped',e)}
     navigator.serviceWorker.addEventListener('controllerchange',()=>{
       if(!hadController)return;
-      const key='dexbinder_v0183a_controller_reload';
+      const key='dexbinder_v0183b_controller_reload';
       if(sessionStorage.getItem(key))return;
       sessionStorage.setItem(key,'1');
       location.reload();
@@ -11469,9 +11471,13 @@ function applyTrainerAppearance(){
  const outfitMap={'#8b79eb':'purple','#e27da7':'pink','#5c8fc8':'blue','#4f7c68':'green','#30354f':'charcoal'};
  const skinToken=skinMap[vals.skin]||'light',hairToken=hairMap[vals.hair]||'brown',eyeToken=eyeMap[vals.eyes]||'brown',outfitToken=outfitMap[vals.outfit]||'purple';
  const hairStyleToken=({short:'cropped',pony:'pony'})[vals.hairStyle]||vals.hairStyle||'long';
- const base=$('#trainerSpriteBase'),hair=$('#trainerSpriteHair'),cap=$('#trainerSpriteCap');
- if(base)base.src=`./trainer-assets/base-${skinToken}-${outfitToken}-${eyeToken}.png`;
- if(hair)hair.src=`./trainer-assets/hair-${hairStyleToken}-${hairToken}.png`;
+ const base=$('#trainerSpriteBase'),hairRear=$('#trainerSpriteHairRear'),hairFront=$('#trainerSpriteHairFront'),cap=$('#trainerSpriteCap');
+ const baseSrc=`./trainer-assets/base-${skinToken}-${outfitToken}-${eyeToken}.png`;
+ const rearSrc=`./trainer-assets/hair-${hairStyleToken}-${hairToken}-rear.svg`;
+ const frontSrc=`./trainer-assets/hair-${hairStyleToken}-${hairToken}-front.svg`;
+ if(base){base.onerror=()=>{base.onerror=null;base.src='./trainer-assets/base-light-purple-brown.png'};base.src=baseSrc}
+ if(hairRear){hairRear.onerror=()=>{hairRear.onerror=null;hairRear.src='./trainer-assets/hair-long-brown-rear.svg'};hairRear.src=rearSrc}
+ if(hairFront){hairFront.onerror=()=>{hairFront.onerror=null;hairFront.src='./trainer-assets/hair-long-brown-front.svg'};hairFront.src=frontSrc}
  if(cap)cap.style.display=pref.cap===false?'none':'block';
 
  const toggle=$('#trainerCapToggle');if(toggle)toggle.checked=pref.cap!==false;
